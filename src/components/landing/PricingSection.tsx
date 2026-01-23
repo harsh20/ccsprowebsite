@@ -1,36 +1,39 @@
-import { Check, Sparkles } from "lucide-react";
+import { Check, Sparkles, Clock } from "lucide-react";
 
 const plans = [
   {
-    name: "Free",
-    price: "$0",
+    name: "3-Month Bridge",
+    price: "$60",
     period: "",
-    description: "Get started with the basics",
+    description: "Get started with a short commitment",
     features: [
-      "Credential vault storage",
-      "Expiration tracking",
-      "Draft packet preview",
-      "Email reminders",
+      "Full Texas packet access",
+      "AI expiry extraction",
+      "Email & SMS alerts",
+      "3 months of access",
     ],
-    cta: "Start free",
+    cta: "Start Bridge Plan",
     highlighted: false,
+    badge: null,
   },
   {
-    name: "Pro",
+    name: "Texas Independent Tier",
     price: "$25",
     period: "/month",
-    yearlyPrice: "$216/year",
-    yearlyLabel: "Best value – save 28%",
-    description: "Full packet generation with e-signature",
+    yearlyPrice: "$270/year",
+    yearlyLabel: "Best value – save 10%",
+    description: "Everything you need for Texas credentialing",
     features: [
-      "Everything in Free",
-      "Texas packet builder",
-      "Signed PDF with e-signature",
-      "Complete audit trail",
-      "Priority support",
+      "Unlimited PDF Packet Exports",
+      "AI Expiry Extraction",
+      "CAQH Intake Screen",
+      "Multi-channel alerts (Email, SMS, Push)",
+      "Enterprise Audit Trail",
+      "HIPAA-Aligned Security",
     ],
     cta: "Go Pro",
     highlighted: true,
+    badge: "Most Popular",
   },
   {
     name: "CAQH Concierge",
@@ -46,7 +49,7 @@ const plans = [
     ],
     cta: "Add Concierge",
     highlighted: false,
-    isAddon: true,
+    badge: "Add-on",
   },
 ];
 
@@ -59,7 +62,7 @@ export function PricingSection() {
             Simple, transparent pricing
           </h2>
           <p className="text-lg text-muted-foreground">
-            Start free, upgrade when you need signed packets
+            One plan. Everything included. Built for Texas independent providers.
           </p>
         </div>
 
@@ -73,18 +76,16 @@ export function PricingSection() {
                   : ""
               }`}
             >
-              {plan.highlighted && (
+              {plan.badge && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <div className="flex items-center gap-1 bg-primary text-primary-foreground text-xs font-medium px-3 py-1 rounded-full">
-                    <Sparkles className="h-3 w-3" />
-                    Most Popular
-                  </div>
-                </div>
-              )}
-              {plan.isAddon && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <div className="bg-muted text-muted-foreground text-xs font-medium px-3 py-1 rounded-full">
-                    Add-on
+                  <div className={`flex items-center gap-1 text-xs font-medium px-3 py-1 rounded-full ${
+                    plan.highlighted 
+                      ? "bg-primary text-primary-foreground" 
+                      : "bg-muted text-muted-foreground"
+                  }`}>
+                    {plan.highlighted && <Sparkles className="h-3 w-3" />}
+                    {plan.badge === "Add-on" && <Clock className="h-3 w-3" />}
+                    {plan.badge}
                   </div>
                 </div>
               )}

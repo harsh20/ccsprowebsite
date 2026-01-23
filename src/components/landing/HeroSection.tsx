@@ -1,4 +1,4 @@
-import { ArrowRight, CheckCircle, FileText, Clock, Shield } from "lucide-react";
+import { ArrowRight, CheckCircle, FileText, Clock, Shield, Sparkles } from "lucide-react";
 
 export function HeroSection() {
   return (
@@ -9,18 +9,18 @@ export function HeroSection() {
           <div className="space-y-8">
             <div className="space-y-4">
               <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl text-balance">
-                Credentialing packets for US providers,{" "}
-                <span className="text-primary">ready to submit</span>
+                Automated Credentialing Packets for{" "}
+                <span className="text-primary">Texas Independent Providers</span>
               </h1>
               <p className="text-lg text-muted-foreground sm:text-xl max-w-xl">
-                Store credentials once, track expirations, generate a structured Texas packet as PDF. Pro includes signed PDF via e-signature. Add CAQH Concierge for done-for-you updates.
+                Complete your Texas-specific profile, track expiries with AI, and generate submission-ready packets in minutes. All for $25/month.
               </p>
             </div>
 
             {/* CTAs */}
             <div className="flex flex-wrap gap-4 items-center">
               <a href="#pricing" className="btn-primary text-base px-8 py-4">
-                Start free
+                Start My Texas Profile for Free
                 <ArrowRight className="h-4 w-4" />
               </a>
               <a href="#sample" className="btn-secondary text-base">
@@ -38,12 +38,12 @@ export function HeroSection() {
                 All documents stored in the US
               </span>
               <span className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-primary" />
-                Texas live now
+                <Sparkles className="h-4 w-4 text-primary" />
+                AI-powered extraction
               </span>
               <span className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-primary" />
-                More states rolling out
+                <CheckCircle className="h-4 w-4 text-primary" />
+                Texas live now
               </span>
             </div>
           </div>
@@ -82,38 +82,47 @@ export function HeroSection() {
                   </div>
                 </div>
 
-                {/* Expiry Tracking */}
+                {/* Readiness States */}
                 <div className="space-y-3">
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Expiration Tracking</p>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between rounded-lg border border-border bg-background px-3 py-2">
-                      <span className="text-sm">TX Medical License</span>
-                      <span className="text-xs font-medium text-primary">Expires in 45 days</span>
-                    </div>
-                    <div className="flex items-center justify-between rounded-lg border border-border bg-background px-3 py-2">
-                      <span className="text-sm">Malpractice COI</span>
-                      <span className="text-xs font-medium text-muted-foreground">Expires in 120 days</span>
-                    </div>
-                    <div className="flex items-center justify-between rounded-lg border border-orange-200 bg-orange-50 px-3 py-2">
-                      <span className="text-sm">DEA Certificate</span>
-                      <span className="text-xs font-medium text-orange-600">Optional</span>
-                    </div>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Readiness States</p>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium bg-red-100 text-red-700">
+                      <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
+                      Missing
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium bg-blue-100 text-blue-700">
+                      <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+                      Uploaded
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium bg-orange-100 text-orange-700">
+                      <span className="h-1.5 w-1.5 rounded-full bg-orange-500" />
+                      Expiring Soon
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium bg-gray-100 text-gray-700">
+                      <span className="h-1.5 w-1.5 rounded-full bg-gray-500" />
+                      Expired
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium bg-green-100 text-green-700">
+                      <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                      Complete
+                    </span>
                   </div>
                 </div>
 
-                {/* Missing Items */}
-                <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-2">
-                  <p className="text-xs font-medium text-muted-foreground">Missing Items (2)</p>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    <li className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-orange-500" />
-                      Work history verification
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-orange-500" />
-                      Board certification upload
-                    </li>
-                  </ul>
+                {/* Expiry Tracking */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between rounded-lg border border-green-200 bg-green-50 px-3 py-2">
+                    <span className="text-sm">TX Medical License</span>
+                    <span className="text-xs font-medium text-green-600">Complete</span>
+                  </div>
+                  <div className="flex items-center justify-between rounded-lg border border-orange-200 bg-orange-50 px-3 py-2">
+                    <span className="text-sm">Malpractice COI</span>
+                    <span className="text-xs font-medium text-orange-600">Expiring in 45 days</span>
+                  </div>
+                  <div className="flex items-center justify-between rounded-lg border border-red-200 bg-red-50 px-3 py-2">
+                    <span className="text-sm">DEA Certificate</span>
+                    <span className="text-xs font-medium text-red-600">Missing</span>
+                  </div>
                 </div>
 
                 {/* Action Buttons */}

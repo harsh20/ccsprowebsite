@@ -1,40 +1,40 @@
-import { Vault, Wand2, FileText, PenTool, Activity, Headphones } from "lucide-react";
+import { Vault, Sparkles, FileText, Bell, History, UserCheck } from "lucide-react";
 
 const features = [
   {
     icon: Vault,
     title: "Credential vault with expiry tracking",
-    description: "Store all licenses, certifications, and documents with automatic expiration alerts.",
+    description: "Store all licenses, certifications, and documents with automatic expiration alerts powered by AI extraction.",
     link: "#",
   },
   {
-    icon: Wand2,
-    title: "Smart data capture",
-    description: "Enter once, reuse everywhere. No more re-typing the same information.",
+    icon: Sparkles,
+    title: "AI-powered data capture",
+    description: "Our AI/OCR pipeline automatically extracts issue and expiry dates from uploaded documents.",
     link: "#",
   },
   {
     icon: FileText,
     title: "Texas packet builder",
-    description: "Structured PDF output matching payer and facility requirements.",
+    description: "Generate professionally formatted, submission-ready PDF packets with cover pages and organized sections.",
     link: "#",
   },
   {
-    icon: PenTool,
-    title: "Signed PDF export",
-    description: "Pro feature with e-signature and complete audit trail.",
+    icon: UserCheck,
+    title: "CAQH Done-For-You",
+    description: "Secure intake for CAQH ProView credentials with encryption at rest. We handle the updates.",
     link: "#",
   },
   {
-    icon: Activity,
-    title: "Activity log and notifications",
-    description: "Track every change with email notifications for complete transparency.",
+    icon: Bell,
+    title: "Multi-Channel Alerts",
+    description: "Expiry reminders delivered via Email, SMS, and Push notifications. Never miss a deadline.",
     link: "#",
   },
   {
-    icon: Headphones,
-    title: "Concierge option",
-    description: "Done-for-you CAQH updates with your choice of consent model.",
+    icon: History,
+    title: "Enterprise Audit Trail",
+    description: "Immutable, append-only logs of every field change and document access for forensic integrity.",
     link: "#",
   },
 ];
@@ -48,7 +48,7 @@ export function FeaturesGrid() {
             What's included
           </h2>
           <p className="text-lg text-muted-foreground">
-            Everything you need to manage credentials and generate compliant packets
+            Everything you need to manage credentials and generate submission-ready packets
           </p>
         </div>
 
