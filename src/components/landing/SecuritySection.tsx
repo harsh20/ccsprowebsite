@@ -1,19 +1,21 @@
 import { Shield, Lock, Users, Activity, Database, ArrowRight, KeyRound, Layers } from "lucide-react";
+import { securityContent } from "@/content/landing";
+import { SecurityFeature } from "./shared/Cards";
 
-const securityFeatures = [
-  { icon: Shield, text: "Documents stored in the United States" },
-  { icon: Lock, text: "AES-256 Encryption for all sensitive PII and credentialing data" },
-  { icon: KeyRound, text: "Mandatory Multi-Factor Authentication (MFA) with no opt-out" },
-  { icon: Layers, text: "Strict Tenant Isolation at the data layer" },
-  { icon: Users, text: "Role-based access controls" },
-  { icon: Activity, text: "Immutable audit trail and activity logs" },
-  { icon: Database, text: "Backups and retention controls" },
-];
+const iconMap = {
+  Shield,
+  Lock,
+  Users,
+  Activity,
+  Database,
+  KeyRound,
+  Layers,
+};
 
 export function SecuritySection() {
   return (
-    <section id="security" className="section-spacing bg-background">
-      <div className="section-container">
+    <section id="security" className="py-16 sm:py-20 lg:py-24 bg-background">
+      <div className="container mx-auto px-4">
         <div className="card-elevated p-8 sm:p-12 lg:p-16 bg-gradient-to-br from-primary/5 to-transparent">
           <div className="grid gap-8 lg:grid-cols-2 items-center">
             {/* Content */}
@@ -21,32 +23,28 @@ export function SecuritySection() {
               <div className="space-y-4">
                 <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
                   <Shield className="h-4 w-4" />
-                  HIPAA-Aligned Security
+                  {securityContent.badge}
                 </div>
                 <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
-                  Your data, protected
+                  {securityContent.sectionTitle}
                 </h2>
                 <p className="text-lg text-muted-foreground max-w-md">
-                  We understand you're trusting us with sensitive documents. Here's how we protect them with enterprise-grade security.
+                  {securityContent.sectionSubtitle}
                 </p>
               </div>
 
               <div className="space-y-4">
-                {securityFeatures.map((feature, index) => (
-                  <div key={index} className="flex items-center gap-4">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                      <feature.icon className="h-5 w-5 text-primary" />
-                    </div>
-                    <span className="text-foreground font-medium">{feature.text}</span>
-                  </div>
-                ))}
+                {securityContent.features.map((feature, index) => {
+                  const Icon = iconMap[feature.icon as keyof typeof iconMap];
+                  return <SecurityFeature key={index} icon={Icon} text={feature.text} />;
+                })}
               </div>
 
               <a
-                href="#"
+                href={securityContent.cta.href}
                 className="inline-flex items-center gap-2 text-primary font-medium hover:underline"
               >
-                View security details
+                {securityContent.cta.label}
                 <ArrowRight className="h-4 w-4" />
               </a>
             </div>
@@ -62,15 +60,20 @@ export function SecuritySection() {
                   </div>
                 </div>
                 {/* Floating badges */}
-                <div className="absolute -top-2 -right-4 bg-background rounded-lg shadow-lg px-3 py-2 text-xs font-medium">
-                  AES-256 Encryption
-                </div>
-                <div className="absolute bottom-4 -left-8 bg-background rounded-lg shadow-lg px-3 py-2 text-xs font-medium">
-                  Mandatory MFA
-                </div>
-                <div className="absolute top-1/2 -right-12 bg-background rounded-lg shadow-lg px-3 py-2 text-xs font-medium">
-                  Tenant Isolation
-                </div>
+                {securityContent.floatingBadges.map((badge, index) => (
+                  <div
+                    key={index}
+                    className={`absolute bg-background rounded-lg shadow-lg px-3 py-2 text-xs font-medium ${
+                      index === 0
+                        ? "-top-2 -right-4"
+                        : index === 1
+                        ? "bottom-4 -left-8"
+                        : "top-1/2 -right-12"
+                    }`}
+                  >
+                    {badge}
+                  </div>
+                ))}
               </div>
             </div>
           </div>

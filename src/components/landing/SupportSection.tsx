@@ -1,53 +1,49 @@
 import { MessageSquare, Mail, Clock, ExternalLink } from "lucide-react";
+import { supportContent } from "@/content/landing";
+import { SupportFeatureBadge, SectionHeader } from "./shared/Cards";
 
-const supportFeatures = [
-  { icon: MessageSquare, text: "Chat support" },
-  { icon: Mail, text: "Email support" },
-  { icon: Clock, text: "24/7 availability" },
-];
+const iconMap = {
+  MessageSquare,
+  Mail,
+  Clock,
+};
 
 export function SupportSection() {
   return (
-    <section className="section-spacing section-tinted">
-      <div className="section-container">
+    <section className="py-16 sm:py-20 lg:py-24 section-tinted">
+      <div className="container mx-auto px-4">
         <div className="max-w-3xl mx-auto text-center space-y-8">
           <div className="space-y-4">
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
-              We're here when you need us
+              {supportContent.sectionTitle}
             </h2>
             <p className="text-lg text-muted-foreground">
-              15-minute response target for critical issues like login failures and packet generation.
+              {supportContent.sectionSubtitle}
             </p>
           </div>
 
           <div className="flex flex-wrap justify-center gap-6">
-            {supportFeatures.map((feature, index) => (
-              <div
-                key={index}
-                className="flex items-center gap-3 px-6 py-4 bg-background rounded-xl shadow-sm"
-              >
-                <feature.icon className="h-5 w-5 text-primary" />
-                <span className="font-medium text-foreground">{feature.text}</span>
-              </div>
-            ))}
+            {supportContent.features.map((feature, index) => {
+              const Icon = iconMap[feature.icon as keyof typeof iconMap];
+              return <SupportFeatureBadge key={index} icon={Icon} text={feature.text} />;
+            })}
           </div>
 
           <div className="flex flex-wrap justify-center gap-4">
-            <a
-              href="#"
-              className="inline-flex items-center gap-2 text-primary font-medium hover:underline"
-            >
-              Help Center
-              <ExternalLink className="h-4 w-4" />
-            </a>
-            <span className="text-muted-foreground">•</span>
-            <a
-              href="#"
-              className="inline-flex items-center gap-2 text-primary font-medium hover:underline"
-            >
-              Status Page
-              <ExternalLink className="h-4 w-4" />
-            </a>
+            {supportContent.links.map((link, index) => (
+              <span key={index}>
+                <a
+                  href={link.href}
+                  className="inline-flex items-center gap-2 text-primary font-medium hover:underline"
+                >
+                  {link.label}
+                  <ExternalLink className="h-4 w-4" />
+                </a>
+                {index < supportContent.links.length - 1 && (
+                  <span className="ml-4 text-muted-foreground">•</span>
+                )}
+              </span>
+            ))}
           </div>
         </div>
       </div>

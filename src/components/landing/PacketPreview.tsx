@@ -1,26 +1,15 @@
 import { FileText, CheckCircle, Download } from "lucide-react";
-
-const packetItems = [
-  "Provider profile & demographics",
-  "State licenses & IDs",
-  "Malpractice COI documentation",
-  "Board certifications",
-  "Work history verification",
-  "Required attestations",
-];
+import { packetPreviewContent } from "@/content/landing";
+import { SectionHeader } from "./shared/Cards";
 
 export function PacketPreview() {
   return (
-    <section id="sample" className="section-spacing bg-background">
-      <div className="section-container">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-            Sample Texas packet preview
-          </h2>
-          <p className="text-lg text-muted-foreground">
-            See exactly what a structured credentialing packet includes
-          </p>
-        </div>
+    <section id="sample" className="py-16 sm:py-20 lg:py-24 bg-background">
+      <div className="container mx-auto px-4">
+        <SectionHeader
+          title={packetPreviewContent.sectionTitle}
+          subtitle={packetPreviewContent.sectionSubtitle}
+        />
 
         <div className="grid gap-8 lg:grid-cols-2 items-start">
           {/* PDF Viewer Mock */}
@@ -30,7 +19,7 @@ export function PacketPreview() {
               <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/30">
                 <div className="flex items-center gap-2">
                   <FileText className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-medium">Texas_Credential_Packet_Sample.pdf</span>
+                  <span className="text-sm font-medium">{packetPreviewContent.fileName}</span>
                 </div>
                 <button className="btn-ghost text-xs py-1 px-2">
                   <Download className="h-3 w-3 mr-1" />
@@ -41,10 +30,7 @@ export function PacketPreview() {
               {/* PDF Pages Mock */}
               <div className="p-6 space-y-4 bg-muted/20">
                 {[1, 2, 3].map((page) => (
-                  <div
-                    key={page}
-                    className="bg-background rounded-lg shadow-sm p-6 space-y-3"
-                  >
+                  <div key={page} className="bg-background rounded-lg shadow-sm p-6 space-y-3">
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <span>Page {page}</span>
                       <span className="text-muted-foreground/50">|</span>
@@ -79,11 +65,8 @@ export function PacketPreview() {
                 What's included in the packet
               </h3>
               <div className="space-y-3">
-                {packetItems.map((item, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-3 p-3 rounded-lg bg-muted/30"
-                  >
+                {packetPreviewContent.checklist.map((item, index) => (
+                  <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
                     <span className="text-foreground">{item}</span>
                   </div>
@@ -91,8 +74,8 @@ export function PacketPreview() {
               </div>
             </div>
 
-            <a href="#pricing" className="btn-primary inline-flex">
-              Start free to generate your packet
+            <a href={packetPreviewContent.cta.href} className="btn-primary inline-flex">
+              {packetPreviewContent.cta.label}
             </a>
           </div>
         </div>

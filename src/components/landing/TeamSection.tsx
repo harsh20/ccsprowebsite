@@ -1,49 +1,34 @@
 import { Shield, Briefcase } from "lucide-react";
+import { teamContent } from "@/content/landing";
+import { TeamMemberCard, SectionHeader } from "./shared/Cards";
 
-const team = [
-  {
-    name: "David",
-    role: "Operations & Security",
-    icon: Shield,
-    bio: "Ex-US Air Force. Brings an operations mindset focused on reliability and security.",
-  },
-  {
-    name: "Skeeter",
-    role: "Advisor",
-    icon: Briefcase,
-    bio: "Strategic advisor supporting product direction.",
-  },
-];
+const iconMap = {
+  Shield,
+  Briefcase,
+};
 
 export function TeamSection() {
   return (
-    <section className="section-spacing bg-background">
-      <div className="section-container">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-            The team behind CCS Pro
-          </h2>
-          <p className="text-lg text-muted-foreground">
-            Built by people who understand credentialing
-          </p>
-        </div>
+    <section className="py-16 sm:py-20 lg:py-24 bg-background">
+      <div className="container mx-auto px-4">
+        <SectionHeader
+          title={teamContent.sectionTitle}
+          subtitle={teamContent.sectionSubtitle}
+        />
 
         <div className="grid gap-6 sm:grid-cols-2 max-w-2xl mx-auto">
-          {team.map((member, index) => (
-            <div
-              key={index}
-              className="card-elevated p-6 text-center space-y-4"
-            >
-              <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                <member.icon className="h-8 w-8 text-primary" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-foreground text-lg">{member.name}</h3>
-                <p className="text-sm text-primary">{member.role}</p>
-              </div>
-              <p className="text-sm text-muted-foreground">{member.bio}</p>
-            </div>
-          ))}
+          {teamContent.members.map((member, index) => {
+            const Icon = iconMap[member.icon as keyof typeof iconMap];
+            return (
+              <TeamMemberCard
+                key={index}
+                name={member.name}
+                role={member.role}
+                bio={member.bio}
+                icon={Icon}
+              />
+            );
+          })}
         </div>
       </div>
     </section>
