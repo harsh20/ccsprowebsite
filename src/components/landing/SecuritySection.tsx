@@ -1,10 +1,12 @@
-import { Shield, Lock, Users, Activity, Database, ArrowRight } from "lucide-react";
+import { Shield, Lock, Users, Activity, Database, ArrowRight, KeyRound, Layers } from "lucide-react";
 
 const securityFeatures = [
   { icon: Shield, text: "Documents stored in the United States" },
-  { icon: Lock, text: "Encryption in transit and at rest" },
+  { icon: Lock, text: "AES-256 Encryption for all sensitive PII and credentialing data" },
+  { icon: KeyRound, text: "Mandatory Multi-Factor Authentication (MFA) with no opt-out" },
+  { icon: Layers, text: "Strict Tenant Isolation at the data layer" },
   { icon: Users, text: "Role-based access controls" },
-  { icon: Activity, text: "Audit trail and activity logs" },
+  { icon: Activity, text: "Immutable audit trail and activity logs" },
   { icon: Database, text: "Backups and retention controls" },
 ];
 
@@ -19,13 +21,13 @@ export function SecuritySection() {
               <div className="space-y-4">
                 <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
                   <Shield className="h-4 w-4" />
-                  Security & Privacy
+                  HIPAA-Aligned Security
                 </div>
                 <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
                   Your data, protected
                 </h2>
                 <p className="text-lg text-muted-foreground max-w-md">
-                  We understand you're trusting us with sensitive documents. Here's how we protect them.
+                  We understand you're trusting us with sensitive documents. Here's how we protect them with enterprise-grade security.
                 </p>
               </div>
 
@@ -61,10 +63,13 @@ export function SecuritySection() {
                 </div>
                 {/* Floating badges */}
                 <div className="absolute -top-2 -right-4 bg-background rounded-lg shadow-lg px-3 py-2 text-xs font-medium">
-                  US Storage Only
+                  AES-256 Encryption
                 </div>
                 <div className="absolute bottom-4 -left-8 bg-background rounded-lg shadow-lg px-3 py-2 text-xs font-medium">
-                  256-bit Encryption
+                  Mandatory MFA
+                </div>
+                <div className="absolute top-1/2 -right-12 bg-background rounded-lg shadow-lg px-3 py-2 text-xs font-medium">
+                  Tenant Isolation
                 </div>
               </div>
             </div>

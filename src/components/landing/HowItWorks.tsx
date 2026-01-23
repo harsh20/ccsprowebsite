@@ -1,23 +1,23 @@
-import { UserPlus, Clock, FileOutput } from "lucide-react";
+import { ClipboardCheck, Sparkles, FileOutput } from "lucide-react";
 
 const steps = [
   {
-    icon: UserPlus,
+    icon: ClipboardCheck,
     step: "01",
-    title: "Add your profile and upload credentials",
-    description: "Enter your information once. Upload licenses, certifications, and supporting documents.",
+    title: "Texas-Calibrated Profile Build",
+    description: "Complete your profile with field-level validation tailored specifically to Texas credentialing standards. Our readiness engine scores your progress in real-time.",
   },
   {
-    icon: Clock,
+    icon: Sparkles,
     step: "02",
-    title: "Track expirations with reminders",
-    description: "Get notified before licenses, COIs, and certifications expire.",
+    title: "AI-Powered Expiry Detection",
+    description: "Securely upload your files. Our AI/OCR pipeline automatically extracts issue and expiry dates, mapping them to five distinct readiness states.",
   },
   {
     icon: FileOutput,
     step: "03",
-    title: "Generate your Texas packet as PDF",
-    description: "Download a structured packet. Sign it with e-signature in Pro.",
+    title: "One-Click Packet Assembly",
+    description: "Generate professionally formatted, submission-ready PDF packets instantly, complete with cover pages and organized sections.",
   },
 ];
 
@@ -30,7 +30,7 @@ export function HowItWorks() {
             How it works
           </h2>
           <p className="text-lg text-muted-foreground">
-            Three simple steps to a complete credentialing packet
+            Three simple steps to a submission-ready credentialing packet
           </p>
         </div>
 
@@ -58,10 +58,17 @@ export function HowItWorks() {
           ))}
         </div>
 
-        {/* Note */}
-        <p className="text-center text-sm text-muted-foreground mt-8">
-          <span className="font-medium">Pro tip:</span> Draft packet preview available even if incomplete
-        </p>
+        {/* Readiness States Note */}
+        <div className="mt-8 p-4 bg-muted/50 rounded-xl">
+          <p className="text-center text-sm text-muted-foreground">
+            <span className="font-medium text-foreground">5 Readiness States:</span>{" "}
+            <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-red-500" /> Missing</span> •{" "}
+            <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-blue-500" /> Uploaded</span> •{" "}
+            <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-orange-500" /> Expiring Soon</span> •{" "}
+            <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-gray-500" /> Expired</span> •{" "}
+            <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-green-500" /> Complete</span>
+          </p>
+        </div>
       </div>
     </section>
   );
