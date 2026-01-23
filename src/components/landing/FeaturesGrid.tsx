@@ -1,76 +1,38 @@
-import { Vault, Sparkles, FileText, Bell, History, UserCheck } from "lucide-react";
+import { Vault, Sparkles, FileText, UserCheck, Bell, History } from "lucide-react";
+import { featuresContent } from "@/content/landing";
+import { FeatureCard, SectionHeader } from "./shared/Cards";
 
-const features = [
-  {
-    icon: Vault,
-    title: "Credential vault with expiry tracking",
-    description: "Store all licenses, certifications, and documents with automatic expiration alerts powered by AI extraction.",
-    link: "#",
-  },
-  {
-    icon: Sparkles,
-    title: "AI-powered data capture",
-    description: "Our AI/OCR pipeline automatically extracts issue and expiry dates from uploaded documents.",
-    link: "#",
-  },
-  {
-    icon: FileText,
-    title: "Texas packet builder",
-    description: "Generate professionally formatted, submission-ready PDF packets with cover pages and organized sections.",
-    link: "#",
-  },
-  {
-    icon: UserCheck,
-    title: "CAQH Done-For-You",
-    description: "Secure intake for CAQH ProView credentials with encryption at rest. We handle the updates.",
-    link: "#",
-  },
-  {
-    icon: Bell,
-    title: "Multi-Channel Alerts",
-    description: "Expiry reminders delivered via Email, SMS, and Push notifications. Never miss a deadline.",
-    link: "#",
-  },
-  {
-    icon: History,
-    title: "Enterprise Audit Trail",
-    description: "Immutable, append-only logs of every field change and document access for forensic integrity.",
-    link: "#",
-  },
-];
+const iconMap = {
+  Vault,
+  Sparkles,
+  FileText,
+  UserCheck,
+  Bell,
+  History,
+};
 
 export function FeaturesGrid() {
   return (
-    <section id="product" className="section-spacing section-tinted">
-      <div className="section-container">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-            What's included
-          </h2>
-          <p className="text-lg text-muted-foreground">
-            Everything you need to manage credentials and generate submission-ready packets
-          </p>
-        </div>
+    <section id="product" className="py-16 sm:py-20 lg:py-24 section-tinted">
+      <div className="container mx-auto px-4">
+        <SectionHeader
+          title={featuresContent.sectionTitle}
+          subtitle={featuresContent.sectionSubtitle}
+        />
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((feature, index) => (
-            <div
-              key={index}
-              className="card-elevated card-hover p-6 space-y-4"
-            >
-              <div className="icon-box">
-                <feature.icon className="h-5 w-5" />
-              </div>
-              <h3 className="font-semibold text-foreground">{feature.title}</h3>
-              <p className="text-sm text-muted-foreground">{feature.description}</p>
-              <a
-                href={feature.link}
-                className="inline-flex items-center text-sm font-medium text-primary hover:underline"
-              >
-                Learn more →
-              </a>
-            </div>
-          ))}
+          {featuresContent.features.map((feature, index) => {
+            const Icon = iconMap[feature.icon as keyof typeof iconMap];
+            return (
+              <FeatureCard
+                key={index}
+                icon={Icon}
+                title={feature.title}
+                description={feature.description}
+                link={feature.link}
+              />
+            );
+          })}
         </div>
       </div>
     </section>

@@ -1,49 +1,54 @@
-import { ArrowRight, CheckCircle, FileText, Clock, Shield, Sparkles } from "lucide-react";
+import { ArrowRight, CheckCircle, FileText, Shield, Sparkles } from "lucide-react";
+import { heroContent, heroDashboard } from "@/content/landing";
+import { ReadinessStatePill } from "./shared/Cards";
 
 export function HeroSection() {
   return (
     <section className="section-tinted overflow-hidden">
-      <div className="section-container py-12 sm:py-16 lg:py-20">
+      <div className="container mx-auto px-4 py-12 sm:py-16 lg:py-20">
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
           {/* Left Column - Copy */}
           <div className="space-y-8">
             <div className="space-y-4">
               <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl text-balance">
-                Automated Credentialing Packets for{" "}
-                <span className="text-primary">Texas Independent Providers</span>
+                {heroContent.headline}{" "}
+                <span className="text-primary">{heroContent.headlineHighlight}</span>
               </h1>
               <p className="text-lg text-muted-foreground sm:text-xl max-w-xl">
-                Complete your Texas-specific profile, track expiries with AI, and generate submission-ready packets in minutes. All for $25/month.
+                {heroContent.subheadline}
               </p>
             </div>
 
             {/* CTAs */}
             <div className="flex flex-wrap gap-4 items-center">
-              <a href="#pricing" className="btn-primary text-base px-8 py-4">
-                Start My Texas Profile for Free
+              <a href={heroContent.primaryCta.href} className="btn-primary text-base px-8 py-4">
+                {heroContent.primaryCta.label}
                 <ArrowRight className="h-4 w-4" />
               </a>
-              <a href="#sample" className="btn-secondary text-base">
-                View sample Texas packet
+              <a href={heroContent.secondaryCta.href} className="btn-secondary text-base">
+                {heroContent.secondaryCta.label}
               </a>
             </div>
-            <a href="#demo" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
-              Book a demo →
+            <a
+              href={heroContent.tertiaryCta.href}
+              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+            >
+              {heroContent.tertiaryCta.label}
             </a>
 
             {/* Trust Line */}
             <div className="flex flex-wrap gap-4 text-sm text-muted-foreground pt-4 border-t border-border/50">
               <span className="flex items-center gap-2">
                 <Shield className="h-4 w-4 text-primary" />
-                All documents stored in the US
+                {heroContent.trustIndicators[0].text}
               </span>
               <span className="flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-primary" />
-                AI-powered extraction
+                {heroContent.trustIndicators[1].text}
               </span>
               <span className="flex items-center gap-2">
                 <CheckCircle className="h-4 w-4 text-primary" />
-                Texas live now
+                {heroContent.trustIndicators[2].text}
               </span>
             </div>
           </div>
@@ -59,11 +64,11 @@ export function HeroSection() {
                       <FileText className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <p className="font-semibold text-foreground">Credential Packet</p>
-                      <p className="text-sm text-muted-foreground">Texas Requirements</p>
+                      <p className="font-semibold text-foreground">{heroDashboard.title}</p>
+                      <p className="text-sm text-muted-foreground">{heroDashboard.subtitle}</p>
                     </div>
                   </div>
-                  <div className="badge-pill">92% Complete</div>
+                  <div className="badge-pill">{heroDashboard.completionPercent}% Complete</div>
                 </div>
 
                 {/* State & NPI */}
@@ -71,67 +76,69 @@ export function HeroSection() {
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-muted-foreground">State</label>
                     <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2">
-                      <span className="text-sm font-medium">Texas</span>
+                      <span className="text-sm font-medium">{heroDashboard.stateValue}</span>
                     </div>
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-muted-foreground">NPI Number</label>
                     <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2">
-                      <span className="text-sm font-medium">1234567890</span>
+                      <span className="text-sm font-medium">{heroDashboard.npiValue}</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Readiness States */}
                 <div className="space-y-3">
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Readiness States</p>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                    Readiness States
+                  </p>
                   <div className="flex flex-wrap gap-2">
-                    <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium bg-red-100 text-red-700">
-                      <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
-                      Missing
-                    </span>
-                    <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium bg-blue-100 text-blue-700">
-                      <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
-                      Uploaded
-                    </span>
-                    <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium bg-orange-100 text-orange-700">
-                      <span className="h-1.5 w-1.5 rounded-full bg-orange-500" />
-                      Expiring Soon
-                    </span>
-                    <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium bg-gray-100 text-gray-700">
-                      <span className="h-1.5 w-1.5 rounded-full bg-gray-500" />
-                      Expired
-                    </span>
-                    <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium bg-green-100 text-green-700">
-                      <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
-                      Complete
-                    </span>
+                    {heroDashboard.readinessStates.map((state, index) => (
+                      <ReadinessStatePill
+                        key={index}
+                        label={state.label}
+                        color={state.color as "red" | "blue" | "orange" | "gray" | "green"}
+                      />
+                    ))}
                   </div>
                 </div>
 
-                {/* Expiry Tracking */}
+                {/* Document Status */}
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between rounded-lg border border-green-200 bg-green-50 px-3 py-2">
-                    <span className="text-sm">TX Medical License</span>
-                    <span className="text-xs font-medium text-green-600">Complete</span>
-                  </div>
-                  <div className="flex items-center justify-between rounded-lg border border-orange-200 bg-orange-50 px-3 py-2">
-                    <span className="text-sm">Malpractice COI</span>
-                    <span className="text-xs font-medium text-orange-600">Expiring in 45 days</span>
-                  </div>
-                  <div className="flex items-center justify-between rounded-lg border border-red-200 bg-red-50 px-3 py-2">
-                    <span className="text-sm">DEA Certificate</span>
-                    <span className="text-xs font-medium text-red-600">Missing</span>
-                  </div>
+                  {heroDashboard.documents.map((doc, index) => (
+                    <div
+                      key={index}
+                      className={`flex items-center justify-between rounded-lg border px-3 py-2 ${
+                        doc.statusColor === "green"
+                          ? "border-green-200 bg-green-50"
+                          : doc.statusColor === "orange"
+                          ? "border-orange-200 bg-orange-50"
+                          : "border-red-200 bg-red-50"
+                      }`}
+                    >
+                      <span className="text-sm">{doc.name}</span>
+                      <span
+                        className={`text-xs font-medium ${
+                          doc.statusColor === "green"
+                            ? "text-green-600"
+                            : doc.statusColor === "orange"
+                            ? "text-orange-600"
+                            : "text-red-600"
+                        }`}
+                      >
+                        {doc.status}
+                      </span>
+                    </div>
+                  ))}
                 </div>
 
                 {/* Action Buttons */}
                 <div className="grid grid-cols-2 gap-3">
                   <button className="btn-secondary text-sm py-2.5">
-                    Generate Packet PDF
+                    {heroDashboard.buttons.secondary}
                   </button>
                   <button className="btn-primary text-sm py-2.5">
-                    Generate Signed PDF
+                    {heroDashboard.buttons.primary}
                   </button>
                 </div>
               </div>
