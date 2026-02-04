@@ -9,7 +9,9 @@ import ComingSoon from "./pages/ComingSoon";
 
 const queryClient = new QueryClient();
 
-const isComingSoon = import.meta.env.VITE_COMING_SOON === "true";
+// Coming soon: set VITE_COMING_SOON=true in Vercel env vars, then redeploy (build bakes it in)
+const isComingSoon =
+  String(import.meta.env.VITE_COMING_SOON ?? "").toLowerCase().trim() === "true";
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
