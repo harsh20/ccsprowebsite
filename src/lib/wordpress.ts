@@ -64,10 +64,11 @@ export interface SiteConfigResponse {
  * Fetch site config (e.g. coming soon mode). Used at runtime so the flag can be toggled from WordPress without redeploying.
  */
 export async function getSiteConfig(): Promise<SiteConfigResponse> {
-  const url = `${WP_API_URL}/ccspro/v1/site-config`;
+  const url = `${WP_API_URL}/ccspro/v1/site-config?t=${Date.now()}`;
   const response = await fetch(url, {
     method: "GET",
     headers: { Accept: "application/json" },
+    cache: "no-store",
   });
   if (!response.ok) {
     return { comingSoon: false };

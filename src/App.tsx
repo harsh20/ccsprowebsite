@@ -15,18 +15,26 @@ const queryClient = new QueryClient();
 const buildTimeComingSoon =
   String(import.meta.env.VITE_COMING_SOON ?? "").toLowerCase().trim() === "true";
 
+const SITE_CONFIG_TIMEOUT_MS = 8000;
+
 const App = () => {
   const [comingSoon, setComingSoon] = useState<boolean | null>(null);
 
   useEffect(() => {
+    const timeout = setTimeout(() => {
+      setComingSoon((prev) => (prev === null ? false : prev));
+    }, SITE_CONFIG_TIMEOUT_MS);
+
     getSiteConfig()
       .then((config) => setComingSoon(config.comingSoon))
-      .catch(() => setComingSoon(false));
+      .catch(() => setComingSoon(false))
+      .finally(() => clearTimeout(timeout));
+
+    return () => clearTimeout(timeout);
   }, []);
 
-  // While loading: use build-time value so Vercel env still works; if no build-time value, show full site (don't flash coming soon)
-  const showComingSoon =
-    comingSoon === true || (comingSoon === null && buildTimeComingSoon);
+  // Show Coming Soon while loading (null) or when API says true; show full site only when API says false or after timeout/failure
+  const showComingSoon = comingSoon !== false;
 
   return (
     <QueryClientProvider client={queryClient}>
