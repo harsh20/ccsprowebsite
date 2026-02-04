@@ -487,3 +487,26 @@ export const footerContent = {
   },
   copyright: "CCS Pro. All rights reserved.",
 };
+
+/** Static fallback when WordPress API is unavailable. Matches LandingPageContent shape. */
+export const defaultLandingPageContent = {
+  siteConfig,
+  navLinks,
+  navCtas,
+  heroContent,
+  heroDashboard,
+  verificationContent,
+  founderContent,
+  problemOutcomeContent,
+  howItWorksContent,
+  featuresContent,
+  packetPreviewContent,
+  securityContent,
+  caqhConciergeContent,
+  pricingContent,
+  supportContent,
+  teamContent,
+  faqContent,
+  finalCtaContent,
+  footerContent,
+} as const;

@@ -1,18 +1,15 @@
-import { Shield, Lock, Users, Activity, Database, ArrowRight, KeyRound, Layers } from "lucide-react";
+import { Shield, ArrowRight } from "lucide-react";
 import { securityContent } from "@/content/landing";
+import { getLandingIcon } from "@/lib/landing-icons";
 import { SecurityFeature } from "./shared/Cards";
+import type { LandingPageContent } from "@/types/wordpress";
 
-const iconMap = {
-  Shield,
-  Lock,
-  Users,
-  Activity,
-  Database,
-  KeyRound,
-  Layers,
-};
+interface SecuritySectionProps {
+  content?: LandingPageContent;
+}
 
-export function SecuritySection() {
+export function SecuritySection({ content }: SecuritySectionProps) {
+  const data = content?.securityContent ?? securityContent;
   return (
     <section id="security" className="py-16 sm:py-20 lg:py-24 bg-background">
       <div className="container mx-auto px-4">
@@ -23,28 +20,28 @@ export function SecuritySection() {
               <div className="space-y-4">
                 <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
                   <Shield className="h-4 w-4" />
-                  {securityContent.badge}
+                  {data.badge}
                 </div>
                 <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
-                  {securityContent.sectionTitle}
+                  {data.sectionTitle}
                 </h2>
                 <p className="text-lg text-muted-foreground max-w-md">
-                  {securityContent.sectionSubtitle}
+                  {data.sectionSubtitle}
                 </p>
               </div>
 
               <div className="space-y-4">
-                {securityContent.features.map((feature, index) => {
-                  const Icon = iconMap[feature.icon as keyof typeof iconMap];
+                {data.features.map((feature, index) => {
+                  const Icon = getLandingIcon(feature.icon);
                   return <SecurityFeature key={index} icon={Icon} text={feature.text} />;
                 })}
               </div>
 
               <a
-                href={securityContent.cta.href}
+                href={data.cta.href}
                 className="inline-flex items-center gap-2 text-primary font-medium hover:underline"
               >
-                {securityContent.cta.label}
+                {data.cta.label}
                 <ArrowRight className="h-4 w-4" />
               </a>
             </div>
@@ -60,7 +57,7 @@ export function SecuritySection() {
                   </div>
                 </div>
                 {/* Floating badges */}
-                {securityContent.floatingBadges.map((badge, index) => (
+                {data.floatingBadges.map((badge, index) => (
                   <div
                     key={index}
                     className={`absolute bg-background rounded-lg shadow-lg px-3 py-2 text-xs font-medium ${

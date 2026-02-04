@@ -1,14 +1,20 @@
 import { FileText, CheckCircle, Download } from "lucide-react";
 import { packetPreviewContent } from "@/content/landing";
 import { SectionHeader } from "./shared/Cards";
+import type { LandingPageContent } from "@/types/wordpress";
 
-export function PacketPreview() {
+interface PacketPreviewProps {
+  content?: LandingPageContent;
+}
+
+export function PacketPreview({ content }: PacketPreviewProps) {
+  const data = content?.packetPreviewContent ?? packetPreviewContent;
   return (
     <section id="sample" className="py-16 sm:py-20 lg:py-24 bg-background">
       <div className="container mx-auto px-4">
         <SectionHeader
-          title={packetPreviewContent.sectionTitle}
-          subtitle={packetPreviewContent.sectionSubtitle}
+          title={data.sectionTitle}
+          subtitle={data.sectionSubtitle}
         />
 
         <div className="grid gap-8 lg:grid-cols-2 items-start">
@@ -19,7 +25,7 @@ export function PacketPreview() {
               <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/30">
                 <div className="flex items-center gap-2">
                   <FileText className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-medium">{packetPreviewContent.fileName}</span>
+                  <span className="text-sm font-medium">{data.fileName}</span>
                 </div>
                 <button className="btn-ghost text-xs py-1 px-2">
                   <Download className="h-3 w-3 mr-1" />
@@ -65,7 +71,7 @@ export function PacketPreview() {
                 What's included in the packet
               </h3>
               <div className="space-y-3">
-                {packetPreviewContent.checklist.map((item, index) => (
+                {data.checklist.map((item, index) => (
                   <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
                     <span className="text-foreground">{item}</span>
@@ -74,8 +80,8 @@ export function PacketPreview() {
               </div>
             </div>
 
-            <a href={packetPreviewContent.cta.href} className="btn-primary inline-flex">
-              {packetPreviewContent.cta.label}
+            <a href={data.cta.href} className="btn-primary inline-flex">
+              {data.cta.label}
             </a>
           </div>
         </div>

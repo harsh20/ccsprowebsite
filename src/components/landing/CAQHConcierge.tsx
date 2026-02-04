@@ -1,14 +1,15 @@
-import { UserCheck, ShieldCheck, Bell, CheckCircle } from "lucide-react";
+import { Bell, CheckCircle } from "lucide-react";
 import { caqhConciergeContent } from "@/content/landing";
+import { getLandingIcon } from "@/lib/landing-icons";
 import { ConsentModeCard } from "./shared/Cards";
+import type { LandingPageContent } from "@/types/wordpress";
 
-const iconMap = {
-  ShieldCheck,
-  UserCheck,
-  Bell,
-};
+interface CAQHConciergeProps {
+  content?: LandingPageContent;
+}
 
-export function CAQHConcierge() {
+export function CAQHConcierge({ content }: CAQHConciergeProps) {
+  const data = content?.caqhConciergeContent ?? caqhConciergeContent;
   return (
     <section className="py-16 sm:py-20 lg:py-24 section-tinted">
       <div className="container mx-auto px-4">
@@ -16,19 +17,19 @@ export function CAQHConcierge() {
           {/* Left - Benefits */}
           <div className="space-y-6">
             <div className="space-y-4">
-              <div className="badge-pill">{caqhConciergeContent.badge}</div>
+              <div className="badge-pill">{data.badge}</div>
               <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
-                {caqhConciergeContent.sectionTitle}
+                {data.sectionTitle}
               </h2>
               <p className="text-lg text-muted-foreground">
-                {caqhConciergeContent.sectionSubtitle}
+                {data.sectionSubtitle}
               </p>
             </div>
 
             <div className="space-y-3">
-              <h3 className="font-semibold text-foreground">{caqhConciergeContent.benefitsTitle}</h3>
+              <h3 className="font-semibold text-foreground">{data.benefitsTitle}</h3>
               <div className="space-y-2">
-                {caqhConciergeContent.benefits.map((benefit, index) => (
+                {data.benefits.map((benefit, index) => (
                   <div key={index} className="flex items-center gap-3">
                     <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
                     <span className="text-muted-foreground">{benefit}</span>
@@ -37,18 +38,18 @@ export function CAQHConcierge() {
               </div>
             </div>
 
-            <a href={caqhConciergeContent.cta.href} className="btn-primary inline-flex">
-              {caqhConciergeContent.cta.label}
+            <a href={data.cta.href} className="btn-primary inline-flex">
+              {data.cta.label}
             </a>
           </div>
 
           {/* Right - Consent Modes */}
           <div className="space-y-6">
-            <h3 className="font-semibold text-foreground">{caqhConciergeContent.consentTitle}</h3>
+            <h3 className="font-semibold text-foreground">{data.consentTitle}</h3>
 
             <div className="space-y-4">
-              {caqhConciergeContent.consentModes.map((mode, index) => {
-                const Icon = iconMap[mode.icon as keyof typeof iconMap];
+              {data.consentModes.map((mode, index) => {
+                const Icon = getLandingIcon(mode.icon);
                 return (
                   <ConsentModeCard
                     key={index}
@@ -66,10 +67,10 @@ export function CAQHConcierge() {
                 <Bell className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-medium text-foreground text-sm">
-                    {caqhConciergeContent.alwaysIncluded.title}
+                    {data.alwaysIncluded.title}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {caqhConciergeContent.alwaysIncluded.description}
+                    {data.alwaysIncluded.description}
                   </p>
                 </div>
               </div>

@@ -1,3 +1,8 @@
+import { useParams } from "react-router-dom";
+import { useLandingPage } from "@/hooks/useWordPress";
+import { defaultLandingPageContent } from "@/content/landing";
+import type { LandingPageContent } from "@/types/wordpress";
+import { LandingPageSkeleton } from "@/components/landing/LandingPageSkeleton";
 import { Header } from "@/components/landing/Header";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { LogoStrip } from "@/components/landing/LogoStrip";
@@ -16,26 +21,37 @@ import { FinalCTA } from "@/components/landing/FinalCTA";
 import { Footer } from "@/components/landing/Footer";
 
 const Index = () => {
+  const { slug: urlSlug } = useParams<{ slug?: string }>();
+  const slug = urlSlug ?? "default";
+  const { data, isLoading } = useLandingPage(slug);
+
+  const content: LandingPageContent =
+    data ?? (defaultLandingPageContent as unknown as LandingPageContent);
+
+  if (isLoading) {
+    return <LandingPageSkeleton />;
+  }
+
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <Header content={content} />
       <main>
-        <HeroSection />
-        <LogoStrip />
-        <FounderSpotlight />
-        <ProblemOutcome />
-        <HowItWorks />
-        <FeaturesGrid />
-        <PacketPreview />
-        <SecuritySection />
-        <CAQHConcierge />
-        <PricingSection />
-        <SupportSection />
-        <TeamSection />
-        <FAQSection />
-        <FinalCTA />
+        <HeroSection content={content} />
+        <LogoStrip content={content} />
+        <FounderSpotlight content={content} />
+        <ProblemOutcome content={content} />
+        <HowItWorks content={content} />
+        <FeaturesGrid content={content} />
+        <PacketPreview content={content} />
+        <SecuritySection content={content} />
+        <CAQHConcierge content={content} />
+        <PricingSection content={content} />
+        <SupportSection content={content} />
+        <TeamSection content={content} />
+        <FAQSection content={content} />
+        <FinalCTA content={content} />
       </main>
-      <Footer />
+      <Footer content={content} />
     </div>
   );
 };

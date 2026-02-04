@@ -1,24 +1,25 @@
-import { Shield, Briefcase } from "lucide-react";
 import { teamContent } from "@/content/landing";
+import { getLandingIcon } from "@/lib/landing-icons";
 import { TeamMemberCard, SectionHeader } from "./shared/Cards";
+import type { LandingPageContent } from "@/types/wordpress";
 
-const iconMap = {
-  Shield,
-  Briefcase,
-};
+interface TeamSectionProps {
+  content?: LandingPageContent;
+}
 
-export function TeamSection() {
+export function TeamSection({ content }: TeamSectionProps) {
+  const data = content?.teamContent ?? teamContent;
   return (
     <section className="py-16 sm:py-20 lg:py-24 bg-background">
       <div className="container mx-auto px-4">
         <SectionHeader
-          title={teamContent.sectionTitle}
-          subtitle={teamContent.sectionSubtitle}
+          title={data.sectionTitle}
+          subtitle={data.sectionSubtitle}
         />
 
         <div className="grid gap-6 sm:grid-cols-2 max-w-2xl mx-auto">
-          {teamContent.members.map((member, index) => {
-            const Icon = iconMap[member.icon as keyof typeof iconMap];
+          {data.members.map((member, index) => {
+            const Icon = getLandingIcon(member.icon);
             return (
               <TeamMemberCard
                 key={index}

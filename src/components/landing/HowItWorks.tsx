@@ -1,25 +1,25 @@
-import { ClipboardCheck, Sparkles, FileOutput } from "lucide-react";
 import { howItWorksContent } from "@/content/landing";
+import { getLandingIcon } from "@/lib/landing-icons";
 import { StepCard, SectionHeader } from "./shared/Cards";
+import type { LandingPageContent } from "@/types/wordpress";
 
-const iconMap = {
-  ClipboardCheck,
-  Sparkles,
-  FileOutput,
-};
+interface HowItWorksProps {
+  content?: LandingPageContent;
+}
 
-export function HowItWorks() {
+export function HowItWorks({ content }: HowItWorksProps) {
+  const data = content?.howItWorksContent ?? howItWorksContent;
   return (
     <section id="how-it-works" className="py-16 sm:py-20 lg:py-24 bg-background">
       <div className="container mx-auto px-4">
         <SectionHeader
-          title={howItWorksContent.sectionTitle}
-          subtitle={howItWorksContent.sectionSubtitle}
+          title={data.sectionTitle}
+          subtitle={data.sectionSubtitle}
         />
 
         <div className="grid gap-6 lg:grid-cols-3">
-          {howItWorksContent.steps.map((step, index) => {
-            const Icon = iconMap[step.icon as keyof typeof iconMap];
+          {data.steps.map((step, index) => {
+            const Icon = getLandingIcon(step.icon);
             return (
               <StepCard
                 key={index}
@@ -35,8 +35,8 @@ export function HowItWorks() {
         {/* Readiness States Note */}
         <div className="mt-8 p-4 bg-muted/50 rounded-xl">
           <p className="text-center text-sm text-muted-foreground">
-            <span className="font-medium text-foreground">{howItWorksContent.readinessNote.label}</span>{" "}
-            {howItWorksContent.readinessNote.states.map((state, index) => (
+            <span className="font-medium text-foreground">{data.readinessNote.label}</span>{" "}
+            {data.readinessNote.states.map((state, index) => (
               <span key={index}>
                 <span className="inline-flex items-center gap-1">
                   <span
@@ -54,7 +54,7 @@ export function HowItWorks() {
                   />
                   {state.label}
                 </span>
-                {index < howItWorksContent.readinessNote.states.length - 1 && " • "}
+                {index < data.readinessNote.states.length - 1 && " • "}
               </span>
             ))}
           </p>

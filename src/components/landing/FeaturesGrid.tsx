@@ -1,28 +1,25 @@
-import { Vault, Sparkles, FileText, UserCheck, Bell, History } from "lucide-react";
 import { featuresContent } from "@/content/landing";
+import { getLandingIcon } from "@/lib/landing-icons";
 import { FeatureCard, SectionHeader } from "./shared/Cards";
+import type { LandingPageContent } from "@/types/wordpress";
 
-const iconMap = {
-  Vault,
-  Sparkles,
-  FileText,
-  UserCheck,
-  Bell,
-  History,
-};
+interface FeaturesGridProps {
+  content?: LandingPageContent;
+}
 
-export function FeaturesGrid() {
+export function FeaturesGrid({ content }: FeaturesGridProps) {
+  const data = content?.featuresContent ?? featuresContent;
   return (
     <section id="product" className="py-16 sm:py-20 lg:py-24 section-tinted">
       <div className="container mx-auto px-4">
         <SectionHeader
-          title={featuresContent.sectionTitle}
-          subtitle={featuresContent.sectionSubtitle}
+          title={data.sectionTitle}
+          subtitle={data.sectionSubtitle}
         />
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {featuresContent.features.map((feature, index) => {
-            const Icon = iconMap[feature.icon as keyof typeof iconMap];
+          {data.features.map((feature, index) => {
+            const Icon = getLandingIcon(feature.icon);
             return (
               <FeatureCard
                 key={index}

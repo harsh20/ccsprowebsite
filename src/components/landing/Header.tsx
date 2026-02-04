@@ -1,9 +1,17 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { navLinks, navCtas, siteConfig } from "@/content/landing";
+import type { LandingPageContent } from "@/types/wordpress";
 
-export function Header() {
+interface HeaderProps {
+  content?: LandingPageContent;
+}
+
+export function Header({ content }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const site = content?.siteConfig ?? siteConfig;
+  const links = content?.navLinks ?? navLinks;
+  const ctas = content?.navCtas ?? navCtas;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-lg">
@@ -13,28 +21,28 @@ export function Header() {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
             <span className="text-sm font-bold text-primary-foreground">C</span>
           </div>
-          <span className="text-lg font-bold text-foreground">{siteConfig.name}</span>
+          <span className="text-lg font-bold text-foreground">{site.name}</span>
         </a>
 
         {/* Desktop Navigation */}
         <div className="hidden items-center gap-1 lg:flex">
-          {navLinks.map((link) => (
+          {links.map((link) => (
             <a key={link.label} href={link.href} className="btn-ghost">
               {link.label}
             </a>
           ))}
-          <a href={navCtas.signIn.href} className="btn-ghost">
-            {navCtas.signIn.label}
+          <a href={ctas.signIn.href} className="btn-ghost">
+            {ctas.signIn.label}
           </a>
         </div>
 
         {/* Desktop CTAs */}
         <div className="hidden items-center gap-3 lg:flex">
-          <a href={navCtas.secondary.href} className="btn-ghost text-muted-foreground hover:text-primary">
-            {navCtas.secondary.label}
+          <a href={ctas.secondary.href} className="btn-ghost text-muted-foreground hover:text-primary">
+            {ctas.secondary.label}
           </a>
-          <a href={navCtas.primary.href} className="btn-primary">
-            {navCtas.primary.label}
+          <a href={ctas.primary.href} className="btn-primary">
+            {ctas.primary.label}
           </a>
         </div>
 
@@ -63,17 +71,17 @@ export function Header() {
               </a>
             ))}
             <a
-              href={navCtas.signIn.href}
+              href={ctas.signIn.href}
               className="block py-2 text-muted-foreground hover:text-foreground"
             >
-              {navCtas.signIn.label}
+              {ctas.signIn.label}
             </a>
             <div className="flex flex-col gap-2 pt-4 border-t border-border">
-              <a href={navCtas.secondary.href} className="btn-secondary text-center">
-                {navCtas.secondary.label}
+              <a href={ctas.secondary.href} className="btn-secondary text-center">
+                {ctas.secondary.label}
               </a>
-              <a href={navCtas.primary.href} className="btn-primary text-center">
-                {navCtas.primary.label}
+              <a href={ctas.primary.href} className="btn-primary text-center">
+                {ctas.primary.label}
               </a>
             </div>
           </div>

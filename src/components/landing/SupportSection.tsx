@@ -1,36 +1,37 @@
-import { MessageSquare, Mail, Clock, ExternalLink } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { supportContent } from "@/content/landing";
-import { SupportFeatureBadge, SectionHeader } from "./shared/Cards";
+import { getLandingIcon } from "@/lib/landing-icons";
+import { SupportFeatureBadge } from "./shared/Cards";
+import type { LandingPageContent } from "@/types/wordpress";
 
-const iconMap = {
-  MessageSquare,
-  Mail,
-  Clock,
-};
+interface SupportSectionProps {
+  content?: LandingPageContent;
+}
 
-export function SupportSection() {
+export function SupportSection({ content }: SupportSectionProps) {
+  const data = content?.supportContent ?? supportContent;
   return (
     <section className="py-16 sm:py-20 lg:py-24 section-tinted">
       <div className="container mx-auto px-4">
         <div className="max-w-3xl mx-auto text-center space-y-8">
           <div className="space-y-4">
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
-              {supportContent.sectionTitle}
+              {data.sectionTitle}
             </h2>
             <p className="text-lg text-muted-foreground">
-              {supportContent.sectionSubtitle}
+              {data.sectionSubtitle}
             </p>
           </div>
 
           <div className="flex flex-wrap justify-center gap-6">
-            {supportContent.features.map((feature, index) => {
-              const Icon = iconMap[feature.icon as keyof typeof iconMap];
+            {data.features.map((feature, index) => {
+              const Icon = getLandingIcon(feature.icon);
               return <SupportFeatureBadge key={index} icon={Icon} text={feature.text} />;
             })}
           </div>
 
           <div className="flex flex-wrap justify-center gap-4">
-            {supportContent.links.map((link, index) => (
+            {data.links.map((link, index) => (
               <span key={index}>
                 <a
                   href={link.href}
@@ -39,7 +40,7 @@ export function SupportSection() {
                   {link.label}
                   <ExternalLink className="h-4 w-4" />
                 </a>
-                {index < supportContent.links.length - 1 && (
+                {index < data.links.length - 1 && (
                   <span className="ml-4 text-muted-foreground">•</span>
                 )}
               </span>

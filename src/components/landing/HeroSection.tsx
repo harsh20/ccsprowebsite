@@ -1,8 +1,17 @@
-import { ArrowRight, CheckCircle, FileText, Shield, Sparkles } from "lucide-react";
+import { ArrowRight, FileText } from "lucide-react";
 import { heroContent, heroDashboard } from "@/content/landing";
+import { getLandingIcon } from "@/lib/landing-icons";
 import { ReadinessStatePill } from "./shared/Cards";
+import type { LandingPageContent } from "@/types/wordpress";
 
-export function HeroSection() {
+interface HeroSectionProps {
+  content?: LandingPageContent;
+}
+
+export function HeroSection({ content }: HeroSectionProps) {
+  const hero = content?.heroContent ?? heroContent;
+  const dashboard = content?.heroDashboard ?? heroDashboard;
+
   return (
     <section className="section-tinted overflow-hidden">
       <div className="container mx-auto px-4 py-12 sm:py-16 lg:py-20">
@@ -11,45 +20,42 @@ export function HeroSection() {
           <div className="space-y-8">
             <div className="space-y-4">
               <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl text-balance">
-                {heroContent.headline}{" "}
-                <span className="text-primary">{heroContent.headlineHighlight}</span>
+                {hero.headline}{" "}
+                <span className="text-primary">{hero.headlineHighlight}</span>
               </h1>
               <p className="text-lg text-muted-foreground sm:text-xl max-w-xl">
-                {heroContent.subheadline}
+                {hero.subheadline}
               </p>
             </div>
 
             {/* CTAs */}
             <div className="flex flex-wrap gap-4 items-center">
-              <a href={heroContent.primaryCta.href} className="btn-primary text-base px-8 py-4">
-                {heroContent.primaryCta.label}
+              <a href={hero.primaryCta.href} className="btn-primary text-base px-8 py-4">
+                {hero.primaryCta.label}
                 <ArrowRight className="h-4 w-4" />
               </a>
-              <a href={heroContent.secondaryCta.href} className="btn-secondary text-base">
-                {heroContent.secondaryCta.label}
+              <a href={hero.secondaryCta.href} className="btn-secondary text-base">
+                {hero.secondaryCta.label}
               </a>
             </div>
             <a
-              href={heroContent.tertiaryCta.href}
+              href={hero.tertiaryCta.href}
               className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
             >
-              {heroContent.tertiaryCta.label}
+              {hero.tertiaryCta.label}
             </a>
 
             {/* Trust Line */}
             <div className="flex flex-wrap gap-4 text-sm text-muted-foreground pt-4 border-t border-border/50">
-              <span className="flex items-center gap-2">
-                <Shield className="h-4 w-4 text-primary" />
-                {heroContent.trustIndicators[0].text}
-              </span>
-              <span className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-primary" />
-                {heroContent.trustIndicators[1].text}
-              </span>
-              <span className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-primary" />
-                {heroContent.trustIndicators[2].text}
-              </span>
+              {hero.trustIndicators.map((indicator, index) => {
+                const Icon = getLandingIcon(indicator.icon);
+                return (
+                  <span key={index} className="flex items-center gap-2">
+                    <Icon className="h-4 w-4 text-primary" />
+                    {indicator.text}
+                  </span>
+                );
+              })}
             </div>
           </div>
 
@@ -64,11 +70,11 @@ export function HeroSection() {
                       <FileText className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <p className="font-semibold text-foreground">{heroDashboard.title}</p>
-                      <p className="text-sm text-muted-foreground">{heroDashboard.subtitle}</p>
+                      <p className="font-semibold text-foreground">{dashboard.title}</p>
+                      <p className="text-sm text-muted-foreground">{dashboard.subtitle}</p>
                     </div>
                   </div>
-                  <div className="badge-pill">{heroDashboard.completionPercent}% Complete</div>
+                  <div className="badge-pill">{dashboard.completionPercent}% Complete</div>
                 </div>
 
                 {/* State & NPI */}
@@ -76,13 +82,13 @@ export function HeroSection() {
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-muted-foreground">State</label>
                     <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2">
-                      <span className="text-sm font-medium">{heroDashboard.stateValue}</span>
+                      <span className="text-sm font-medium">{dashboard.stateValue}</span>
                     </div>
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-muted-foreground">NPI Number</label>
                     <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2">
-                      <span className="text-sm font-medium">{heroDashboard.npiValue}</span>
+                      <span className="text-sm font-medium">{dashboard.npiValue}</span>
                     </div>
                   </div>
                 </div>
@@ -93,7 +99,7 @@ export function HeroSection() {
                     Readiness States
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    {heroDashboard.readinessStates.map((state, index) => (
+                    {dashboard.readinessStates.map((state, index) => (
                       <ReadinessStatePill
                         key={index}
                         label={state.label}
@@ -105,7 +111,7 @@ export function HeroSection() {
 
                 {/* Document Status */}
                 <div className="space-y-2">
-                  {heroDashboard.documents.map((doc, index) => (
+                  {dashboard.documents.map((doc, index) => (
                     <div
                       key={index}
                       className={`flex items-center justify-between rounded-lg border px-3 py-2 ${
@@ -135,10 +141,10 @@ export function HeroSection() {
                 {/* Action Buttons */}
                 <div className="grid grid-cols-2 gap-3">
                   <button className="btn-secondary text-sm py-2.5">
-                    {heroDashboard.buttons.secondary}
+                    {dashboard.buttons.secondary}
                   </button>
                   <button className="btn-primary text-sm py-2.5">
-                    {heroDashboard.buttons.primary}
+                    {dashboard.buttons.primary}
                   </button>
                 </div>
               </div>

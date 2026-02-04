@@ -1,13 +1,13 @@
-import { Shield, MapPin, Clock } from "lucide-react";
-import { footerContent, siteConfig } from "@/content/landing";
+import { footerContent } from "@/content/landing";
+import { getLandingIcon } from "@/lib/landing-icons";
+import type { LandingPageContent } from "@/types/wordpress";
 
-const iconMap = {
-  MapPin,
-  Shield,
-  Clock,
-};
+interface FooterProps {
+  content?: LandingPageContent;
+}
 
-export function Footer() {
+export function Footer({ content }: FooterProps) {
+  const data = content?.footerContent ?? footerContent;
   return (
     <footer className="bg-foreground text-background">
       <div className="container mx-auto px-4 py-12 lg:py-16">
@@ -18,16 +18,16 @@ export function Footer() {
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
                 <span className="text-sm font-bold text-primary-foreground">C</span>
               </div>
-              <span className="text-lg font-bold">{footerContent.brand.name}</span>
+              <span className="text-lg font-bold">{data.brand.name}</span>
             </div>
             <p className="text-sm text-background/70 max-w-sm">
-              {footerContent.brand.description}
+              {data.brand.description}
             </p>
 
             {/* Trust badges */}
             <div className="flex flex-wrap gap-4 pt-4">
-              {footerContent.trustBadges.map((badge, index) => {
-                const Icon = iconMap[badge.icon as keyof typeof iconMap];
+              {data.trustBadges.map((badge, index) => {
+                const Icon = getLandingIcon(badge.icon);
                 return (
                   <div key={index} className="flex items-center gap-2 text-xs text-background/60">
                     <Icon className="h-3 w-3" />
@@ -42,7 +42,7 @@ export function Footer() {
           <div>
             <h4 className="font-semibold mb-4 text-sm">Legal</h4>
             <ul className="space-y-2">
-              {footerContent.links.legal.map((link) => (
+              {data.links.legal.map((link) => (
                 <li key={link.label}>
                   <a
                     href={link.href}
@@ -59,7 +59,7 @@ export function Footer() {
           <div>
             <h4 className="font-semibold mb-4 text-sm">Support</h4>
             <ul className="space-y-2">
-              {footerContent.links.support.map((link) => (
+              {data.links.support.map((link) => (
                 <li key={link.label}>
                   <a
                     href={link.href}
@@ -76,7 +76,7 @@ export function Footer() {
         {/* Bottom */}
         <div className="border-t border-background/10 mt-12 pt-8">
           <p className="text-sm text-background/50 text-center">
-            © {new Date().getFullYear()} {footerContent.copyright}
+            © {new Date().getFullYear()} {data.copyright}
           </p>
         </div>
       </div>
