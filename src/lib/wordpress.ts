@@ -56,6 +56,29 @@ export async function getLandingPage(
   return data as LandingPageContent;
 }
 
+export interface SiteConfigResponse {
+  comingSoon: boolean;
+}
+
+/**
+ * Fetch site config (e.g. coming soon mode). Used at runtime so the flag can be toggled from WordPress without redeploying.
+ */
+export async function getSiteConfig(): Promise<SiteConfigResponse> {
+  const url = `${WP_API_URL}/ccspro/v1/site-config`;
+  const response = await fetch(url, {
+    method: "GET",
+    headers: { Accept: "application/json" },
+  });
+  if (!response.ok) {
+    return { comingSoon: false };
+  }
+  const data = await response.json();
+  return {
+    comingSoon: Boolean(data?.comingSoon),
+  };
+}
+
 export const wpClient = {
   getLandingPage,
+  getSiteConfig,
 };

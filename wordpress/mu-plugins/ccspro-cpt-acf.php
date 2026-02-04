@@ -40,7 +40,54 @@ function ccspro_register_landing_page_cpt() {
 }
 
 // ---------------------------------------------------------------------------
-// 2. CORS HEADERS
+// 2. COMING SOON MODE (site-config API + admin toggle)
+// ---------------------------------------------------------------------------
+
+add_action('admin_menu', 'ccspro_add_coming_soon_menu');
+
+function ccspro_add_coming_soon_menu() {
+    add_options_page(
+        'CCS Pro Site',
+        'CCS Pro Site',
+        'manage_options',
+        'ccspro-site',
+        'ccspro_render_coming_soon_page'
+    );
+}
+
+function ccspro_render_coming_soon_page() {
+    if (isset($_POST['ccspro_coming_soon']) && current_user_can('manage_options')) {
+        check_admin_referer('ccspro_coming_soon');
+        $value = !empty($_POST['ccspro_coming_soon']) ? '1' : '0';
+        update_option('ccspro_coming_soon', $value);
+        echo '<div class="notice notice-success"><p>Coming soon mode ' . ($value === '1' ? 'enabled' : 'disabled') . '.</p></div>';
+    }
+    $current = get_option('ccspro_coming_soon', '0') === '1';
+    ?>
+    <div class="wrap">
+        <h1>CCS Pro Site</h1>
+        <form method="post" action="">
+            <?php wp_nonce_field('ccspro_coming_soon'); ?>
+            <table class="form-table">
+                <tr>
+                    <th scope="row">Coming soon mode</th>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="ccspro_coming_soon" value="1" <?php checked($current); ?> />
+                            Show "Coming Soon" page on the live site instead of the full landing page
+                        </label>
+                        <p class="description">The frontend (ccsprocert.com) fetches this setting at runtime. Toggling here takes effect immediately; no redeploy needed.</p>
+                    </td>
+                </tr>
+            </table>
+            <?php submit_button('Save'); ?>
+        </form>
+    </div>
+    <?php
+}
+
+// ---------------------------------------------------------------------------
+// 3. CORS HEADERS
 // ---------------------------------------------------------------------------
 
 add_action('rest_api_init', 'ccspro_add_cors_headers', 15);
@@ -82,7 +129,7 @@ function ccspro_handle_preflight() {
 }
 
 // ---------------------------------------------------------------------------
-// 3. ACF FIELD GROUPS (requires ACF to be active)
+// 4. ACF FIELD GROUPS (requires ACF to be active)
 // ---------------------------------------------------------------------------
 
 add_action('acf/init', 'ccspro_register_acf_field_groups');
@@ -570,6 +617,11 @@ function ccspro_get_field_group_config() {
 add_action('rest_api_init', 'ccspro_register_rest_routes');
 
 function ccspro_register_rest_routes() {
+    register_rest_route('ccspro/v1', '/site-config', array(
+        'methods' => 'GET',
+        'callback' => 'ccspro_rest_get_site_config',
+        'permission_callback' => '__return_true',
+    ));
     register_rest_route('ccspro/v1', '/landing-page/(?P<slug>[a-z0-9\-]+)', array(
         'methods' => 'GET',
         'callback' => 'ccspro_rest_get_landing_page',
@@ -583,6 +635,11 @@ function ccspro_register_rest_routes() {
             ),
         ),
     ));
+}
+
+function ccspro_rest_get_site_config($request) {
+    $coming_soon = get_option('ccspro_coming_soon', '0') === '1';
+    return rest_ensure_response(array('comingSoon' => $coming_soon));
 }
 
 function ccspro_rest_get_landing_page($request) {

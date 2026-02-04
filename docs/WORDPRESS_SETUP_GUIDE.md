@@ -136,7 +136,19 @@ To add another variation (e.g. Texas):
 
 ---
 
-## 6. Frontend Environment Variable
+## 6. Coming Soon Mode
+
+The frontend (ccsprocert.com) fetches a **site config** from WordPress at runtime. You can show a "Coming Soon" page instead of the full site without redeploying the frontend.
+
+1. In WordPress Admin, go to **Settings** > **CCS Pro Site**.
+2. Check **Coming soon mode** to show the Coming Soon page on the live site; uncheck to show the full landing page.
+3. Click **Save**. The change takes effect immediately on the next page load at ccsprocert.com.
+
+API: `GET https://wpcms.ccsprocert.com/wp-json/ccspro/v1/site-config` returns `{ "comingSoon": true }` or `false`.
+
+---
+
+## 7. Frontend Environment Variable
 
 In your frontend (Vercel or local `.env`), set:
 
@@ -148,7 +160,7 @@ For local development, create a `.env` file in the project root with this line. 
 
 ---
 
-## 7. Troubleshooting
+## 8. Troubleshooting
 
 | Issue | Check |
 |-------|------|
@@ -159,7 +171,7 @@ For local development, create a `.env` file in the project root with this line. 
 
 ---
 
-## 8. Security Notes
+## 9. Security Notes
 
 - Keep WordPress, themes, and plugins updated.
 - Use a strong admin password and 2FA if available.
