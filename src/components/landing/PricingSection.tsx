@@ -1,5 +1,7 @@
+import { useMemo, useState } from "react";
 import { pricingContent } from "@/content/landing";
-import { PricingCard, SectionHeader } from "./shared/Cards";
+import { PricingCard } from "./shared/Cards";
+import { Switch } from "@/components/ui/switch";
 import type { LandingPageContent } from "@/types/wordpress";
 
 interface PricingSectionProps {
@@ -7,23 +9,40 @@ interface PricingSectionProps {
 }
 
 export function PricingSection({ content }: PricingSectionProps) {
+  const [isYearly, setIsYearly] = useState(false);
   const data = content?.pricingContent ?? pricingContent;
   const additional = data.additionalInfo;
-  return (
-    <section id="pricing" className="py-16 sm:py-20 lg:py-24 bg-background">
-      <div className="container mx-auto px-4">
-        <SectionHeader
-          title={data.sectionTitle}
-          subtitle={data.sectionSubtitle}
-        />
 
-        <div className="grid gap-6 lg:grid-cols-3 max-w-5xl mx-auto">
-          {data.plans.map((plan, index) => (
+  const plans = useMemo(
+    () =>
+      data.plans.map((plan) => ({
+        ...plan,
+        price: isYearly && plan.yearlyPrice ? plan.yearlyPrice : plan.price,
+      })),
+    [data.plans, isYearly]
+  );
+
+  return (
+    <section id="pricing" className="py-20 px-4 bg-muted/30">
+      <div className="section-container max-w-5xl">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">{data.sectionTitle}</h2>
+          <p className="text-lg text-muted-foreground mb-6">{data.sectionSubtitle}</p>
+
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <span className={`text-sm font-medium ${!isYearly ? "text-foreground" : "text-muted-foreground"}`}>Monthly</span>
+            <Switch checked={isYearly} onCheckedChange={setIsYearly} />
+            <span className={`text-sm font-medium ${isYearly ? "text-foreground" : "text-muted-foreground"}`}>Yearly <span className="text-success">(Save more)</span></span>
+          </div>
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-3">
+          {plans.map((plan, index) => (
             <PricingCard
               key={index}
               name={plan.name}
               price={plan.price}
-              period={plan.period}
+              period={isYearly ? "" : plan.period}
               yearlyPrice={plan.yearlyPrice}
               yearlyLabel={plan.yearlyLabel}
               description={plan.description}
@@ -35,19 +54,13 @@ export function PricingSection({ content }: PricingSectionProps) {
           ))}
         </div>
 
-        {/* Additional Info */}
-        <div className="max-w-2xl mx-auto mt-12 text-center space-y-4">
+        <div className="max-w-3xl mx-auto mt-10 text-center space-y-3">
           <p className="text-sm text-muted-foreground">
             <span className="font-medium text-foreground">{additional.updatePrice}</span>
           </p>
-          <div className="p-4 bg-muted/50 rounded-xl">
-            <p className="text-sm text-muted-foreground">
-              {additional.refundPolicy}
-            </p>
-            <a
-              href={additional.refundLink.href}
-              className="text-sm text-primary font-medium hover:underline mt-2 inline-block"
-            >
+          <div className="p-4 rounded-xl border border-border bg-background/70">
+            <p className="text-sm text-muted-foreground">{additional.refundPolicy}</p>
+            <a href={additional.refundLink.href} className="inline-block mt-2 text-sm text-primary font-medium hover:underline">
               {additional.refundLink.label}
             </a>
           </div>

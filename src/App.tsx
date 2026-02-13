@@ -4,13 +4,14 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { getSiteConfig } from "@/lib/wordpress";
+import { getContentProvider } from "@/content/providers";
 import PasswordGate from "@/components/PasswordGate";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ComingSoon from "./pages/ComingSoon";
 
 const queryClient = new QueryClient();
+const contentProvider = getContentProvider();
 
 // Build-time fallback (Vercel env). Runtime check from WordPress takes precedence.
 const buildTimeComingSoon =
@@ -26,7 +27,7 @@ const App = () => {
       setComingSoon((prev) => (prev === null ? false : prev));
     }, SITE_CONFIG_TIMEOUT_MS);
 
-    getSiteConfig()
+    contentProvider.getSiteConfig()
       .then((config) => setComingSoon(config.comingSoon))
       .catch(() => setComingSoon(false))
       .finally(() => clearTimeout(timeout));
