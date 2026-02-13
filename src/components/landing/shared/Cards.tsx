@@ -70,11 +70,13 @@ export function FeatureCard({
 
 interface PricingCardProps {
   name: string;
-  price: string;
-  period?: string;
-  yearlyPrice?: string;
-  yearlyLabel?: string;
+  price: number;
   description: string;
+  applicationsIncluded: number | null;
+  validityPeriod: string;
+  billingType: "one_time" | "subscription";
+  allowAdditionalPayers?: boolean;
+  additionalPayerPrice?: number | null;
   features: string[];
   cta: string;
   highlighted?: boolean;
@@ -85,10 +87,12 @@ interface PricingCardProps {
 export function PricingCard({
   name,
   price,
-  period = "",
-  yearlyPrice,
-  yearlyLabel,
   description,
+  applicationsIncluded,
+  validityPeriod,
+  billingType,
+  allowAdditionalPayers = false,
+  additionalPayerPrice = null,
   features,
   cta,
   highlighted = false,
@@ -117,22 +121,47 @@ export function PricingCard({
 
       <div className="space-y-4 mb-6">
         <h3 className="text-xl font-bold text-foreground">{name}</h3>
-        <div className="flex items-baseline gap-1">
-          <span className="text-4xl font-bold text-foreground">{price}</span>
-          <span className="text-muted-foreground">{period}</span>
-        </div>
-        {yearlyPrice && (
-          <div className="space-y-1">
-            <p className="text-sm text-muted-foreground">{yearlyPrice}</p>
-            {yearlyLabel && (
-              <p className="text-xs font-medium text-primary">{yearlyLabel}</p>
-            )}
+        <div className="space-y-1">
+          <div className="flex items-baseline gap-2">
+            <span className="text-4xl font-bold text-foreground">${price}</span>
+            <span className="text-muted-foreground">
+              {billingType === "subscription" ? "billed annually" : "one-time"}
+            </span>
           </div>
-        )}
+          <p className="text-sm text-muted-foreground">+ sales tax</p>
+        </div>
         <p className="text-sm text-muted-foreground">{description}</p>
       </div>
 
       <ul className="space-y-3 mb-8 flex-grow">
+        <li className="flex items-start gap-3 text-sm">
+          <svg
+            className="h-4 w-4 text-primary flex-shrink-0 mt-0.5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+          <span className="text-foreground">
+            {applicationsIncluded === null ? "Unlimited payer applications" : `${applicationsIncluded} payer application${applicationsIncluded === 1 ? "" : "s"}`}
+          </span>
+        </li>
+        <li className="flex items-start gap-3 text-sm">
+          <svg
+            className="h-4 w-4 text-primary flex-shrink-0 mt-0.5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+          <span className="text-foreground">
+            {billingType === "subscription" ? "Renews annually" : `Valid for ${validityPeriod}`}
+          </span>
+        </li>
         {features.map((feature, index) => (
           <li key={index} className="flex items-start gap-3 text-sm">
             <svg
@@ -148,6 +177,12 @@ export function PricingCard({
           </li>
         ))}
       </ul>
+
+      {allowAdditionalPayers && additionalPayerPrice !== null && (
+        <p className="mb-4 text-sm text-muted-foreground">
+          Need more? Add payers at ${additionalPayerPrice} each
+        </p>
+      )}
 
       <button
         onClick={onCtaClick}

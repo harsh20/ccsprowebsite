@@ -151,28 +151,33 @@ export interface CAQHConciergeContent {
   };
 }
 
-export interface PricingPlan {
+export interface PackPlan {
   name: string;
-  price: string;
-  period: string;
+  price: number;
+  badge?: string | null;
   description: string;
+  applicationsIncluded: number | null;
+  validityPeriod: string;
+  billingType: "one_time" | "subscription";
+  planType: "pack" | "unlimited";
+  allowAdditionalPayers: boolean;
+  additionalPayerPrice?: number | null;
   features: string[];
   cta: string;
   highlighted: boolean;
-  badge: string | null;
-  yearlyPrice?: string | null;
-  yearlyLabel?: string | null;
+  gracePeriodDays?: number;
 }
 
 export interface PricingContent {
   sectionTitle: string;
   sectionSubtitle: string;
-  plans: PricingPlan[];
-  additionalInfo: {
-    updatePrice: string;
-    refundPolicy: string;
-    refundLink: CtaLink;
+  packs: PackPlan[];
+  postYearBehavior: {
+    title: string;
+    items: Array<{ text: string; kind: "positive" | "negative" }>;
+    renewalNote: string;
   };
+  footerNote?: string;
 }
 
 export interface SupportContent {

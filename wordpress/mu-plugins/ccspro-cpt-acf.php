@@ -134,6 +134,22 @@ function ccspro_handle_preflight() {
 // ---------------------------------------------------------------------------
 
 add_action('acf/init', 'ccspro_register_acf_field_groups');
+add_action('acf/init', 'ccspro_register_acf_options_pages');
+
+function ccspro_register_acf_options_pages() {
+    if (!function_exists('acf_add_options_page')) {
+        return;
+    }
+
+    acf_add_options_page(array(
+        'page_title' => 'CCS Pro Pricing Settings',
+        'menu_title' => 'CCS Pro Pricing',
+        'menu_slug' => 'ccspro-pricing-settings',
+        'capability' => 'manage_options',
+        'redirect' => false,
+        'position' => 61,
+    ));
+}
 
 function ccspro_register_acf_field_groups() {
     if (!function_exists('acf_add_local_field_group')) {
@@ -623,49 +639,12 @@ function ccspro_get_field_group_config() {
                     'type' => 'tab',
                     'placement' => 'top',
                 ),
-                array('key' => 'field_pricing_title', 'label' => 'Section Title', 'name' => 'pricing_title', 'type' => 'text', 'wrapper' => array('width' => '50')),
-                array('key' => 'field_pricing_subtitle', 'label' => 'Section Subtitle', 'name' => 'pricing_subtitle', 'type' => 'text', 'wrapper' => array('width' => '50')),
                 array(
-                    'key' => 'field_pricing_plans',
-                    'label' => 'Plans',
-                    'name' => 'pricing_plans',
-                    'type' => 'repeater',
-                    'instructions' => 'Add pricing tiers. Mark one as "Highlighted" for emphasis.',
-                    'layout' => 'block',
-                    'button_label' => 'Add Plan',
-                    'sub_fields' => array(
-                        array('key' => 'field_plan_name', 'label' => 'Name', 'name' => 'name', 'type' => 'text', 'wrapper' => array('width' => '25')),
-                        array('key' => 'field_plan_price', 'label' => 'Price', 'name' => 'price', 'type' => 'text', 'placeholder' => '$99', 'wrapper' => array('width' => '15')),
-                        array('key' => 'field_plan_period', 'label' => 'Period', 'name' => 'period', 'type' => 'text', 'placeholder' => '/month', 'wrapper' => array('width' => '15')),
-                        array('key' => 'field_plan_badge', 'label' => 'Badge', 'name' => 'badge', 'type' => 'text', 'placeholder' => 'Most Popular', 'wrapper' => array('width' => '25')),
-                        array('key' => 'field_plan_highlighted', 'label' => 'Highlighted', 'name' => 'highlighted', 'type' => 'true_false', 'ui' => 1, 'wrapper' => array('width' => '20')),
-                        array('key' => 'field_plan_yearly_price', 'label' => 'Yearly Price', 'name' => 'yearly_price', 'type' => 'text', 'wrapper' => array('width' => '25')),
-                        array('key' => 'field_plan_yearly_label', 'label' => 'Yearly Label', 'name' => 'yearly_label', 'type' => 'text', 'wrapper' => array('width' => '25')),
-                        array('key' => 'field_plan_description', 'label' => 'Description', 'name' => 'description', 'type' => 'text', 'wrapper' => array('width' => '50')),
-                        array(
-                            'key' => 'field_plan_features',
-                            'label' => 'Features',
-                            'name' => 'features',
-                            'type' => 'repeater',
-                            'layout' => 'table',
-                            'button_label' => 'Add Feature',
-                            'sub_fields' => array(
-                                array('key' => 'field_plan_feature_text', 'label' => 'Feature', 'name' => 'feature_text', 'type' => 'text'),
-                            ),
-                        ),
-                        array('key' => 'field_plan_cta', 'label' => 'CTA Button Text', 'name' => 'cta', 'type' => 'text', 'placeholder' => 'Get Started'),
-                    ),
-                ),
-                array(
-                    'key' => 'field_pricing_additional_message',
+                    'key' => 'field_pricing_global_notice',
                     'label' => '',
                     'type' => 'message',
-                    'message' => '<strong>Additional Info</strong>',
+                    'message' => '<strong>Pricing is managed globally.</strong><br/>Use <em>CCS Pro Pricing</em> in the WordPress admin menu to update plans once for all landing pages.',
                 ),
-                array('key' => 'field_pricing_update_price', 'label' => 'Update Price Text', 'name' => 'pricing_update_price', 'type' => 'text'),
-                array('key' => 'field_pricing_refund_policy', 'label' => 'Refund Policy', 'name' => 'pricing_refund_policy', 'type' => 'textarea', 'rows' => 2),
-                array('key' => 'field_pricing_refund_label', 'label' => 'Refund Link Label', 'name' => 'pricing_refund_label', 'type' => 'text', 'wrapper' => array('width' => '50')),
-                array('key' => 'field_pricing_refund_href', 'label' => 'Refund Link Href', 'name' => 'pricing_refund_href', 'type' => 'text', 'wrapper' => array('width' => '50')),
 
                 // =====================================================================
                 // TAB: Support
@@ -852,6 +831,135 @@ function ccspro_get_field_group_config() {
             'instruction_placement' => 'label',
             'active' => true,
         ),
+        array(
+            'key' => 'group_ccspro_global_pricing',
+            'title' => 'Global Pricing Settings',
+            'fields' => array(
+                array('key' => 'field_pricing_title', 'label' => 'Section Title', 'name' => 'pricing_title', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_pricing_subtitle', 'label' => 'Section Subtitle', 'name' => 'pricing_subtitle', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array(
+                    'key' => 'field_pricing_plans',
+                    'label' => 'Credentialing Packs',
+                    'name' => 'pricing_plans',
+                    'type' => 'repeater',
+                    'instructions' => 'Add pack-based pricing cards. Set billing type to one_time for packs and subscription for annual renewing plans.',
+                    'layout' => 'block',
+                    'min' => 1,
+                    'max' => 4,
+                    'button_label' => 'Add Plan',
+                    'sub_fields' => array(
+                        array('key' => 'field_plan_name', 'label' => 'Name', 'name' => 'name', 'type' => 'text', 'wrapper' => array('width' => '30')),
+                        array('key' => 'field_plan_price', 'label' => 'Price', 'name' => 'price', 'type' => 'number', 'wrapper' => array('width' => '20')),
+                        array('key' => 'field_plan_badge', 'label' => 'Badge', 'name' => 'badge', 'type' => 'text', 'placeholder' => 'Most Popular', 'wrapper' => array('width' => '30')),
+                        array('key' => 'field_plan_highlighted', 'label' => 'Highlighted', 'name' => 'highlighted', 'type' => 'true_false', 'ui' => 1, 'wrapper' => array('width' => '20')),
+                        array('key' => 'field_plan_apps', 'label' => 'Applications Included', 'name' => 'applications_included', 'type' => 'number', 'wrapper' => array('width' => '25')),
+                        array('key' => 'field_plan_validity', 'label' => 'Validity Period', 'name' => 'validity_period', 'type' => 'text', 'default_value' => '1 year', 'wrapper' => array('width' => '25')),
+                        array(
+                            'key' => 'field_plan_billing_type',
+                            'label' => 'Billing Type',
+                            'name' => 'billing_type',
+                            'type' => 'select',
+                            'choices' => array('one_time' => 'One-Time', 'subscription' => 'Subscription'),
+                            'default_value' => 'one_time',
+                            'wrapper' => array('width' => '25'),
+                        ),
+                        array(
+                            'key' => 'field_plan_type',
+                            'label' => 'Plan Type',
+                            'name' => 'plan_type',
+                            'type' => 'select',
+                            'choices' => array('pack' => 'Pack', 'unlimited' => 'Unlimited'),
+                            'default_value' => 'pack',
+                            'wrapper' => array('width' => '25'),
+                        ),
+                        array(
+                            'key' => 'field_plan_allow_additional_payers',
+                            'label' => 'Allow Additional Payers',
+                            'name' => 'allow_additional_payers',
+                            'type' => 'true_false',
+                            'ui' => 1,
+                            'wrapper' => array('width' => '50'),
+                        ),
+                        array(
+                            'key' => 'field_plan_additional_payer_price',
+                            'label' => 'Additional Payer Price',
+                            'name' => 'additional_payer_price',
+                            'type' => 'number',
+                            'wrapper' => array('width' => '50'),
+                            'conditional_logic' => array(
+                                array(
+                                    array(
+                                        'field' => 'field_plan_allow_additional_payers',
+                                        'operator' => '==',
+                                        'value' => '1',
+                                    ),
+                                ),
+                            ),
+                        ),
+                        array('key' => 'field_plan_grace_period_days', 'label' => 'Grace Period Days', 'name' => 'grace_period_days', 'type' => 'number', 'default_value' => 30, 'wrapper' => array('width' => '25')),
+                        array('key' => 'field_plan_description', 'label' => 'Description', 'name' => 'description', 'type' => 'textarea', 'rows' => 2, 'wrapper' => array('width' => '75')),
+                        array(
+                            'key' => 'field_plan_features',
+                            'label' => 'Features',
+                            'name' => 'features',
+                            'type' => 'repeater',
+                            'layout' => 'table',
+                            'button_label' => 'Add Feature',
+                            'sub_fields' => array(
+                                array('key' => 'field_plan_feature_text', 'label' => 'Feature', 'name' => 'feature_text', 'type' => 'text'),
+                            ),
+                        ),
+                        array('key' => 'field_plan_cta', 'label' => 'CTA Button Text', 'name' => 'cta', 'type' => 'text', 'placeholder' => 'Get Started'),
+                    ),
+                ),
+                array(
+                    'key' => 'field_pricing_post_year_message',
+                    'label' => '',
+                    'type' => 'message',
+                    'message' => '<strong>Post-Year Behavior Copy (shown only when one-time plans are present)</strong>',
+                ),
+                array('key' => 'field_post_year_title', 'label' => 'Post-Year Title', 'name' => 'post_year_title', 'type' => 'text', 'default_value' => 'What happens after 1 year?'),
+                array(
+                    'key' => 'field_post_year_items',
+                    'label' => 'Post-Year Items',
+                    'name' => 'post_year_items',
+                    'type' => 'repeater',
+                    'layout' => 'table',
+                    'button_label' => 'Add Item',
+                    'sub_fields' => array(
+                        array('key' => 'field_post_year_item_text', 'label' => 'Text', 'name' => 'text', 'type' => 'text', 'wrapper' => array('width' => '80')),
+                        array(
+                            'key' => 'field_post_year_item_kind',
+                            'label' => 'Kind',
+                            'name' => 'kind',
+                            'type' => 'select',
+                            'choices' => array('positive' => 'Positive', 'negative' => 'Negative'),
+                            'default_value' => 'positive',
+                            'wrapper' => array('width' => '20'),
+                        ),
+                    ),
+                ),
+                array('key' => 'field_post_year_renewal_note', 'label' => 'Post-Year Renewal Note', 'name' => 'post_year_renewal_note', 'type' => 'text'),
+                array(
+                    'key' => 'field_pricing_footer_message',
+                    'label' => '',
+                    'type' => 'message',
+                    'message' => '<strong>Pricing Footer Note</strong>',
+                ),
+                array('key' => 'field_pricing_footer_note', 'label' => 'Footer Note', 'name' => 'pricing_footer_note', 'type' => 'text', 'default_value' => 'Prices shown before sales tax.'),
+            ),
+            'location' => array(
+                array(
+                    array('param' => 'options_page', 'operator' => '==', 'value' => 'ccspro-pricing-settings'),
+                ),
+            ),
+            'menu_order' => 0,
+            'position' => 'normal',
+            'style' => 'default',
+            'label_placement' => 'top',
+            'instruction_placement' => 'label',
+            'active' => true,
+        ),
     );
 }
 
@@ -910,6 +1018,89 @@ function ccspro_rest_get_landing_page($request) {
 
     $data = ccspro_transform_landing_page_to_frontend($post_id);
     return rest_ensure_response($data);
+}
+
+function ccspro_map_pricing_packs($pricing_plans_raw) {
+    $pricing_packs = array();
+    $has_highlight = false;
+
+    foreach ((array) $pricing_plans_raw as $plan) {
+        $feats = isset($plan['features']) && is_array($plan['features']) ? $plan['features'] : array();
+        $feats = array_filter(array_map(function ($f) {
+            return isset($f['feature_text']) ? $f['feature_text'] : '';
+        }, $feats), function ($f) {
+            return $f !== '';
+        });
+
+        $plan_type = isset($plan['plan_type']) ? $plan['plan_type'] : 'pack';
+        $billing_type = isset($plan['billing_type']) && $plan['billing_type'] === 'subscription' ? 'subscription' : 'one_time';
+        $allow_additional_payers = !empty($plan['allow_additional_payers']);
+        $is_highlighted = !empty($plan['highlighted']) && !$has_highlight;
+        if ($is_highlighted) {
+            $has_highlight = true;
+        }
+
+        $applications_included = isset($plan['applications_included']) && $plan['applications_included'] !== ''
+            ? (int) $plan['applications_included']
+            : null;
+        if ($plan_type === 'unlimited') {
+            $applications_included = null;
+        }
+
+        $pricing_packs[] = array(
+            'name' => isset($plan['name']) ? $plan['name'] : '',
+            'price' => isset($plan['price']) && $plan['price'] !== '' ? (float) $plan['price'] : 0,
+            'badge' => isset($plan['badge']) ? $plan['badge'] : null,
+            'description' => isset($plan['description']) ? $plan['description'] : '',
+            'applicationsIncluded' => $applications_included,
+            'validityPeriod' => !empty($plan['validity_period']) ? $plan['validity_period'] : '1 year',
+            'billingType' => $billing_type,
+            'planType' => $plan_type === 'unlimited' ? 'unlimited' : 'pack',
+            'allowAdditionalPayers' => $allow_additional_payers,
+            'additionalPayerPrice' => $allow_additional_payers && isset($plan['additional_payer_price']) && $plan['additional_payer_price'] !== ''
+                ? (float) $plan['additional_payer_price']
+                : null,
+            'features' => $feats,
+            'cta' => isset($plan['cta']) ? $plan['cta'] : '',
+            'highlighted' => $is_highlighted,
+            'gracePeriodDays' => isset($plan['grace_period_days']) && $plan['grace_period_days'] !== '' ? (int) $plan['grace_period_days'] : 30,
+        );
+    }
+
+    return array_slice($pricing_packs, 0, 4);
+}
+
+function ccspro_get_pricing_content($scope = 'option', $post_id = 0) {
+    $target = $scope === 'option' ? 'option' : $post_id;
+
+    $pricing_plans_raw = get_field('pricing_plans', $target) ?: array();
+    $pricing_packs = ccspro_map_pricing_packs($pricing_plans_raw);
+    $post_year_items_raw = get_field('post_year_items', $target) ?: array();
+    $post_year_items = array_values(array_filter(array_map(function ($row) {
+        if (!isset($row['text']) || $row['text'] === '') {
+            return null;
+        }
+        return array(
+            'text' => $row['text'],
+            'kind' => isset($row['kind']) && $row['kind'] === 'negative' ? 'negative' : 'positive',
+        );
+    }, $post_year_items_raw)));
+
+    if ($scope === 'option' && empty($pricing_packs) && $post_id) {
+        return ccspro_get_pricing_content('post', $post_id);
+    }
+
+    return array(
+        'sectionTitle' => get_field('pricing_title', $target) ?: 'Simple, transparent pricing',
+        'sectionSubtitle' => get_field('pricing_subtitle', $target) ?: '',
+        'packs' => $pricing_packs,
+        'postYearBehavior' => array(
+            'title' => get_field('post_year_title', $target) ?: 'What happens after 1 year?',
+            'items' => $post_year_items,
+            'renewalNote' => get_field('post_year_renewal_note', $target) ?: '',
+        ),
+        'footerNote' => get_field('pricing_footer_note', $target) ?: '',
+    );
 }
 
 /**
@@ -1021,27 +1212,7 @@ function ccspro_transform_landing_page_to_frontend($post_id) {
             'description' => isset($row['description']) ? $row['description'] : '',
         );
     }, $caqh_consent);
-
-    $pricing_plans_raw = get_field('pricing_plans', $post_id) ?: array();
-    $pricing_plans = array();
-    foreach ($pricing_plans_raw as $plan) {
-        $feats = isset($plan['features']) && is_array($plan['features']) ? $plan['features'] : array();
-        $feats = array_map(function ($f) {
-            return isset($f['feature_text']) ? $f['feature_text'] : '';
-        }, $feats);
-        $pricing_plans[] = array(
-            'name' => isset($plan['name']) ? $plan['name'] : '',
-            'price' => isset($plan['price']) ? $plan['price'] : '',
-            'period' => isset($plan['period']) ? $plan['period'] : '',
-            'description' => isset($plan['description']) ? $plan['description'] : '',
-            'features' => $feats,
-            'cta' => isset($plan['cta']) ? $plan['cta'] : '',
-            'highlighted' => !empty($plan['highlighted']),
-            'badge' => isset($plan['badge']) ? $plan['badge'] : null,
-            'yearlyPrice' => isset($plan['yearly_price']) ? $plan['yearly_price'] : null,
-            'yearlyLabel' => isset($plan['yearly_label']) ? $plan['yearly_label'] : null,
-        );
-    }
+    $pricing_content = ccspro_get_pricing_content('option', $post_id);
 
     $support_features = get_field('support_features', $post_id) ?: array();
     $support_features = array_map(function ($row) {
@@ -1192,19 +1363,7 @@ function ccspro_transform_landing_page_to_frontend($post_id) {
                 'description' => get_field('caqh_always_description', $post_id) ?: '',
             ),
         ),
-        'pricingContent' => array(
-            'sectionTitle' => get_field('pricing_title', $post_id) ?: 'Simple, transparent pricing',
-            'sectionSubtitle' => get_field('pricing_subtitle', $post_id) ?: '',
-            'plans' => $pricing_plans,
-            'additionalInfo' => array(
-                'updatePrice' => get_field('pricing_update_price', $post_id) ?: '',
-                'refundPolicy' => get_field('pricing_refund_policy', $post_id) ?: '',
-                'refundLink' => array(
-                    'label' => get_field('pricing_refund_label', $post_id) ?: '',
-                    'href' => get_field('pricing_refund_href', $post_id) ?: '#',
-                ),
-            ),
-        ),
+        'pricingContent' => $pricing_content,
         'supportContent' => array(
             'sectionTitle' => get_field('support_title', $post_id) ?: "We're here when you need us",
             'sectionSubtitle' => get_field('support_subtitle', $post_id) ?: '',
