@@ -2,7 +2,6 @@ import { useParams } from "react-router-dom";
 import { useLandingPage } from "@/hooks/useWordPress";
 import { defaultLandingPageContent } from "@/content/landing";
 import type { LandingPageContent } from "@/types/wordpress";
-import { LandingPageSkeleton } from "@/components/landing/LandingPageSkeleton";
 import { Header } from "@/components/landing/Header";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { LogoStrip } from "@/components/landing/LogoStrip";
@@ -21,14 +20,10 @@ import { Footer } from "@/components/landing/Footer";
 const Index = () => {
   const { slug: urlSlug } = useParams<{ slug?: string }>();
   const slug = urlSlug ?? "default";
-  const { data, isLoading } = useLandingPage(slug);
+  const { data } = useLandingPage(slug);
 
   const content: LandingPageContent =
     data ?? (defaultLandingPageContent as unknown as LandingPageContent);
-
-  if (isLoading) {
-    return <LandingPageSkeleton />;
-  }
 
   return (
     <div className="min-h-screen bg-background">
