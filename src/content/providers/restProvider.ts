@@ -53,10 +53,11 @@ async function getSiteConfig(): Promise<SiteConfigResponse> {
 }
 
 async function getPricingContent(): Promise<PricingContent> {
-  const url = `${WP_API_URL}/ccspro/v1/pricing`;
+  const url = `${WP_API_URL}/ccspro/v1/pricing?t=${Date.now()}`;
   const response = await fetch(url, {
     method: "GET",
     headers: { Accept: "application/json" },
+    cache: "no-store",
   });
 
   if (!response.ok) {
