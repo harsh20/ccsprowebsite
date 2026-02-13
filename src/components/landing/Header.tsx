@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Moon, Sun } from "lucide-react";
 import { navLinks, navCtas, siteConfig } from "@/content/landing";
 import type { LandingPageContent } from "@/types/wordpress";
+import ccsLogo from "@/assets/ccs-logo.png";
 
 interface HeaderProps {
   content?: LandingPageContent;
@@ -9,58 +10,54 @@ interface HeaderProps {
 
 export function Header({ content }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains("dark"));
+
   const site = content?.siteConfig ?? siteConfig;
   const links = content?.navLinks ?? navLinks;
   const ctas = content?.navCtas ?? navCtas;
 
+  const toggleDarkMode = () => {
+    document.documentElement.classList.toggle("dark");
+    setIsDark((prev) => !prev);
+  };
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-lg">
-      <nav className="container mx-auto px-4 flex h-16 items-center justify-between">
-        {/* Logo */}
-        <a href="#" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-            <span className="text-sm font-bold text-primary-foreground">C</span>
-          </div>
-          <span className="text-lg font-bold text-foreground">{site.name}</span>
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/85 backdrop-blur-md border-b border-border">
+      <nav className="section-container flex h-16 items-center justify-between">
+        <a href="#" className="flex items-center gap-3">
+          <img src={ccsLogo} alt={site.name} className="h-9 w-auto" />
+          <span className="hidden sm:inline text-sm font-semibold text-muted-foreground">{site.tagline}</span>
         </a>
 
-        {/* Desktop Navigation */}
-        <div className="hidden items-center gap-1 lg:flex">
+        <div className="hidden lg:flex items-center gap-6">
           {links.map((link) => (
-            <a key={link.label} href={link.href} className="btn-ghost">
+            <a key={link.label} href={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               {link.label}
             </a>
           ))}
-          <a href={ctas.signIn.href} className="btn-ghost">
-            {ctas.signIn.label}
-          </a>
         </div>
 
-        {/* Desktop CTAs */}
-        <div className="hidden items-center gap-3 lg:flex">
-          <a href={ctas.secondary.href} className="btn-ghost text-muted-foreground hover:text-primary">
-            {ctas.secondary.label}
-          </a>
-          <a href={ctas.primary.href} className="btn-primary">
-            {ctas.primary.label}
-          </a>
+        <div className="hidden lg:flex items-center gap-3">
+          <button type="button" className="btn-ghost" onClick={toggleDarkMode} aria-label="Toggle dark mode">
+            {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
+          <a href={ctas.signIn.href} className="btn-ghost">{ctas.signIn.label}</a>
+          <a href={ctas.primary.href} className="btn-primary">{ctas.primary.label}</a>
         </div>
 
-        {/* Mobile Menu Button */}
         <button
           className="lg:hidden p-2 text-muted-foreground hover:text-foreground"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          onClick={() => setMobileMenuOpen((v) => !v)}
           aria-label="Toggle menu"
         >
           {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </nav>
 
-      {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="lg:hidden border-t border-border bg-background">
-          <div className="container mx-auto px-4 py-4 space-y-2">
-            {navLinks.map((link) => (
+          <div className="section-container py-4 space-y-2">
+            {links.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
@@ -70,20 +67,15 @@ export function Header({ content }: HeaderProps) {
                 {link.label}
               </a>
             ))}
-            <a
-              href={ctas.signIn.href}
-              className="block py-2 text-muted-foreground hover:text-foreground"
-            >
-              {ctas.signIn.label}
-            </a>
-            <div className="flex flex-col gap-2 pt-4 border-t border-border">
-              <a href={ctas.secondary.href} className="btn-secondary text-center">
-                {ctas.secondary.label}
-              </a>
-              <a href={ctas.primary.href} className="btn-primary text-center">
-                {ctas.primary.label}
-              </a>
+            <div className="flex items-center justify-between pt-3 border-t border-border mt-3">
+              <a href={ctas.signIn.href} className="btn-ghost">{ctas.signIn.label}</a>
+              <button type="button" className="btn-ghost" onClick={toggleDarkMode} aria-label="Toggle dark mode">
+                {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </button>
             </div>
+            <a href={ctas.primary.href} className="btn-primary w-full text-center mt-2" onClick={() => setMobileMenuOpen(false)}>
+              {ctas.primary.label}
+            </a>
           </div>
         </div>
       )}

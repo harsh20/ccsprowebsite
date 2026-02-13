@@ -56,7 +56,8 @@ function ccspro_add_coming_soon_menu() {
 }
 
 function ccspro_render_coming_soon_page() {
-    if (isset($_POST['ccspro_coming_soon']) && current_user_can('manage_options')) {
+    // Form submitted: nonce is always sent; checkbox is only sent when checked
+    if (isset($_POST['_wpnonce']) && current_user_can('manage_options')) {
         check_admin_referer('ccspro_coming_soon');
         $value = !empty($_POST['ccspro_coming_soon']) ? '1' : '0';
         update_option('ccspro_coming_soon', $value);
@@ -150,351 +151,551 @@ function ccspro_get_field_group_config() {
         array('param' => 'post_type', 'operator' => '==', 'value' => 'landing_page'),
     ));
 
+    // Single consolidated field group with tabs for clean UX
     return array(
-        // ----- Site Config -----
         array(
-            'key' => 'group_ccspro_site_config',
-            'title' => 'Site Config',
+            'key' => 'group_ccspro_landing_page',
+            'title' => 'Landing Page Content',
             'fields' => array(
-                array('key' => 'field_site_name', 'label' => 'Site Name', 'name' => 'site_name', 'type' => 'text', 'default_value' => 'CCS Pro'),
-                array('key' => 'field_site_tagline', 'label' => 'Tagline', 'name' => 'site_tagline', 'type' => 'text'),
-                array('key' => 'field_site_description', 'label' => 'Description', 'name' => 'site_description', 'type' => 'textarea'),
-            ),
-            'location' => $default_location,
-        ),
-        // ----- Navigation -----
-        array(
-            'key' => 'group_ccspro_nav',
-            'title' => 'Navigation',
-            'fields' => array(
+                // =====================================================================
+                // TAB: General
+                // =====================================================================
+                array(
+                    'key' => 'field_tab_general',
+                    'label' => 'General',
+                    'type' => 'tab',
+                    'placement' => 'top',
+                ),
+                // ----- Site Config -----
+                array(
+                    'key' => 'field_accordion_site_config',
+                    'label' => 'Site Config',
+                    'type' => 'accordion',
+                    'open' => 1,
+                    'multi_expand' => 1,
+                ),
+                array(
+                    'key' => 'field_site_name',
+                    'label' => 'Site Name',
+                    'name' => 'site_name',
+                    'type' => 'text',
+                    'default_value' => 'CCS Pro',
+                    'wrapper' => array('width' => '33'),
+                ),
+                array(
+                    'key' => 'field_site_tagline',
+                    'label' => 'Tagline',
+                    'name' => 'site_tagline',
+                    'type' => 'text',
+                    'wrapper' => array('width' => '67'),
+                ),
+                array(
+                    'key' => 'field_site_description',
+                    'label' => 'Description',
+                    'name' => 'site_description',
+                    'type' => 'textarea',
+                    'rows' => 2,
+                ),
+                // ----- Navigation -----
+                array(
+                    'key' => 'field_accordion_navigation',
+                    'label' => 'Navigation',
+                    'type' => 'accordion',
+                    'open' => 0,
+                    'multi_expand' => 1,
+                ),
                 array(
                     'key' => 'field_nav_links',
                     'label' => 'Nav Links',
                     'name' => 'nav_links',
                     'type' => 'repeater',
+                    'instructions' => 'Menu items shown in the header navigation.',
+                    'layout' => 'table',
+                    'button_label' => 'Add Link',
                     'sub_fields' => array(
-                        array('key' => 'field_nav_link_label', 'label' => 'Label', 'name' => 'label', 'type' => 'text'),
-                        array('key' => 'field_nav_link_href', 'label' => 'Href', 'name' => 'href', 'type' => 'text'),
+                        array('key' => 'field_nav_link_label', 'label' => 'Label', 'name' => 'label', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                        array('key' => 'field_nav_link_href', 'label' => 'Href', 'name' => 'href', 'type' => 'text', 'placeholder' => '#section', 'wrapper' => array('width' => '50')),
                     ),
                 ),
-                array('key' => 'field_nav_primary_label', 'label' => 'Primary CTA Label', 'name' => 'nav_primary_label', 'type' => 'text'),
-                array('key' => 'field_nav_primary_href', 'label' => 'Primary CTA Href', 'name' => 'nav_primary_href', 'type' => 'text'),
-                array('key' => 'field_nav_secondary_label', 'label' => 'Secondary CTA Label', 'name' => 'nav_secondary_label', 'type' => 'text'),
-                array('key' => 'field_nav_secondary_href', 'label' => 'Secondary CTA Href', 'name' => 'nav_secondary_href', 'type' => 'text'),
-                array('key' => 'field_nav_signin_label', 'label' => 'Sign In Label', 'name' => 'nav_signin_label', 'type' => 'text'),
-                array('key' => 'field_nav_signin_href', 'label' => 'Sign In Href', 'name' => 'nav_signin_href', 'type' => 'text'),
-            ),
-            'location' => $default_location,
-        ),
-        // ----- Hero -----
-        array(
-            'key' => 'group_ccspro_hero',
-            'title' => 'Hero Section',
-            'fields' => array(
-                array('key' => 'field_hero_headline', 'label' => 'Headline', 'name' => 'hero_headline', 'type' => 'text'),
-                array('key' => 'field_hero_headline_highlight', 'label' => 'Headline Highlight', 'name' => 'hero_headline_highlight', 'type' => 'text'),
-                array('key' => 'field_hero_subheadline', 'label' => 'Subheadline', 'name' => 'hero_subheadline', 'type' => 'textarea'),
-                array('key' => 'field_hero_primary_label', 'label' => 'Primary CTA Label', 'name' => 'hero_primary_label', 'type' => 'text'),
-                array('key' => 'field_hero_primary_href', 'label' => 'Primary CTA Href', 'name' => 'hero_primary_href', 'type' => 'text'),
-                array('key' => 'field_hero_secondary_label', 'label' => 'Secondary CTA Label', 'name' => 'hero_secondary_label', 'type' => 'text'),
-                array('key' => 'field_hero_secondary_href', 'label' => 'Secondary CTA Href', 'name' => 'hero_secondary_href', 'type' => 'text'),
-                array('key' => 'field_hero_tertiary_label', 'label' => 'Tertiary CTA Label', 'name' => 'hero_tertiary_label', 'type' => 'text'),
-                array('key' => 'field_hero_tertiary_href', 'label' => 'Tertiary CTA Href', 'name' => 'hero_tertiary_href', 'type' => 'text'),
+                array(
+                    'key' => 'field_nav_ctas_message',
+                    'label' => '',
+                    'type' => 'message',
+                    'message' => '<strong>Header Buttons</strong>',
+                ),
+                array('key' => 'field_nav_primary_label', 'label' => 'Primary CTA Label', 'name' => 'nav_primary_label', 'type' => 'text', 'wrapper' => array('width' => '50'), 'placeholder' => 'Start free'),
+                array('key' => 'field_nav_primary_href', 'label' => 'Primary CTA Href', 'name' => 'nav_primary_href', 'type' => 'text', 'wrapper' => array('width' => '50'), 'placeholder' => '#pricing'),
+                array('key' => 'field_nav_secondary_label', 'label' => 'Secondary CTA Label', 'name' => 'nav_secondary_label', 'type' => 'text', 'wrapper' => array('width' => '50'), 'placeholder' => 'Book a demo'),
+                array('key' => 'field_nav_secondary_href', 'label' => 'Secondary CTA Href', 'name' => 'nav_secondary_href', 'type' => 'text', 'wrapper' => array('width' => '50'), 'placeholder' => '#demo'),
+                array('key' => 'field_nav_signin_label', 'label' => 'Sign In Label', 'name' => 'nav_signin_label', 'type' => 'text', 'wrapper' => array('width' => '50'), 'placeholder' => 'Sign in'),
+                array('key' => 'field_nav_signin_href', 'label' => 'Sign In Href', 'name' => 'nav_signin_href', 'type' => 'text', 'wrapper' => array('width' => '50'), 'placeholder' => '/login'),
+                array(
+                    'key' => 'field_accordion_navigation_end',
+                    'label' => 'Navigation End',
+                    'type' => 'accordion',
+                    'endpoint' => 1,
+                ),
+
+                // =====================================================================
+                // TAB: Hero
+                // =====================================================================
+                array(
+                    'key' => 'field_tab_hero',
+                    'label' => 'Hero',
+                    'type' => 'tab',
+                    'placement' => 'top',
+                ),
+                // ----- Hero Content -----
+                array(
+                    'key' => 'field_accordion_hero_content',
+                    'label' => 'Hero Content',
+                    'type' => 'accordion',
+                    'open' => 1,
+                    'multi_expand' => 1,
+                ),
+                array('key' => 'field_hero_headline', 'label' => 'Headline', 'name' => 'hero_headline', 'type' => 'text', 'wrapper' => array('width' => '60')),
+                array('key' => 'field_hero_headline_highlight', 'label' => 'Highlight Word', 'name' => 'hero_headline_highlight', 'type' => 'text', 'instructions' => 'Word to highlight in the headline', 'wrapper' => array('width' => '40')),
+                array('key' => 'field_hero_subheadline', 'label' => 'Subheadline', 'name' => 'hero_subheadline', 'type' => 'textarea', 'rows' => 2),
+                array(
+                    'key' => 'field_hero_ctas_message',
+                    'label' => '',
+                    'type' => 'message',
+                    'message' => '<strong>Hero Buttons</strong>',
+                ),
+                array('key' => 'field_hero_primary_label', 'label' => 'Primary CTA Label', 'name' => 'hero_primary_label', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_hero_primary_href', 'label' => 'Primary CTA Href', 'name' => 'hero_primary_href', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_hero_secondary_label', 'label' => 'Secondary CTA Label', 'name' => 'hero_secondary_label', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_hero_secondary_href', 'label' => 'Secondary CTA Href', 'name' => 'hero_secondary_href', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_hero_tertiary_label', 'label' => 'Tertiary CTA Label', 'name' => 'hero_tertiary_label', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_hero_tertiary_href', 'label' => 'Tertiary CTA Href', 'name' => 'hero_tertiary_href', 'type' => 'text', 'wrapper' => array('width' => '50')),
                 array(
                     'key' => 'field_hero_trust_indicators',
                     'label' => 'Trust Indicators',
                     'name' => 'hero_trust_indicators',
                     'type' => 'repeater',
+                    'instructions' => 'Small trust badges below hero buttons (e.g., "HIPAA Compliant").',
+                    'layout' => 'table',
+                    'button_label' => 'Add Indicator',
                     'sub_fields' => array(
-                        array('key' => 'field_hero_trust_icon', 'label' => 'Icon', 'name' => 'icon', 'type' => 'text', 'placeholder' => 'Shield'),
-                        array('key' => 'field_hero_trust_text', 'label' => 'Text', 'name' => 'text', 'type' => 'text'),
+                        array('key' => 'field_hero_trust_icon', 'label' => 'Icon', 'name' => 'icon', 'type' => 'text', 'placeholder' => 'Shield', 'wrapper' => array('width' => '30')),
+                        array('key' => 'field_hero_trust_text', 'label' => 'Text', 'name' => 'text', 'type' => 'text', 'wrapper' => array('width' => '70')),
                     ),
                 ),
-                array('key' => 'field_hero_dashboard_title', 'label' => 'Dashboard Title', 'name' => 'hero_dashboard_title', 'type' => 'text'),
-                array('key' => 'field_hero_dashboard_subtitle', 'label' => 'Dashboard Subtitle', 'name' => 'hero_dashboard_subtitle', 'type' => 'text'),
-                array('key' => 'field_hero_dashboard_completion', 'label' => 'Completion %', 'name' => 'hero_dashboard_completion', 'type' => 'number', 'default_value' => 92),
-                array('key' => 'field_hero_dashboard_state', 'label' => 'State Value', 'name' => 'hero_dashboard_state', 'type' => 'text'),
-                array('key' => 'field_hero_dashboard_npi', 'label' => 'NPI Value', 'name' => 'hero_dashboard_npi', 'type' => 'text'),
+                // ----- Hero Dashboard -----
+                array(
+                    'key' => 'field_accordion_hero_dashboard',
+                    'label' => 'Dashboard Preview',
+                    'type' => 'accordion',
+                    'open' => 0,
+                    'multi_expand' => 1,
+                ),
+                array('key' => 'field_hero_dashboard_title', 'label' => 'Dashboard Title', 'name' => 'hero_dashboard_title', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_hero_dashboard_subtitle', 'label' => 'Dashboard Subtitle', 'name' => 'hero_dashboard_subtitle', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_hero_dashboard_completion', 'label' => 'Completion %', 'name' => 'hero_dashboard_completion', 'type' => 'number', 'default_value' => 92, 'wrapper' => array('width' => '33')),
+                array('key' => 'field_hero_dashboard_state', 'label' => 'State Value', 'name' => 'hero_dashboard_state', 'type' => 'text', 'placeholder' => 'California', 'wrapper' => array('width' => '33')),
+                array('key' => 'field_hero_dashboard_npi', 'label' => 'NPI Value', 'name' => 'hero_dashboard_npi', 'type' => 'text', 'placeholder' => '1234567890', 'wrapper' => array('width' => '34')),
                 array(
                     'key' => 'field_hero_dashboard_documents',
                     'label' => 'Dashboard Documents',
                     'name' => 'hero_dashboard_documents',
                     'type' => 'repeater',
+                    'instructions' => 'Sample documents shown in the dashboard preview.',
+                    'layout' => 'table',
+                    'button_label' => 'Add Document',
                     'sub_fields' => array(
-                        array('key' => 'field_hero_doc_name', 'label' => 'Name', 'name' => 'name', 'type' => 'text'),
-                        array('key' => 'field_hero_doc_status', 'label' => 'Status', 'name' => 'status', 'type' => 'text'),
-                        array('key' => 'field_hero_doc_color', 'label' => 'Status Color', 'name' => 'status_color', 'type' => 'text'),
+                        array('key' => 'field_hero_doc_name', 'label' => 'Name', 'name' => 'name', 'type' => 'text', 'wrapper' => array('width' => '40')),
+                        array('key' => 'field_hero_doc_status', 'label' => 'Status', 'name' => 'status', 'type' => 'text', 'placeholder' => 'Complete', 'wrapper' => array('width' => '30')),
+                        array('key' => 'field_hero_doc_color', 'label' => 'Color', 'name' => 'status_color', 'type' => 'select', 'choices' => array('green' => 'Green', 'blue' => 'Blue', 'orange' => 'Orange', 'red' => 'Red', 'gray' => 'Gray'), 'default_value' => 'gray', 'wrapper' => array('width' => '30')),
                     ),
                 ),
-                array('key' => 'field_hero_dashboard_btn_primary', 'label' => 'Button Primary', 'name' => 'hero_dashboard_btn_primary', 'type' => 'text'),
-                array('key' => 'field_hero_dashboard_btn_secondary', 'label' => 'Button Secondary', 'name' => 'hero_dashboard_btn_secondary', 'type' => 'text'),
-            ),
-            'location' => $default_location,
-        ),
-        // ----- Verification / Logo Strip -----
-        array(
-            'key' => 'group_ccspro_verification',
-            'title' => 'Verification / Logo Strip',
-            'fields' => array(
+                array('key' => 'field_hero_dashboard_btn_primary', 'label' => 'Button Primary', 'name' => 'hero_dashboard_btn_primary', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_hero_dashboard_btn_secondary', 'label' => 'Button Secondary', 'name' => 'hero_dashboard_btn_secondary', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array(
+                    'key' => 'field_accordion_hero_end',
+                    'label' => 'Hero End',
+                    'type' => 'accordion',
+                    'endpoint' => 1,
+                ),
+
+                // =====================================================================
+                // TAB: Story
+                // =====================================================================
+                array(
+                    'key' => 'field_tab_story',
+                    'label' => 'Story',
+                    'type' => 'tab',
+                    'placement' => 'top',
+                ),
+                // ----- Verification / Logo Strip -----
+                array(
+                    'key' => 'field_accordion_verification',
+                    'label' => 'Verification / Logo Strip',
+                    'type' => 'accordion',
+                    'open' => 1,
+                    'multi_expand' => 1,
+                ),
                 array('key' => 'field_verification_headline', 'label' => 'Headline', 'name' => 'verification_headline', 'type' => 'text'),
                 array(
                     'key' => 'field_verification_items',
-                    'label' => 'Items',
+                    'label' => 'Verification Items',
                     'name' => 'verification_items',
                     'type' => 'repeater',
+                    'instructions' => 'Logos/badges shown below the hero (e.g., DEA, State Medical Board).',
+                    'layout' => 'table',
+                    'button_label' => 'Add Item',
                     'sub_fields' => array(
-                        array('key' => 'field_verification_icon', 'label' => 'Icon', 'name' => 'icon', 'type' => 'text'),
-                        array('key' => 'field_verification_label', 'label' => 'Label', 'name' => 'label', 'type' => 'text'),
+                        array('key' => 'field_verification_icon', 'label' => 'Icon', 'name' => 'icon', 'type' => 'text', 'placeholder' => 'Award', 'wrapper' => array('width' => '30')),
+                        array('key' => 'field_verification_label', 'label' => 'Label', 'name' => 'label', 'type' => 'text', 'wrapper' => array('width' => '70')),
                     ),
                 ),
-            ),
-            'location' => $default_location,
-        ),
-        // ----- Founder Spotlight -----
-        array(
-            'key' => 'group_ccspro_founder',
-            'title' => 'Founder Spotlight',
-            'fields' => array(
-                array('key' => 'field_founder_name', 'label' => 'Name', 'name' => 'founder_name', 'type' => 'text'),
-                array('key' => 'field_founder_title', 'label' => 'Title', 'name' => 'founder_title', 'type' => 'text'),
-                array('key' => 'field_founder_initials', 'label' => 'Initials', 'name' => 'founder_initials', 'type' => 'text'),
-                array('key' => 'field_founder_quote', 'label' => 'Quote', 'name' => 'founder_quote', 'type' => 'textarea'),
+                // ----- Founder Spotlight -----
+                array(
+                    'key' => 'field_accordion_founder',
+                    'label' => 'Founder Spotlight',
+                    'type' => 'accordion',
+                    'open' => 0,
+                    'multi_expand' => 1,
+                ),
+                array('key' => 'field_founder_name', 'label' => 'Name', 'name' => 'founder_name', 'type' => 'text', 'wrapper' => array('width' => '40')),
+                array('key' => 'field_founder_title', 'label' => 'Title', 'name' => 'founder_title', 'type' => 'text', 'wrapper' => array('width' => '40')),
+                array('key' => 'field_founder_initials', 'label' => 'Initials', 'name' => 'founder_initials', 'type' => 'text', 'wrapper' => array('width' => '20'), 'placeholder' => 'DR'),
+                array('key' => 'field_founder_quote', 'label' => 'Quote', 'name' => 'founder_quote', 'type' => 'textarea', 'rows' => 3),
                 array(
                     'key' => 'field_founder_bullets',
                     'label' => 'Bullets',
                     'name' => 'founder_bullets',
                     'type' => 'repeater',
+                    'layout' => 'table',
+                    'button_label' => 'Add Bullet',
                     'sub_fields' => array(
                         array('key' => 'field_founder_bullet_text', 'label' => 'Text', 'name' => 'bullet_text', 'type' => 'text'),
                     ),
                 ),
-            ),
-            'location' => $default_location,
-        ),
-        // ----- Problem / Outcome -----
-        array(
-            'key' => 'group_ccspro_problem_outcome',
-            'title' => 'Problem / Outcome',
-            'fields' => array(
+                // ----- Problem / Outcome -----
+                array(
+                    'key' => 'field_accordion_problem_outcome',
+                    'label' => 'Problem / Outcome',
+                    'type' => 'accordion',
+                    'open' => 0,
+                    'multi_expand' => 1,
+                ),
                 array(
                     'key' => 'field_problems',
                     'label' => 'Problems',
                     'name' => 'problems',
                     'type' => 'repeater',
+                    'instructions' => 'Pain points that CCS Pro solves.',
+                    'layout' => 'block',
+                    'button_label' => 'Add Problem',
                     'sub_fields' => array(
-                        array('key' => 'field_problem_icon', 'label' => 'Icon', 'name' => 'icon', 'type' => 'text'),
-                        array('key' => 'field_problem_title', 'label' => 'Title', 'name' => 'title', 'type' => 'text'),
-                        array('key' => 'field_problem_description', 'label' => 'Description', 'name' => 'description', 'type' => 'textarea'),
+                        array('key' => 'field_problem_icon', 'label' => 'Icon', 'name' => 'icon', 'type' => 'text', 'placeholder' => 'AlertTriangle', 'wrapper' => array('width' => '20')),
+                        array('key' => 'field_problem_title', 'label' => 'Title', 'name' => 'title', 'type' => 'text', 'wrapper' => array('width' => '80')),
+                        array('key' => 'field_problem_description', 'label' => 'Description', 'name' => 'description', 'type' => 'textarea', 'rows' => 2),
                     ),
                 ),
-                array('key' => 'field_outcome_prefix', 'label' => 'Outcome Prefix', 'name' => 'outcome_prefix', 'type' => 'text'),
-                array('key' => 'field_outcome_middle', 'label' => 'Outcome Middle', 'name' => 'outcome_middle', 'type' => 'text'),
-                array('key' => 'field_outcome_suffix', 'label' => 'Outcome Suffix', 'name' => 'outcome_suffix', 'type' => 'text'),
-            ),
-            'location' => $default_location,
-        ),
-        // ----- How It Works -----
-        array(
-            'key' => 'group_ccspro_how_it_works',
-            'title' => 'How It Works',
-            'fields' => array(
-                array('key' => 'field_how_title', 'label' => 'Section Title', 'name' => 'how_it_works_title', 'type' => 'text'),
-                array('key' => 'field_how_subtitle', 'label' => 'Section Subtitle', 'name' => 'how_it_works_subtitle', 'type' => 'text'),
+                array(
+                    'key' => 'field_outcome_message',
+                    'label' => '',
+                    'type' => 'message',
+                    'message' => '<strong>Outcome Statement</strong> — builds a sentence: "[Prefix] [Middle] [Suffix]"',
+                ),
+                array('key' => 'field_outcome_prefix', 'label' => 'Prefix', 'name' => 'outcome_prefix', 'type' => 'text', 'wrapper' => array('width' => '33')),
+                array('key' => 'field_outcome_middle', 'label' => 'Middle (highlighted)', 'name' => 'outcome_middle', 'type' => 'text', 'wrapper' => array('width' => '34')),
+                array('key' => 'field_outcome_suffix', 'label' => 'Suffix', 'name' => 'outcome_suffix', 'type' => 'text', 'wrapper' => array('width' => '33')),
+                array(
+                    'key' => 'field_accordion_story_end',
+                    'label' => 'Story End',
+                    'type' => 'accordion',
+                    'endpoint' => 1,
+                ),
+
+                // =====================================================================
+                // TAB: How It Works
+                // =====================================================================
+                array(
+                    'key' => 'field_tab_how_it_works',
+                    'label' => 'How It Works',
+                    'type' => 'tab',
+                    'placement' => 'top',
+                ),
+                array('key' => 'field_how_title', 'label' => 'Section Title', 'name' => 'how_it_works_title', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_how_subtitle', 'label' => 'Section Subtitle', 'name' => 'how_it_works_subtitle', 'type' => 'text', 'wrapper' => array('width' => '50')),
                 array(
                     'key' => 'field_how_steps',
                     'label' => 'Steps',
                     'name' => 'how_it_works_steps',
                     'type' => 'repeater',
+                    'instructions' => 'The step-by-step process.',
+                    'layout' => 'block',
+                    'button_label' => 'Add Step',
                     'sub_fields' => array(
-                        array('key' => 'field_how_step_icon', 'label' => 'Icon', 'name' => 'icon', 'type' => 'text'),
-                        array('key' => 'field_how_step_number', 'label' => 'Step Number', 'name' => 'step_number', 'type' => 'text', 'placeholder' => '01'),
-                        array('key' => 'field_how_step_title', 'label' => 'Title', 'name' => 'title', 'type' => 'text'),
-                        array('key' => 'field_how_step_description', 'label' => 'Description', 'name' => 'description', 'type' => 'textarea'),
+                        array('key' => 'field_how_step_number', 'label' => 'Step #', 'name' => 'step_number', 'type' => 'text', 'placeholder' => '01', 'wrapper' => array('width' => '15')),
+                        array('key' => 'field_how_step_icon', 'label' => 'Icon', 'name' => 'icon', 'type' => 'text', 'placeholder' => 'Upload', 'wrapper' => array('width' => '20')),
+                        array('key' => 'field_how_step_title', 'label' => 'Title', 'name' => 'title', 'type' => 'text', 'wrapper' => array('width' => '65')),
+                        array('key' => 'field_how_step_description', 'label' => 'Description', 'name' => 'description', 'type' => 'textarea', 'rows' => 2),
                     ),
                 ),
-                array('key' => 'field_how_readiness_label', 'label' => 'Readiness Note Label', 'name' => 'how_readiness_label', 'type' => 'text'),
+                array('key' => 'field_how_readiness_label', 'label' => 'Readiness Note Label', 'name' => 'how_readiness_label', 'type' => 'text', 'placeholder' => '5 Readiness States:'),
                 array(
                     'key' => 'field_how_readiness_states',
                     'label' => 'Readiness States',
                     'name' => 'how_readiness_states',
                     'type' => 'repeater',
+                    'instructions' => 'Status indicators for document readiness.',
+                    'layout' => 'table',
+                    'button_label' => 'Add State',
                     'sub_fields' => array(
-                        array('key' => 'field_how_state_label', 'label' => 'Label', 'name' => 'label', 'type' => 'text'),
-                        array('key' => 'field_how_state_color', 'label' => 'Color', 'name' => 'color', 'type' => 'text'),
+                        array('key' => 'field_how_state_label', 'label' => 'Label', 'name' => 'label', 'type' => 'text', 'wrapper' => array('width' => '60')),
+                        array('key' => 'field_how_state_color', 'label' => 'Color', 'name' => 'color', 'type' => 'select', 'choices' => array('red' => 'Red', 'orange' => 'Orange', 'blue' => 'Blue', 'green' => 'Green', 'gray' => 'Gray'), 'wrapper' => array('width' => '40')),
                     ),
                 ),
-            ),
-            'location' => $default_location,
-        ),
-        // ----- Features -----
-        array(
-            'key' => 'group_ccspro_features',
-            'title' => 'Features',
-            'fields' => array(
-                array('key' => 'field_features_title', 'label' => 'Section Title', 'name' => 'features_title', 'type' => 'text'),
-                array('key' => 'field_features_subtitle', 'label' => 'Section Subtitle', 'name' => 'features_subtitle', 'type' => 'text'),
+
+                // =====================================================================
+                // TAB: Features
+                // =====================================================================
+                array(
+                    'key' => 'field_tab_features',
+                    'label' => 'Features',
+                    'type' => 'tab',
+                    'placement' => 'top',
+                ),
+                // ----- Features Grid -----
+                array(
+                    'key' => 'field_accordion_features',
+                    'label' => 'Features Grid',
+                    'type' => 'accordion',
+                    'open' => 1,
+                    'multi_expand' => 1,
+                ),
+                array('key' => 'field_features_title', 'label' => 'Section Title', 'name' => 'features_title', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_features_subtitle', 'label' => 'Section Subtitle', 'name' => 'features_subtitle', 'type' => 'text', 'wrapper' => array('width' => '50')),
                 array(
                     'key' => 'field_features_items',
                     'label' => 'Features',
                     'name' => 'features_items',
                     'type' => 'repeater',
+                    'layout' => 'block',
+                    'button_label' => 'Add Feature',
                     'sub_fields' => array(
-                        array('key' => 'field_feature_icon', 'label' => 'Icon', 'name' => 'icon', 'type' => 'text'),
-                        array('key' => 'field_feature_title', 'label' => 'Title', 'name' => 'title', 'type' => 'text'),
-                        array('key' => 'field_feature_description', 'label' => 'Description', 'name' => 'description', 'type' => 'textarea'),
-                        array('key' => 'field_feature_link', 'label' => 'Link', 'name' => 'link', 'type' => 'text'),
+                        array('key' => 'field_feature_icon', 'label' => 'Icon', 'name' => 'icon', 'type' => 'text', 'placeholder' => 'FileCheck', 'wrapper' => array('width' => '20')),
+                        array('key' => 'field_feature_title', 'label' => 'Title', 'name' => 'title', 'type' => 'text', 'wrapper' => array('width' => '40')),
+                        array('key' => 'field_feature_link', 'label' => 'Link', 'name' => 'link', 'type' => 'text', 'placeholder' => '#', 'wrapper' => array('width' => '40')),
+                        array('key' => 'field_feature_description', 'label' => 'Description', 'name' => 'description', 'type' => 'textarea', 'rows' => 2),
                     ),
                 ),
-            ),
-            'location' => $default_location,
-        ),
-        // ----- Packet Preview -----
-        array(
-            'key' => 'group_ccspro_packet',
-            'title' => 'Packet Preview',
-            'fields' => array(
-                array('key' => 'field_packet_title', 'label' => 'Section Title', 'name' => 'packet_title', 'type' => 'text'),
-                array('key' => 'field_packet_subtitle', 'label' => 'Section Subtitle', 'name' => 'packet_subtitle', 'type' => 'text'),
-                array('key' => 'field_packet_filename', 'label' => 'File Name', 'name' => 'packet_filename', 'type' => 'text'),
+                // ----- Packet Preview -----
+                array(
+                    'key' => 'field_accordion_packet',
+                    'label' => 'Packet Preview',
+                    'type' => 'accordion',
+                    'open' => 0,
+                    'multi_expand' => 1,
+                ),
+                array('key' => 'field_packet_title', 'label' => 'Section Title', 'name' => 'packet_title', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_packet_subtitle', 'label' => 'Section Subtitle', 'name' => 'packet_subtitle', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_packet_filename', 'label' => 'File Name', 'name' => 'packet_filename', 'type' => 'text', 'placeholder' => 'credential-packet.pdf'),
                 array(
                     'key' => 'field_packet_checklist',
                     'label' => 'Checklist',
                     'name' => 'packet_checklist',
                     'type' => 'repeater',
+                    'layout' => 'table',
+                    'button_label' => 'Add Item',
                     'sub_fields' => array(
                         array('key' => 'field_packet_check_item', 'label' => 'Item', 'name' => 'item_text', 'type' => 'text'),
                     ),
                 ),
-                array('key' => 'field_packet_cta_label', 'label' => 'CTA Label', 'name' => 'packet_cta_label', 'type' => 'text'),
-                array('key' => 'field_packet_cta_href', 'label' => 'CTA Href', 'name' => 'packet_cta_href', 'type' => 'text'),
-            ),
-            'location' => $default_location,
-        ),
-        // ----- Security -----
-        array(
-            'key' => 'group_ccspro_security',
-            'title' => 'Security',
-            'fields' => array(
-                array('key' => 'field_security_badge', 'label' => 'Badge', 'name' => 'security_badge', 'type' => 'text'),
-                array('key' => 'field_security_title', 'label' => 'Title', 'name' => 'security_title', 'type' => 'text'),
-                array('key' => 'field_security_subtitle', 'label' => 'Subtitle', 'name' => 'security_subtitle', 'type' => 'textarea'),
+                array('key' => 'field_packet_cta_label', 'label' => 'CTA Label', 'name' => 'packet_cta_label', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_packet_cta_href', 'label' => 'CTA Href', 'name' => 'packet_cta_href', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array(
+                    'key' => 'field_accordion_features_end',
+                    'label' => 'Features End',
+                    'type' => 'accordion',
+                    'endpoint' => 1,
+                ),
+
+                // =====================================================================
+                // TAB: Security
+                // =====================================================================
+                array(
+                    'key' => 'field_tab_security',
+                    'label' => 'Security',
+                    'type' => 'tab',
+                    'placement' => 'top',
+                ),
+                // ----- Security Section -----
+                array(
+                    'key' => 'field_accordion_security',
+                    'label' => 'Security Section',
+                    'type' => 'accordion',
+                    'open' => 1,
+                    'multi_expand' => 1,
+                ),
+                array('key' => 'field_security_badge', 'label' => 'Badge', 'name' => 'security_badge', 'type' => 'text', 'wrapper' => array('width' => '33')),
+                array('key' => 'field_security_title', 'label' => 'Title', 'name' => 'security_title', 'type' => 'text', 'wrapper' => array('width' => '67')),
+                array('key' => 'field_security_subtitle', 'label' => 'Subtitle', 'name' => 'security_subtitle', 'type' => 'textarea', 'rows' => 2),
                 array(
                     'key' => 'field_security_features',
                     'label' => 'Features',
                     'name' => 'security_features',
                     'type' => 'repeater',
+                    'layout' => 'table',
+                    'button_label' => 'Add Feature',
                     'sub_fields' => array(
-                        array('key' => 'field_security_feat_icon', 'label' => 'Icon', 'name' => 'icon', 'type' => 'text'),
-                        array('key' => 'field_security_feat_text', 'label' => 'Text', 'name' => 'text', 'type' => 'text'),
+                        array('key' => 'field_security_feat_icon', 'label' => 'Icon', 'name' => 'icon', 'type' => 'text', 'placeholder' => 'Shield', 'wrapper' => array('width' => '30')),
+                        array('key' => 'field_security_feat_text', 'label' => 'Text', 'name' => 'text', 'type' => 'text', 'wrapper' => array('width' => '70')),
                     ),
                 ),
-                array('key' => 'field_security_cta_label', 'label' => 'CTA Label', 'name' => 'security_cta_label', 'type' => 'text'),
-                array('key' => 'field_security_cta_href', 'label' => 'CTA Href', 'name' => 'security_cta_href', 'type' => 'text'),
+                array('key' => 'field_security_cta_label', 'label' => 'CTA Label', 'name' => 'security_cta_label', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_security_cta_href', 'label' => 'CTA Href', 'name' => 'security_cta_href', 'type' => 'text', 'wrapper' => array('width' => '50')),
                 array(
                     'key' => 'field_security_floating_badges',
                     'label' => 'Floating Badges',
                     'name' => 'security_floating_badges',
                     'type' => 'repeater',
+                    'layout' => 'table',
+                    'button_label' => 'Add Badge',
                     'sub_fields' => array(
                         array('key' => 'field_security_badge_text', 'label' => 'Badge Text', 'name' => 'badge_text', 'type' => 'text'),
                     ),
                 ),
-            ),
-            'location' => $default_location,
-        ),
-        // ----- CAQH Concierge -----
-        array(
-            'key' => 'group_ccspro_caqh',
-            'title' => 'CAQH Concierge',
-            'fields' => array(
-                array('key' => 'field_caqh_badge', 'label' => 'Badge', 'name' => 'caqh_badge', 'type' => 'text'),
-                array('key' => 'field_caqh_title', 'label' => 'Title', 'name' => 'caqh_title', 'type' => 'text'),
-                array('key' => 'field_caqh_subtitle', 'label' => 'Subtitle', 'name' => 'caqh_subtitle', 'type' => 'textarea'),
+                // ----- CAQH Concierge -----
+                array(
+                    'key' => 'field_accordion_caqh',
+                    'label' => 'CAQH Concierge',
+                    'type' => 'accordion',
+                    'open' => 0,
+                    'multi_expand' => 1,
+                ),
+                array('key' => 'field_caqh_badge', 'label' => 'Badge', 'name' => 'caqh_badge', 'type' => 'text', 'wrapper' => array('width' => '33')),
+                array('key' => 'field_caqh_title', 'label' => 'Title', 'name' => 'caqh_title', 'type' => 'text', 'wrapper' => array('width' => '67')),
+                array('key' => 'field_caqh_subtitle', 'label' => 'Subtitle', 'name' => 'caqh_subtitle', 'type' => 'textarea', 'rows' => 2),
                 array('key' => 'field_caqh_benefits_title', 'label' => 'Benefits Title', 'name' => 'caqh_benefits_title', 'type' => 'text'),
                 array(
                     'key' => 'field_caqh_benefits',
                     'label' => 'Benefits',
                     'name' => 'caqh_benefits',
                     'type' => 'repeater',
+                    'layout' => 'table',
+                    'button_label' => 'Add Benefit',
                     'sub_fields' => array(
                         array('key' => 'field_caqh_benefit_text', 'label' => 'Text', 'name' => 'benefit_text', 'type' => 'text'),
                     ),
                 ),
-                array('key' => 'field_caqh_cta_label', 'label' => 'CTA Label', 'name' => 'caqh_cta_label', 'type' => 'text'),
-                array('key' => 'field_caqh_cta_href', 'label' => 'CTA Href', 'name' => 'caqh_cta_href', 'type' => 'text'),
+                array('key' => 'field_caqh_cta_label', 'label' => 'CTA Label', 'name' => 'caqh_cta_label', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_caqh_cta_href', 'label' => 'CTA Href', 'name' => 'caqh_cta_href', 'type' => 'text', 'wrapper' => array('width' => '50')),
                 array('key' => 'field_caqh_consent_title', 'label' => 'Consent Title', 'name' => 'caqh_consent_title', 'type' => 'text'),
                 array(
                     'key' => 'field_caqh_consent_modes',
                     'label' => 'Consent Modes',
                     'name' => 'caqh_consent_modes',
                     'type' => 'repeater',
+                    'layout' => 'block',
+                    'button_label' => 'Add Mode',
                     'sub_fields' => array(
-                        array('key' => 'field_caqh_consent_icon', 'label' => 'Icon', 'name' => 'icon', 'type' => 'text'),
-                        array('key' => 'field_caqh_consent_title_f', 'label' => 'Title', 'name' => 'title', 'type' => 'text'),
-                        array('key' => 'field_caqh_consent_description', 'label' => 'Description', 'name' => 'description', 'type' => 'textarea'),
+                        array('key' => 'field_caqh_consent_icon', 'label' => 'Icon', 'name' => 'icon', 'type' => 'text', 'wrapper' => array('width' => '20')),
+                        array('key' => 'field_caqh_consent_title_f', 'label' => 'Title', 'name' => 'title', 'type' => 'text', 'wrapper' => array('width' => '80')),
+                        array('key' => 'field_caqh_consent_description', 'label' => 'Description', 'name' => 'description', 'type' => 'textarea', 'rows' => 2),
                     ),
                 ),
-                array('key' => 'field_caqh_always_icon', 'label' => 'Always Included Icon', 'name' => 'caqh_always_icon', 'type' => 'text'),
-                array('key' => 'field_caqh_always_title', 'label' => 'Always Included Title', 'name' => 'caqh_always_title', 'type' => 'text'),
-                array('key' => 'field_caqh_always_description', 'label' => 'Always Included Description', 'name' => 'caqh_always_description', 'type' => 'text'),
-            ),
-            'location' => $default_location,
-        ),
-        // ----- Pricing -----
-        array(
-            'key' => 'group_ccspro_pricing',
-            'title' => 'Pricing',
-            'fields' => array(
-                array('key' => 'field_pricing_title', 'label' => 'Section Title', 'name' => 'pricing_title', 'type' => 'text'),
-                array('key' => 'field_pricing_subtitle', 'label' => 'Section Subtitle', 'name' => 'pricing_subtitle', 'type' => 'text'),
+                array(
+                    'key' => 'field_caqh_always_message',
+                    'label' => '',
+                    'type' => 'message',
+                    'message' => '<strong>Always Included Note</strong>',
+                ),
+                array('key' => 'field_caqh_always_icon', 'label' => 'Icon', 'name' => 'caqh_always_icon', 'type' => 'text', 'wrapper' => array('width' => '20')),
+                array('key' => 'field_caqh_always_title', 'label' => 'Title', 'name' => 'caqh_always_title', 'type' => 'text', 'wrapper' => array('width' => '80')),
+                array('key' => 'field_caqh_always_description', 'label' => 'Description', 'name' => 'caqh_always_description', 'type' => 'text'),
+                array(
+                    'key' => 'field_accordion_security_end',
+                    'label' => 'Security End',
+                    'type' => 'accordion',
+                    'endpoint' => 1,
+                ),
+
+                // =====================================================================
+                // TAB: Pricing
+                // =====================================================================
+                array(
+                    'key' => 'field_tab_pricing',
+                    'label' => 'Pricing',
+                    'type' => 'tab',
+                    'placement' => 'top',
+                ),
+                array('key' => 'field_pricing_title', 'label' => 'Section Title', 'name' => 'pricing_title', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_pricing_subtitle', 'label' => 'Section Subtitle', 'name' => 'pricing_subtitle', 'type' => 'text', 'wrapper' => array('width' => '50')),
                 array(
                     'key' => 'field_pricing_plans',
                     'label' => 'Plans',
                     'name' => 'pricing_plans',
                     'type' => 'repeater',
+                    'instructions' => 'Add pricing tiers. Mark one as "Highlighted" for emphasis.',
+                    'layout' => 'block',
+                    'button_label' => 'Add Plan',
                     'sub_fields' => array(
-                        array('key' => 'field_plan_name', 'label' => 'Name', 'name' => 'name', 'type' => 'text'),
-                        array('key' => 'field_plan_price', 'label' => 'Price', 'name' => 'price', 'type' => 'text'),
-                        array('key' => 'field_plan_period', 'label' => 'Period', 'name' => 'period', 'type' => 'text'),
-                        array('key' => 'field_plan_yearly_price', 'label' => 'Yearly Price', 'name' => 'yearly_price', 'type' => 'text'),
-                        array('key' => 'field_plan_yearly_label', 'label' => 'Yearly Label', 'name' => 'yearly_label', 'type' => 'text'),
-                        array('key' => 'field_plan_description', 'label' => 'Description', 'name' => 'description', 'type' => 'text'),
+                        array('key' => 'field_plan_name', 'label' => 'Name', 'name' => 'name', 'type' => 'text', 'wrapper' => array('width' => '25')),
+                        array('key' => 'field_plan_price', 'label' => 'Price', 'name' => 'price', 'type' => 'text', 'placeholder' => '$99', 'wrapper' => array('width' => '15')),
+                        array('key' => 'field_plan_period', 'label' => 'Period', 'name' => 'period', 'type' => 'text', 'placeholder' => '/month', 'wrapper' => array('width' => '15')),
+                        array('key' => 'field_plan_badge', 'label' => 'Badge', 'name' => 'badge', 'type' => 'text', 'placeholder' => 'Most Popular', 'wrapper' => array('width' => '25')),
+                        array('key' => 'field_plan_highlighted', 'label' => 'Highlighted', 'name' => 'highlighted', 'type' => 'true_false', 'ui' => 1, 'wrapper' => array('width' => '20')),
+                        array('key' => 'field_plan_yearly_price', 'label' => 'Yearly Price', 'name' => 'yearly_price', 'type' => 'text', 'wrapper' => array('width' => '25')),
+                        array('key' => 'field_plan_yearly_label', 'label' => 'Yearly Label', 'name' => 'yearly_label', 'type' => 'text', 'wrapper' => array('width' => '25')),
+                        array('key' => 'field_plan_description', 'label' => 'Description', 'name' => 'description', 'type' => 'text', 'wrapper' => array('width' => '50')),
                         array(
                             'key' => 'field_plan_features',
                             'label' => 'Features',
                             'name' => 'features',
                             'type' => 'repeater',
+                            'layout' => 'table',
+                            'button_label' => 'Add Feature',
                             'sub_fields' => array(
                                 array('key' => 'field_plan_feature_text', 'label' => 'Feature', 'name' => 'feature_text', 'type' => 'text'),
                             ),
                         ),
-                        array('key' => 'field_plan_cta', 'label' => 'CTA', 'name' => 'cta', 'type' => 'text'),
-                        array('key' => 'field_plan_highlighted', 'label' => 'Highlighted', 'name' => 'highlighted', 'type' => 'true_false', 'default_value' => 0),
-                        array('key' => 'field_plan_badge', 'label' => 'Badge', 'name' => 'badge', 'type' => 'text'),
+                        array('key' => 'field_plan_cta', 'label' => 'CTA Button Text', 'name' => 'cta', 'type' => 'text', 'placeholder' => 'Get Started'),
                     ),
                 ),
+                array(
+                    'key' => 'field_pricing_additional_message',
+                    'label' => '',
+                    'type' => 'message',
+                    'message' => '<strong>Additional Info</strong>',
+                ),
                 array('key' => 'field_pricing_update_price', 'label' => 'Update Price Text', 'name' => 'pricing_update_price', 'type' => 'text'),
-                array('key' => 'field_pricing_refund_policy', 'label' => 'Refund Policy', 'name' => 'pricing_refund_policy', 'type' => 'textarea'),
-                array('key' => 'field_pricing_refund_label', 'label' => 'Refund Link Label', 'name' => 'pricing_refund_label', 'type' => 'text'),
-                array('key' => 'field_pricing_refund_href', 'label' => 'Refund Link Href', 'name' => 'pricing_refund_href', 'type' => 'text'),
-            ),
-            'location' => $default_location,
-        ),
-        // ----- Support -----
-        array(
-            'key' => 'group_ccspro_support',
-            'title' => 'Support',
-            'fields' => array(
-                array('key' => 'field_support_title', 'label' => 'Section Title', 'name' => 'support_title', 'type' => 'text'),
-                array('key' => 'field_support_subtitle', 'label' => 'Section Subtitle', 'name' => 'support_subtitle', 'type' => 'text'),
+                array('key' => 'field_pricing_refund_policy', 'label' => 'Refund Policy', 'name' => 'pricing_refund_policy', 'type' => 'textarea', 'rows' => 2),
+                array('key' => 'field_pricing_refund_label', 'label' => 'Refund Link Label', 'name' => 'pricing_refund_label', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_pricing_refund_href', 'label' => 'Refund Link Href', 'name' => 'pricing_refund_href', 'type' => 'text', 'wrapper' => array('width' => '50')),
+
+                // =====================================================================
+                // TAB: Support
+                // =====================================================================
+                array(
+                    'key' => 'field_tab_support',
+                    'label' => 'Support',
+                    'type' => 'tab',
+                    'placement' => 'top',
+                ),
+                // ----- Support -----
+                array(
+                    'key' => 'field_accordion_support',
+                    'label' => 'Support Section',
+                    'type' => 'accordion',
+                    'open' => 1,
+                    'multi_expand' => 1,
+                ),
+                array('key' => 'field_support_title', 'label' => 'Section Title', 'name' => 'support_title', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_support_subtitle', 'label' => 'Section Subtitle', 'name' => 'support_subtitle', 'type' => 'text', 'wrapper' => array('width' => '50')),
                 array(
                     'key' => 'field_support_features',
                     'label' => 'Features',
                     'name' => 'support_features',
                     'type' => 'repeater',
+                    'layout' => 'table',
+                    'button_label' => 'Add Feature',
                     'sub_fields' => array(
-                        array('key' => 'field_support_feat_icon', 'label' => 'Icon', 'name' => 'icon', 'type' => 'text'),
-                        array('key' => 'field_support_feat_text', 'label' => 'Text', 'name' => 'text', 'type' => 'text'),
+                        array('key' => 'field_support_feat_icon', 'label' => 'Icon', 'name' => 'icon', 'type' => 'text', 'placeholder' => 'MessageCircle', 'wrapper' => array('width' => '30')),
+                        array('key' => 'field_support_feat_text', 'label' => 'Text', 'name' => 'text', 'type' => 'text', 'wrapper' => array('width' => '70')),
                     ),
                 ),
                 array(
@@ -502,85 +703,118 @@ function ccspro_get_field_group_config() {
                     'label' => 'Links',
                     'name' => 'support_links',
                     'type' => 'repeater',
+                    'layout' => 'table',
+                    'button_label' => 'Add Link',
                     'sub_fields' => array(
-                        array('key' => 'field_support_link_label', 'label' => 'Label', 'name' => 'label', 'type' => 'text'),
-                        array('key' => 'field_support_link_href', 'label' => 'Href', 'name' => 'href', 'type' => 'text'),
+                        array('key' => 'field_support_link_label', 'label' => 'Label', 'name' => 'label', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                        array('key' => 'field_support_link_href', 'label' => 'Href', 'name' => 'href', 'type' => 'text', 'wrapper' => array('width' => '50')),
                     ),
                 ),
-            ),
-            'location' => $default_location,
-        ),
-        // ----- Team -----
-        array(
-            'key' => 'group_ccspro_team',
-            'title' => 'Team',
-            'fields' => array(
-                array('key' => 'field_team_title', 'label' => 'Section Title', 'name' => 'team_title', 'type' => 'text'),
-                array('key' => 'field_team_subtitle', 'label' => 'Section Subtitle', 'name' => 'team_subtitle', 'type' => 'text'),
+                // ----- Team -----
+                array(
+                    'key' => 'field_accordion_team',
+                    'label' => 'Team',
+                    'type' => 'accordion',
+                    'open' => 0,
+                    'multi_expand' => 1,
+                ),
+                array('key' => 'field_team_title', 'label' => 'Section Title', 'name' => 'team_title', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_team_subtitle', 'label' => 'Section Subtitle', 'name' => 'team_subtitle', 'type' => 'text', 'wrapper' => array('width' => '50')),
                 array(
                     'key' => 'field_team_members',
                     'label' => 'Members',
                     'name' => 'team_members',
                     'type' => 'repeater',
+                    'layout' => 'block',
+                    'button_label' => 'Add Member',
                     'sub_fields' => array(
-                        array('key' => 'field_team_member_name', 'label' => 'Name', 'name' => 'name', 'type' => 'text'),
-                        array('key' => 'field_team_member_role', 'label' => 'Role', 'name' => 'role', 'type' => 'text'),
-                        array('key' => 'field_team_member_icon', 'label' => 'Icon', 'name' => 'icon', 'type' => 'text'),
-                        array('key' => 'field_team_member_bio', 'label' => 'Bio', 'name' => 'bio', 'type' => 'textarea'),
+                        array('key' => 'field_team_member_icon', 'label' => 'Icon', 'name' => 'icon', 'type' => 'text', 'placeholder' => 'User', 'wrapper' => array('width' => '15')),
+                        array('key' => 'field_team_member_name', 'label' => 'Name', 'name' => 'name', 'type' => 'text', 'wrapper' => array('width' => '35')),
+                        array('key' => 'field_team_member_role', 'label' => 'Role', 'name' => 'role', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                        array('key' => 'field_team_member_bio', 'label' => 'Bio', 'name' => 'bio', 'type' => 'textarea', 'rows' => 2),
                     ),
                 ),
-            ),
-            'location' => $default_location,
-        ),
-        // ----- FAQ -----
-        array(
-            'key' => 'group_ccspro_faq',
-            'title' => 'FAQ',
-            'fields' => array(
-                array('key' => 'field_faq_title', 'label' => 'Section Title', 'name' => 'faq_title', 'type' => 'text'),
-                array('key' => 'field_faq_subtitle', 'label' => 'Section Subtitle', 'name' => 'faq_subtitle', 'type' => 'text'),
+                array(
+                    'key' => 'field_accordion_support_end',
+                    'label' => 'Support End',
+                    'type' => 'accordion',
+                    'endpoint' => 1,
+                ),
+
+                // =====================================================================
+                // TAB: FAQ & CTA
+                // =====================================================================
+                array(
+                    'key' => 'field_tab_faq_cta',
+                    'label' => 'FAQ & CTA',
+                    'type' => 'tab',
+                    'placement' => 'top',
+                ),
+                // ----- FAQ -----
+                array(
+                    'key' => 'field_accordion_faq',
+                    'label' => 'FAQ',
+                    'type' => 'accordion',
+                    'open' => 1,
+                    'multi_expand' => 1,
+                ),
+                array('key' => 'field_faq_title', 'label' => 'Section Title', 'name' => 'faq_title', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_faq_subtitle', 'label' => 'Section Subtitle', 'name' => 'faq_subtitle', 'type' => 'text', 'wrapper' => array('width' => '50')),
                 array(
                     'key' => 'field_faq_items',
                     'label' => 'FAQ Items',
                     'name' => 'faq_items',
                     'type' => 'repeater',
+                    'layout' => 'block',
+                    'button_label' => 'Add FAQ',
                     'sub_fields' => array(
                         array('key' => 'field_faq_question', 'label' => 'Question', 'name' => 'question', 'type' => 'text'),
-                        array('key' => 'field_faq_answer', 'label' => 'Answer', 'name' => 'answer', 'type' => 'wysiwyg'),
+                        array('key' => 'field_faq_answer', 'label' => 'Answer', 'name' => 'answer', 'type' => 'wysiwyg', 'tabs' => 'all', 'toolbar' => 'basic', 'media_upload' => 0),
                     ),
                 ),
-            ),
-            'location' => $default_location,
-        ),
-        // ----- Final CTA -----
-        array(
-            'key' => 'group_ccspro_final_cta',
-            'title' => 'Final CTA',
-            'fields' => array(
+                // ----- Final CTA -----
+                array(
+                    'key' => 'field_accordion_final_cta',
+                    'label' => 'Final CTA',
+                    'type' => 'accordion',
+                    'open' => 0,
+                    'multi_expand' => 1,
+                ),
                 array('key' => 'field_final_cta_headline', 'label' => 'Headline', 'name' => 'final_cta_headline', 'type' => 'text'),
                 array('key' => 'field_final_cta_subheadline', 'label' => 'Subheadline', 'name' => 'final_cta_subheadline', 'type' => 'text'),
-                array('key' => 'field_final_cta_primary_label', 'label' => 'Primary CTA Label', 'name' => 'final_cta_primary_label', 'type' => 'text'),
-                array('key' => 'field_final_cta_primary_href', 'label' => 'Primary CTA Href', 'name' => 'final_cta_primary_href', 'type' => 'text'),
-                array('key' => 'field_final_cta_secondary_label', 'label' => 'Secondary CTA Label', 'name' => 'final_cta_secondary_label', 'type' => 'text'),
-                array('key' => 'field_final_cta_secondary_href', 'label' => 'Secondary CTA Href', 'name' => 'final_cta_secondary_href', 'type' => 'text'),
-            ),
-            'location' => $default_location,
-        ),
-        // ----- Footer -----
-        array(
-            'key' => 'group_ccspro_footer',
-            'title' => 'Footer',
-            'fields' => array(
-                array('key' => 'field_footer_brand_name', 'label' => 'Brand Name', 'name' => 'footer_brand_name', 'type' => 'text'),
-                array('key' => 'field_footer_brand_description', 'label' => 'Brand Description', 'name' => 'footer_brand_description', 'type' => 'textarea'),
+                array('key' => 'field_final_cta_primary_label', 'label' => 'Primary CTA Label', 'name' => 'final_cta_primary_label', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_final_cta_primary_href', 'label' => 'Primary CTA Href', 'name' => 'final_cta_primary_href', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_final_cta_secondary_label', 'label' => 'Secondary CTA Label', 'name' => 'final_cta_secondary_label', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_final_cta_secondary_href', 'label' => 'Secondary CTA Href', 'name' => 'final_cta_secondary_href', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array(
+                    'key' => 'field_accordion_faq_cta_end',
+                    'label' => 'FAQ CTA End',
+                    'type' => 'accordion',
+                    'endpoint' => 1,
+                ),
+
+                // =====================================================================
+                // TAB: Footer
+                // =====================================================================
+                array(
+                    'key' => 'field_tab_footer',
+                    'label' => 'Footer',
+                    'type' => 'tab',
+                    'placement' => 'top',
+                ),
+                array('key' => 'field_footer_brand_name', 'label' => 'Brand Name', 'name' => 'footer_brand_name', 'type' => 'text', 'wrapper' => array('width' => '30')),
+                array('key' => 'field_footer_copyright', 'label' => 'Copyright', 'name' => 'footer_copyright', 'type' => 'text', 'wrapper' => array('width' => '70')),
+                array('key' => 'field_footer_brand_description', 'label' => 'Brand Description', 'name' => 'footer_brand_description', 'type' => 'textarea', 'rows' => 2),
                 array(
                     'key' => 'field_footer_trust_badges',
                     'label' => 'Trust Badges',
                     'name' => 'footer_trust_badges',
                     'type' => 'repeater',
+                    'layout' => 'table',
+                    'button_label' => 'Add Badge',
                     'sub_fields' => array(
-                        array('key' => 'field_footer_badge_icon', 'label' => 'Icon', 'name' => 'icon', 'type' => 'text'),
-                        array('key' => 'field_footer_badge_text', 'label' => 'Text', 'name' => 'text', 'type' => 'text'),
+                        array('key' => 'field_footer_badge_icon', 'label' => 'Icon', 'name' => 'icon', 'type' => 'text', 'placeholder' => 'Shield', 'wrapper' => array('width' => '30')),
+                        array('key' => 'field_footer_badge_text', 'label' => 'Text', 'name' => 'text', 'type' => 'text', 'wrapper' => array('width' => '70')),
                     ),
                 ),
                 array(
@@ -588,9 +822,12 @@ function ccspro_get_field_group_config() {
                     'label' => 'Legal Links',
                     'name' => 'footer_legal_links',
                     'type' => 'repeater',
+                    'instructions' => 'Links like Privacy Policy, Terms of Service.',
+                    'layout' => 'table',
+                    'button_label' => 'Add Link',
                     'sub_fields' => array(
-                        array('key' => 'field_footer_legal_label', 'label' => 'Label', 'name' => 'label', 'type' => 'text'),
-                        array('key' => 'field_footer_legal_href', 'label' => 'Href', 'name' => 'href', 'type' => 'text'),
+                        array('key' => 'field_footer_legal_label', 'label' => 'Label', 'name' => 'label', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                        array('key' => 'field_footer_legal_href', 'label' => 'Href', 'name' => 'href', 'type' => 'text', 'wrapper' => array('width' => '50')),
                     ),
                 ),
                 array(
@@ -598,14 +835,22 @@ function ccspro_get_field_group_config() {
                     'label' => 'Support Links',
                     'name' => 'footer_support_links',
                     'type' => 'repeater',
+                    'instructions' => 'Links like Contact, Help Center.',
+                    'layout' => 'table',
+                    'button_label' => 'Add Link',
                     'sub_fields' => array(
-                        array('key' => 'field_footer_support_label', 'label' => 'Label', 'name' => 'label', 'type' => 'text'),
-                        array('key' => 'field_footer_support_href', 'label' => 'Href', 'name' => 'href', 'type' => 'text'),
+                        array('key' => 'field_footer_support_label', 'label' => 'Label', 'name' => 'label', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                        array('key' => 'field_footer_support_href', 'label' => 'Href', 'name' => 'href', 'type' => 'text', 'wrapper' => array('width' => '50')),
                     ),
                 ),
-                array('key' => 'field_footer_copyright', 'label' => 'Copyright', 'name' => 'footer_copyright', 'type' => 'text'),
             ),
             'location' => $default_location,
+            'menu_order' => 0,
+            'position' => 'normal',
+            'style' => 'default',
+            'label_placement' => 'top',
+            'instruction_placement' => 'label',
+            'active' => true,
         ),
     );
 }
