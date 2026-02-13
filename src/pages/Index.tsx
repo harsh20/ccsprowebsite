@@ -10,9 +10,7 @@ import { FounderSpotlight } from "@/components/landing/FounderSpotlight";
 import { ProblemOutcome } from "@/components/landing/ProblemOutcome";
 import { HowItWorks } from "@/components/landing/HowItWorks";
 import { FeaturesGrid } from "@/components/landing/FeaturesGrid";
-import { PacketPreview } from "@/components/landing/PacketPreview";
 import { SecuritySection } from "@/components/landing/SecuritySection";
-import { CAQHConcierge } from "@/components/landing/CAQHConcierge";
 import { PricingSection } from "@/components/landing/PricingSection";
 import { SupportSection } from "@/components/landing/SupportSection";
 import { TeamSection } from "@/components/landing/TeamSection";
@@ -42,9 +40,7 @@ const Index = () => {
         <ProblemOutcome content={content} />
         <HowItWorks content={content} />
         <FeaturesGrid content={content} />
-        <PacketPreview content={content} />
         <SecuritySection content={content} />
-        <CAQHConcierge content={content} />
         <PricingSection content={content} />
         <SupportSection content={content} />
         <TeamSection content={content} />
