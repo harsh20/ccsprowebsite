@@ -975,6 +975,11 @@ function ccspro_register_rest_routes() {
         'callback' => 'ccspro_rest_get_site_config',
         'permission_callback' => '__return_true',
     ));
+    register_rest_route('ccspro/v1', '/pricing', array(
+        'methods' => 'GET',
+        'callback' => 'ccspro_rest_get_pricing',
+        'permission_callback' => '__return_true',
+    ));
     register_rest_route('ccspro/v1', '/landing-page/(?P<slug>[a-z0-9\-]+)', array(
         'methods' => 'GET',
         'callback' => 'ccspro_rest_get_landing_page',
@@ -993,6 +998,15 @@ function ccspro_register_rest_routes() {
 function ccspro_rest_get_site_config($request) {
     $coming_soon = get_option('ccspro_coming_soon', '0') === '1';
     return rest_ensure_response(array('comingSoon' => $coming_soon));
+}
+
+function ccspro_rest_get_pricing($request) {
+    if (!function_exists('get_field')) {
+        return new WP_Error('acf_missing', 'ACF is required', array('status' => 500));
+    }
+
+    $pricing = ccspro_get_pricing_content('option', 0);
+    return rest_ensure_response($pricing);
 }
 
 function ccspro_rest_get_landing_page($request) {

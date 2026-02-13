@@ -1,4 +1,4 @@
-import type { LandingPageContent } from "@/types/wordpress";
+import type { LandingPageContent, PricingContent } from "@/types/wordpress";
 
 export interface SiteConfigResponse {
   comingSoon: boolean;
@@ -6,5 +6,6 @@ export interface SiteConfigResponse {
 
 export interface ContentProvider {
   getLandingPage(slug?: string): Promise<LandingPageContent>;
+  getPricingContent(): Promise<PricingContent>;
   getSiteConfig(): Promise<SiteConfigResponse>;
 }

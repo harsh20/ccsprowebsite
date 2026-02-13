@@ -1,5 +1,5 @@
 import type { ContentProvider, SiteConfigResponse } from "./types";
-import type { LandingPageContent } from "@/types/wordpress";
+import type { LandingPageContent, PricingContent } from "@/types/wordpress";
 
 const WP_GRAPHQL_ENDPOINT = import.meta.env.VITE_WP_GRAPHQL_ENDPOINT ?? "";
 
@@ -27,7 +27,17 @@ async function getSiteConfig(): Promise<SiteConfigResponse> {
   return { comingSoon: false };
 }
 
+async function getPricingContent(): Promise<PricingContent> {
+  if (!WP_GRAPHQL_ENDPOINT) {
+    notConfigured("GraphQL pricing content provider");
+  }
+
+  // Phase 2: implement WPGraphQL query and mapping to PricingContent.
+  notConfigured("GraphQL pricing content provider");
+}
+
 export const wordpressGraphqlProvider: ContentProvider = {
   getLandingPage,
+  getPricingContent,
   getSiteConfig,
 };

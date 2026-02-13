@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useLandingPage } from "@/hooks/useWordPress";
+import { useLandingPage, usePricingContent } from "@/hooks/useWordPress";
 import { defaultLandingPageContent } from "@/content/landing";
 import type { LandingPageContent } from "@/types/wordpress";
 import { Header } from "@/components/landing/Header";
@@ -21,9 +21,15 @@ const Index = () => {
   const { slug: urlSlug } = useParams<{ slug?: string }>();
   const slug = urlSlug ?? "default";
   const { data } = useLandingPage(slug);
+  const { data: pricingData } = usePricingContent();
 
-  const content: LandingPageContent =
+  const baseContent: LandingPageContent =
     data ?? (defaultLandingPageContent as unknown as LandingPageContent);
+
+  const content: LandingPageContent = {
+    ...baseContent,
+    pricingContent: pricingData ?? baseContent.pricingContent,
+  };
 
   return (
     <div className="min-h-screen bg-background">
