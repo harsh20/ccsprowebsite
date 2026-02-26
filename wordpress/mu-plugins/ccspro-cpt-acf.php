@@ -420,6 +420,12 @@ function ccspro_get_field_group_config() {
                     'type' => 'tab',
                     'placement' => 'top',
                 ),
+                array(
+                    'key' => 'field_story_legacy_notice',
+                    'label' => '',
+                    'type' => 'message',
+                    'message' => '<div style="background:#fef3c7;border:1px solid #f59e0b;padding:10px 14px;border-radius:6px;margin-bottom:12px;"><strong>Legacy sections — not used on the current homepage</strong>. "Verification / Logo Strip" and "Founder Spotlight" are retained for backward compatibility with <code>/:slug</code> routes. "Problem / Outcome" remains active.</div>',
+                ),
                 // ----- Verification / Logo Strip -----
                 array(
                     'key' => 'field_accordion_verification',
@@ -569,6 +575,43 @@ function ccspro_get_field_group_config() {
                     'sub_fields' => array(
                         array('key' => 'field_how_state_label', 'label' => 'Label', 'name' => 'label', 'type' => 'text', 'wrapper' => array('width' => '60')),
                         array('key' => 'field_how_state_color', 'label' => 'Color', 'name' => 'color', 'type' => 'select', 'choices' => array('red' => 'Red', 'orange' => 'Orange', 'blue' => 'Blue', 'green' => 'Green', 'gray' => 'Gray'), 'wrapper' => array('width' => '40')),
+                    ),
+                ),
+
+                // =====================================================================
+                // TAB: Ecosystem
+                // =====================================================================
+                array(
+                    'key' => 'field_tab_ecosystem',
+                    'label' => 'Ecosystem',
+                    'type' => 'tab',
+                    'placement' => 'top',
+                ),
+                array(
+                    'key' => 'field_ecosystem_headline',
+                    'label' => 'Ecosystem headline',
+                    'name' => 'ecosystem_headline',
+                    'type' => 'text',
+                    'default_value' => 'One profile. Two sides of credentialing. Finally connected.',
+                ),
+                array(
+                    'key' => 'field_ecosystem_subheadline',
+                    'label' => 'Ecosystem subheadline',
+                    'name' => 'ecosystem_subheadline',
+                    'type' => 'text',
+                    'default_value' => 'Providers build it once. Groups use it everywhere.',
+                ),
+                array(
+                    'key' => 'field_ecosystem_pairs',
+                    'label' => 'Provider → Group pairs',
+                    'name' => 'ecosystem_pairs',
+                    'type' => 'repeater',
+                    'layout' => 'block',
+                    'button_label' => 'Add Pair',
+                    'sub_fields' => array(
+                        array('key' => 'field_ecosystem_provider_action', 'label' => 'Provider side (left card)', 'name' => 'provider_action', 'type' => 'text', 'wrapper' => array('width' => '40')),
+                        array('key' => 'field_ecosystem_connector', 'label' => 'Connector word (enables / means / so / and)', 'name' => 'connector', 'type' => 'text', 'wrapper' => array('width' => '20')),
+                        array('key' => 'field_ecosystem_group_outcome', 'label' => 'Group side (right card)', 'name' => 'group_outcome', 'type' => 'text', 'wrapper' => array('width' => '40')),
                     ),
                 ),
 
@@ -745,6 +788,75 @@ function ccspro_get_field_group_config() {
                     'type' => 'tab',
                     'placement' => 'top',
                 ),
+                array('key' => 'field_pricing_section_title', 'label' => 'Section headline', 'name' => 'pricing_section_title', 'type' => 'text', 'default_value' => 'Simple pricing. No surprises.'),
+                array('key' => 'field_pricing_section_subtitle', 'label' => 'Section subheadline', 'name' => 'pricing_section_subtitle', 'type' => 'text', 'default_value' => "Whether you're a solo provider or managing a 50-person group..."),
+                array(
+                    'key' => 'field_tab_pricing_provider',
+                    'label' => 'Provider Card',
+                    'type' => 'tab',
+                    'placement' => 'left',
+                ),
+                array('key' => 'field_provider_badge', 'label' => 'Provider card: badge label', 'name' => 'provider_badge', 'type' => 'text', 'default_value' => 'For Individual Providers'),
+                array('key' => 'field_provider_price', 'label' => 'Provider card: price', 'name' => 'provider_price', 'type' => 'text', 'default_value' => '$99/year', 'wrapper' => array('width' => '33')),
+                array('key' => 'field_provider_price_sub', 'label' => 'Provider card: price subtext', 'name' => 'provider_price_sub', 'type' => 'text', 'default_value' => '+ $60 per packet generated', 'wrapper' => array('width' => '34')),
+                array('key' => 'field_provider_highlighted', 'label' => 'Provider card: highlighted', 'name' => 'provider_highlighted', 'type' => 'true_false', 'ui' => 1, 'default_value' => 0, 'wrapper' => array('width' => '33')),
+                array(
+                    'key' => 'field_provider_bullets',
+                    'label' => 'Provider card: feature bullets',
+                    'name' => 'provider_bullets',
+                    'type' => 'repeater',
+                    'layout' => 'table',
+                    'button_label' => 'Add Bullet',
+                    'sub_fields' => array(
+                        array('key' => 'field_provider_bullet_text', 'label' => 'Bullet', 'name' => 'bullet_text', 'type' => 'text'),
+                    ),
+                ),
+                array('key' => 'field_provider_cta_label', 'label' => 'Provider card: button label', 'name' => 'provider_cta_label', 'type' => 'text', 'default_value' => 'Get Started — $99/year', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_provider_cta_href', 'label' => 'Provider card: button URL', 'name' => 'provider_cta_href', 'type' => 'text', 'default_value' => '#', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_provider_fine_print', 'label' => 'Provider card: fine print below button', 'name' => 'provider_fine_print', 'type' => 'text', 'default_value' => 'No contracts. Cancel anytime.'),
+                array('key' => 'field_provider_callout', 'label' => 'Provider card: callout line (below bullets)', 'name' => 'provider_callout', 'type' => 'text', 'default_value' => 'Most providers pay under $600 total in year one.'),
+                array(
+                    'key' => 'field_tab_pricing_group',
+                    'label' => 'Group Card',
+                    'type' => 'tab',
+                    'placement' => 'left',
+                ),
+                array('key' => 'field_group_badge', 'label' => 'Group card: badge label', 'name' => 'group_badge', 'type' => 'text', 'default_value' => 'For Groups & Facilities'),
+                array('key' => 'field_group_price', 'label' => 'Group card: price', 'name' => 'group_price', 'type' => 'text', 'default_value' => '$1,199/seat/year', 'wrapper' => array('width' => '33')),
+                array('key' => 'field_group_price_sub', 'label' => 'Group card: price subtext', 'name' => 'group_price_sub', 'type' => 'text', 'default_value' => 'All payer packet workflows included', 'wrapper' => array('width' => '34')),
+                array('key' => 'field_group_highlighted', 'label' => 'Group card: highlighted', 'name' => 'group_highlighted', 'type' => 'true_false', 'ui' => 1, 'default_value' => 1, 'wrapper' => array('width' => '33')),
+                array(
+                    'key' => 'field_group_bullets',
+                    'label' => 'Group card: feature bullets',
+                    'name' => 'group_bullets',
+                    'type' => 'repeater',
+                    'layout' => 'table',
+                    'button_label' => 'Add Bullet',
+                    'sub_fields' => array(
+                        array('key' => 'field_group_bullet_text', 'label' => 'Bullet', 'name' => 'bullet_text', 'type' => 'text'),
+                    ),
+                ),
+                array('key' => 'field_group_cta_label', 'label' => 'Group card: button label', 'name' => 'group_cta_label', 'type' => 'text', 'default_value' => 'Talk to Us', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_group_cta_href', 'label' => 'Group card: button URL', 'name' => 'group_cta_href', 'type' => 'text', 'default_value' => '/contact', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_group_fine_print', 'label' => 'Group card: fine print below button', 'name' => 'group_fine_print', 'type' => 'text', 'default_value' => "Up to 50 seats. More than 50? Let's talk."),
+                array(
+                    'key' => 'field_group_notes',
+                    'label' => 'Group card: notes (below bullets)',
+                    'name' => 'group_notes',
+                    'type' => 'repeater',
+                    'layout' => 'table',
+                    'button_label' => 'Add Note',
+                    'default_value' => array(
+                        array('note_text' => 'One seat = one provider in your roster.'),
+                        array('note_text' => 'All payer workflows included, no packet fees.'),
+                        array('note_text' => "Need more than 50 seats? Let's talk."),
+                    ),
+                    'sub_fields' => array(
+                        array('key' => 'field_group_note_text', 'label' => 'Note', 'name' => 'note_text', 'type' => 'text'),
+                    ),
+                ),
+                array('key' => 'field_group_secondary_link_label', 'label' => 'Group card: secondary link label', 'name' => 'group_secondary_link_label', 'type' => 'text', 'default_value' => 'See full feature comparison →', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_group_secondary_link_href', 'label' => 'Group card: secondary link URL', 'name' => 'group_secondary_link_href', 'type' => 'text', 'default_value' => '/pricing', 'wrapper' => array('width' => '50')),
 
                 // =====================================================================
                 // TAB: Support
@@ -872,169 +984,9 @@ function ccspro_get_field_group_config() {
                     'endpoint' => 1,
                 ),
 
-                // =====================================================================
-                // TAB: Footer
-                // =====================================================================
-                array(
-                    'key' => 'field_tab_footer',
-                    'label' => 'Footer',
-                    'type' => 'tab',
-                    'placement' => 'top',
-                ),
-                array('key' => 'field_footer_brand_name', 'label' => 'Brand Name', 'name' => 'footer_brand_name', 'type' => 'text', 'wrapper' => array('width' => '30')),
-                array('key' => 'field_footer_copyright', 'label' => 'Copyright', 'name' => 'footer_copyright', 'type' => 'text', 'wrapper' => array('width' => '70')),
-                array('key' => 'field_footer_brand_description', 'label' => 'Brand Description', 'name' => 'footer_brand_description', 'type' => 'textarea', 'rows' => 2),
-                array(
-                    'key' => 'field_footer_trust_badges',
-                    'label' => 'Trust Badges',
-                    'name' => 'footer_trust_badges',
-                    'type' => 'repeater',
-                    'layout' => 'table',
-                    'button_label' => 'Add Badge',
-                    'sub_fields' => array(
-                        array('key' => 'field_footer_badge_icon', 'label' => 'Icon', 'name' => 'icon', 'type' => 'text', 'placeholder' => 'Shield', 'wrapper' => array('width' => '30')),
-                        array('key' => 'field_footer_badge_text', 'label' => 'Text', 'name' => 'text', 'type' => 'text', 'wrapper' => array('width' => '70')),
-                    ),
-                ),
-                array(
-                    'key' => 'field_footer_legal_links',
-                    'label' => 'Legal Links',
-                    'name' => 'footer_legal_links',
-                    'type' => 'repeater',
-                    'instructions' => 'Links like Privacy Policy, Terms of Service.',
-                    'layout' => 'table',
-                    'button_label' => 'Add Link',
-                    'sub_fields' => array(
-                        array('key' => 'field_footer_legal_label', 'label' => 'Label', 'name' => 'label', 'type' => 'text', 'wrapper' => array('width' => '50')),
-                        array('key' => 'field_footer_legal_href', 'label' => 'Href', 'name' => 'href', 'type' => 'text', 'wrapper' => array('width' => '50')),
-                    ),
-                ),
-                array(
-                    'key' => 'field_footer_support_links',
-                    'label' => 'Support Links',
-                    'name' => 'footer_support_links',
-                    'type' => 'repeater',
-                    'instructions' => 'Links like Contact, Help Center.',
-                    'layout' => 'table',
-                    'button_label' => 'Add Link',
-                    'sub_fields' => array(
-                        array('key' => 'field_footer_support_label', 'label' => 'Label', 'name' => 'label', 'type' => 'text', 'wrapper' => array('width' => '50')),
-                        array('key' => 'field_footer_support_href', 'label' => 'Href', 'name' => 'href', 'type' => 'text', 'wrapper' => array('width' => '50')),
-                    ),
-                ),
             ),
             'location' => $default_location,
             'menu_order' => 0,
-            'position' => 'normal',
-            'style' => 'seamless',
-            'label_placement' => 'top',
-            'instruction_placement' => 'label',
-            'active' => true,
-        ),
-        array(
-            'key' => 'group_ccspro_pricing_v2',
-            'title' => 'Pricing Section',
-            'fields' => array(
-                array('key' => 'field_pricing_section_title', 'label' => 'Section headline', 'name' => 'pricing_section_title', 'type' => 'text', 'default_value' => 'Simple pricing. No surprises.'),
-                array('key' => 'field_pricing_section_subtitle', 'label' => 'Section subheadline', 'name' => 'pricing_section_subtitle', 'type' => 'text', 'default_value' => "Whether you're a solo provider or managing a 50-person group..."),
-                array('key' => 'field_provider_badge', 'label' => 'Provider card: badge label', 'name' => 'provider_badge', 'type' => 'text', 'default_value' => 'For Individual Providers'),
-                array('key' => 'field_provider_price', 'label' => 'Provider card: price', 'name' => 'provider_price', 'type' => 'text', 'default_value' => '$99/year', 'wrapper' => array('width' => '33')),
-                array('key' => 'field_provider_price_sub', 'label' => 'Provider card: price subtext', 'name' => 'provider_price_sub', 'type' => 'text', 'default_value' => '+ $60 per packet generated', 'wrapper' => array('width' => '34')),
-                array('key' => 'field_provider_highlighted', 'label' => 'Provider card: highlighted', 'name' => 'provider_highlighted', 'type' => 'true_false', 'ui' => 1, 'default_value' => 0, 'wrapper' => array('width' => '33')),
-                array(
-                    'key' => 'field_provider_bullets',
-                    'label' => 'Provider card: feature bullets',
-                    'name' => 'provider_bullets',
-                    'type' => 'repeater',
-                    'layout' => 'table',
-                    'button_label' => 'Add Bullet',
-                    'sub_fields' => array(
-                        array('key' => 'field_provider_bullet_text', 'label' => 'Bullet', 'name' => 'bullet_text', 'type' => 'text'),
-                    ),
-                ),
-                array('key' => 'field_provider_cta_label', 'label' => 'Provider card: button label', 'name' => 'provider_cta_label', 'type' => 'text', 'default_value' => 'Get Started — $99/year', 'wrapper' => array('width' => '50')),
-                array('key' => 'field_provider_cta_href', 'label' => 'Provider card: button URL', 'name' => 'provider_cta_href', 'type' => 'text', 'default_value' => '#', 'wrapper' => array('width' => '50')),
-                array('key' => 'field_provider_fine_print', 'label' => 'Provider card: fine print below button', 'name' => 'provider_fine_print', 'type' => 'text', 'default_value' => 'No contracts. Cancel anytime.'),
-                array('key' => 'field_provider_callout', 'label' => 'Provider card: callout line (below bullets)', 'name' => 'provider_callout', 'type' => 'text', 'default_value' => 'Most providers pay under $600 total in year one.'),
-                array('key' => 'field_group_badge', 'label' => 'Group card: badge label', 'name' => 'group_badge', 'type' => 'text', 'default_value' => 'For Groups & Facilities'),
-                array('key' => 'field_group_price', 'label' => 'Group card: price', 'name' => 'group_price', 'type' => 'text', 'default_value' => '$1,199/seat/year', 'wrapper' => array('width' => '33')),
-                array('key' => 'field_group_price_sub', 'label' => 'Group card: price subtext', 'name' => 'group_price_sub', 'type' => 'text', 'default_value' => 'All payer packet workflows included', 'wrapper' => array('width' => '34')),
-                array('key' => 'field_group_highlighted', 'label' => 'Group card: highlighted', 'name' => 'group_highlighted', 'type' => 'true_false', 'ui' => 1, 'default_value' => 1, 'wrapper' => array('width' => '33')),
-                array(
-                    'key' => 'field_group_bullets',
-                    'label' => 'Group card: feature bullets',
-                    'name' => 'group_bullets',
-                    'type' => 'repeater',
-                    'layout' => 'table',
-                    'button_label' => 'Add Bullet',
-                    'sub_fields' => array(
-                        array('key' => 'field_group_bullet_text', 'label' => 'Bullet', 'name' => 'bullet_text', 'type' => 'text'),
-                    ),
-                ),
-                array('key' => 'field_group_cta_label', 'label' => 'Group card: button label', 'name' => 'group_cta_label', 'type' => 'text', 'default_value' => 'Talk to Us', 'wrapper' => array('width' => '50')),
-                array('key' => 'field_group_cta_href', 'label' => 'Group card: button URL', 'name' => 'group_cta_href', 'type' => 'text', 'default_value' => '/contact', 'wrapper' => array('width' => '50')),
-                array('key' => 'field_group_fine_print', 'label' => 'Group card: fine print below button', 'name' => 'group_fine_print', 'type' => 'text', 'default_value' => "Up to 50 seats. More than 50? Let's talk."),
-                array(
-                    'key' => 'field_group_notes',
-                    'label' => 'Group card: notes (below bullets)',
-                    'name' => 'group_notes',
-                    'type' => 'repeater',
-                    'layout' => 'table',
-                    'button_label' => 'Add Note',
-                    'default_value' => array(
-                        array('note_text' => 'One seat = one provider in your roster.'),
-                        array('note_text' => 'All payer workflows included, no packet fees.'),
-                        array('note_text' => "Need more than 50 seats? Let's talk."),
-                    ),
-                    'sub_fields' => array(
-                        array('key' => 'field_group_note_text', 'label' => 'Note', 'name' => 'note_text', 'type' => 'text'),
-                    ),
-                ),
-                array('key' => 'field_group_secondary_link_label', 'label' => 'Group card: secondary link label', 'name' => 'group_secondary_link_label', 'type' => 'text', 'default_value' => 'See full feature comparison →', 'wrapper' => array('width' => '50')),
-                array('key' => 'field_group_secondary_link_href', 'label' => 'Group card: secondary link URL', 'name' => 'group_secondary_link_href', 'type' => 'text', 'default_value' => '/pricing', 'wrapper' => array('width' => '50')),
-            ),
-            'location' => $default_location,
-            'menu_order' => 1,
-            'position' => 'normal',
-            'style' => 'seamless',
-            'label_placement' => 'top',
-            'instruction_placement' => 'label',
-            'active' => true,
-        ),
-        array(
-            'key' => 'group_ccspro_ecosystem',
-            'title' => 'Ecosystem Section',
-            'fields' => array(
-                array(
-                    'key' => 'field_ecosystem_headline',
-                    'label' => 'Ecosystem headline',
-                    'name' => 'ecosystem_headline',
-                    'type' => 'text',
-                    'default_value' => 'One profile. Two sides of credentialing. Finally connected.',
-                ),
-                array(
-                    'key' => 'field_ecosystem_subheadline',
-                    'label' => 'Ecosystem subheadline',
-                    'name' => 'ecosystem_subheadline',
-                    'type' => 'text',
-                    'default_value' => 'Providers build it once. Groups use it everywhere.',
-                ),
-                array(
-                    'key' => 'field_ecosystem_pairs',
-                    'label' => 'Provider → Group pairs',
-                    'name' => 'ecosystem_pairs',
-                    'type' => 'repeater',
-                    'layout' => 'block',
-                    'button_label' => 'Add Pair',
-                    'sub_fields' => array(
-                        array('key' => 'field_ecosystem_provider_action', 'label' => 'Provider side (left card)', 'name' => 'provider_action', 'type' => 'text', 'wrapper' => array('width' => '40')),
-                        array('key' => 'field_ecosystem_connector', 'label' => 'Connector word (enables / means / so / and)', 'name' => 'connector', 'type' => 'text', 'wrapper' => array('width' => '20')),
-                        array('key' => 'field_ecosystem_group_outcome', 'label' => 'Group side (right card)', 'name' => 'group_outcome', 'type' => 'text', 'wrapper' => array('width' => '40')),
-                    ),
-                ),
-            ),
-            'location' => $default_location,
-            'menu_order' => 2,
             'position' => 'normal',
             'style' => 'seamless',
             'label_placement' => 'top',
@@ -1540,21 +1492,6 @@ function ccspro_transform_landing_page_to_frontend($post_id) {
         );
     }, $faq_items);
 
-    $footer_legal = get_field('footer_legal_links', $post_id) ?: array();
-    $footer_legal = array_map(function ($row) {
-        return array('label' => isset($row['label']) ? $row['label'] : '', 'href' => isset($row['href']) ? $row['href'] : '#');
-    }, $footer_legal);
-
-    $footer_support = get_field('footer_support_links', $post_id) ?: array();
-    $footer_support = array_map(function ($row) {
-        return array('label' => isset($row['label']) ? $row['label'] : '', 'href' => isset($row['href']) ? $row['href'] : '#');
-    }, $footer_support);
-
-    $footer_trust = get_field('footer_trust_badges', $post_id) ?: array();
-    $footer_trust = array_map(function ($row) {
-        return array('icon' => isset($row['icon']) ? $row['icon'] : 'Circle', 'text' => isset($row['text']) ? $row['text'] : '');
-    }, $footer_trust);
-
     return array(
         'siteConfig' => array(
             'name' => get_field('site_name', $post_id) ?: 'CCS Pro',
@@ -1690,15 +1627,6 @@ function ccspro_transform_landing_page_to_frontend($post_id) {
             'subheadline' => get_field('final_cta_subheadline', $post_id) ?: '',
             'primaryCta' => array('label' => get_field('final_cta_primary_label', $post_id) ?: '', 'href' => get_field('final_cta_primary_href', $post_id) ?: '#'),
             'secondaryCta' => array('label' => get_field('final_cta_secondary_label', $post_id) ?: '', 'href' => get_field('final_cta_secondary_href', $post_id) ?: '#'),
-        ),
-        'footerContent' => array(
-            'brand' => array(
-                'name' => get_field('footer_brand_name', $post_id) ?: 'CCS Pro',
-                'description' => get_field('footer_brand_description', $post_id) ?: '',
-            ),
-            'trustBadges' => $footer_trust,
-            'links' => array('legal' => $footer_legal, 'support' => $footer_support),
-            'copyright' => get_field('footer_copyright', $post_id) ?: 'CCS Pro. All rights reserved.',
         ),
     );
 }

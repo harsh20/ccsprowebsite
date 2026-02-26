@@ -95,6 +95,8 @@ export interface HowItWorksContent {
   sectionTitle: string;
   sectionSubtitle: string;
   steps: HowItWorksStep[];
+  providerSteps?: HowItWorksStep[];
+  groupSteps?: HowItWorksStep[];
   readinessNote: {
     label: string;
     states: ReadinessState[];
@@ -180,6 +182,26 @@ export interface PricingContent {
   footerNote?: string;
 }
 
+export interface PricingCardData {
+  badge: string;
+  price: string;
+  priceSub: string;
+  bullets: string[];
+  cta: { label: string; href: string };
+  finePrint: string;
+  callout?: string;
+  notes?: string[];
+  secondaryLink?: { label: string; href: string };
+  highlighted: boolean;
+}
+
+export interface PricingContentV2 {
+  sectionTitle: string;
+  sectionSubtitle: string;
+  providerCard: PricingCardData;
+  groupCard: PricingCardData;
+}
+
 export interface SupportContent {
   sectionTitle: string;
   sectionSubtitle: string;
@@ -228,6 +250,26 @@ export interface FooterContent {
   copyright: string;
 }
 
+export interface GlobalHeaderData {
+  logoUrl: string | null;
+  logoText: string;
+  ctaButton: { label: string; href: string };
+  signinLink: { label: string; href: string };
+}
+
+export interface GlobalFooterData {
+  brandName: string;
+  tagline: string;
+  trustBadges: { icon: string; text: string }[];
+  copyright: string;
+}
+
+export interface SiteConfigResponse {
+  comingSoon: boolean;
+  header: GlobalHeaderData;
+  footer: GlobalFooterData;
+}
+
 export interface LandingPageContent {
   siteConfig: SiteConfig;
   navLinks: NavLink[];
@@ -242,12 +284,13 @@ export interface LandingPageContent {
   packetPreviewContent: PacketPreviewContent;
   securityContent: SecurityContent;
   caqhConciergeContent: CAQHConciergeContent;
-  pricingContent: PricingContent;
+  pricingContent: PricingContent | PricingContentV2;
   supportContent: SupportContent;
   teamContent: TeamContent;
   faqContent: FaqContent;
   finalCtaContent: FinalCtaContent;
-  footerContent: FooterContent;
+  ecosystemContent?: EcosystemContent;
+  footerContent?: FooterContent;
 }
 
 // ============================================================================
@@ -260,8 +303,16 @@ export interface MenuLink {
   openInNewTab?: boolean;
 }
 
+export interface MenusResponse {
+  primaryNav: MenuLink[];
+  footerCol1: MenuLink[];
+  footerCol2: MenuLink[];
+  footerCol3: MenuLink[];
+}
+
 export interface HeaderData {
   logo: string;
+  logoUrl?: string | null;
   primaryNav: MenuLink[];
   ctaButton: CtaLink;
   secondaryLink: CtaLink;
@@ -303,9 +354,9 @@ export interface HowItWorksTabContent {
 }
 
 export interface EcosystemPair {
-  provider: string;
+  providerAction: string;
   connector: string;
-  group: string;
+  groupOutcome: string;
 }
 
 export interface EcosystemContent {

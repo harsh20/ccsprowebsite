@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { getContentProvider } from "@/content/providers";
-import type { LandingPageContent } from "@/types/wordpress";
+import type { SiteConfigResponse } from "@/content/providers";
+import type { LandingPageContent, MenusResponse } from "@/types/wordpress";
 
 const STALE_TIME_MS = 5 * 60 * 1000; // 5 minutes
 const contentProvider = getContentProvider();
@@ -14,6 +15,24 @@ export function useLandingPage(slug: string = "default") {
     queryKey: ["landing-page", slug],
     queryFn: () => contentProvider.getLandingPage(slug),
     staleTime: STALE_TIME_MS,
+    retry: 1,
+  });
+}
+
+export function useSiteConfig() {
+  return useQuery<SiteConfigResponse>({
+    queryKey: ["site-config"],
+    queryFn: () => contentProvider.getSiteConfig(),
+    staleTime: 0, // always fresh -- controls coming-soon toggle
+    retry: 1,
+  });
+}
+
+export function useMenus() {
+  return useQuery<MenusResponse>({
+    queryKey: ["menus"],
+    queryFn: () => contentProvider.getMenus(),
+    staleTime: 5 * 60 * 1000,
     retry: 1,
   });
 }

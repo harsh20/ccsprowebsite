@@ -43,6 +43,10 @@ export function Header({ content, headerData }: HeaderProps) {
   const siteName = headerData
     ? headerData.logo
     : content?.siteConfig.name ?? siteConfig.name;
+  const logoUrl =
+    headerData?.logoUrl && headerData.logoUrl.trim().length > 0
+      ? headerData.logoUrl
+      : null;
 
   const isActive = (href: string) => {
     if (href.startsWith("#") || href.startsWith("/#")) return false;
@@ -90,7 +94,25 @@ export function Header({ content, headerData }: HeaderProps) {
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/85 backdrop-blur-md border-b border-border">
       <nav className="section-container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-3">
-          <img src={ccsLogo} alt={siteName} className="h-9 w-auto" />
+          {logoUrl ? (
+            <img
+              src={logoUrl}
+              alt={siteName}
+              className="h-9 w-auto"
+              loading="eager"
+              fetchPriority="high"
+            />
+          ) : ccsLogo ? (
+            <img
+              src={ccsLogo}
+              alt={siteName}
+              className="h-9 w-auto"
+              loading="eager"
+              fetchPriority="high"
+            />
+          ) : (
+            <span>{siteName}</span>
+          )}
         </Link>
 
         <div className="hidden lg:flex items-center gap-6">

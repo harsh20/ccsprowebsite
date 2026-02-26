@@ -35,14 +35,15 @@ User → ccsprocert.com (Vercel)
     GET wpcms.ccsprocert.com/wp-json/ccspro/v1/site-config  → comingSoon? show blank splash while loading
          ↓
     React Router renders:
-      /           → HomePage.tsx (mock data)
+      /           → HomePage.tsx (live WP + mock fallback merge)
       /pricing    → PricingPage.tsx (mock data)
       /about      → AboutPage.tsx (mock data)
       /contact    → ContactPage.tsx (mock data)
       /:slug      → Index.tsx (WP API or static fallback)
 ```
 
-- **New pages (Phase 1):** Four page templates driven by `src/content/mockData.ts`. Global Header and Footer accept typed props (`HeaderData`, `FooterData`) from mock data.
+- **Homepage (`/`):** Uses live `useLandingPage("default")`, `useSiteConfig()`, and `useMenus()` data with `mockData.ts` fallback when API fields are missing.
+- **Other named pages (`/pricing`, `/about`, `/contact`):** Still driven by `src/content/mockData.ts`.
 - **Legacy route:** `/:slug` still works via `Index.tsx`, which fetches from WordPress or falls back to `src/content/landing.ts`.
 - **REST:** Custom namespace `ccspro/v1`. Key routes: `GET /site-config`, `GET /menus`, `GET /landing-page/{slug}`. CORS allows ccsprocert.com and localhost (5173, 3000, 127.0.0.1:5173).
 
@@ -55,7 +56,7 @@ temp-repo/
 ├── src/
 │   ├── App.tsx              # Coming-soon gate + router (/, /pricing, /about, /contact, /:slug)
 │   ├── pages/
-│   │   ├── HomePage.tsx     # New homepage with mock data — hero, pain point, how it works, ecosystem, pricing, support, FAQ
+│   │   ├── HomePage.tsx     # Homepage with live WP data + mock fallback merge
 │   │   ├── PricingPage.tsx  # Full pricing page — hero, extended cards, feature comparison table, FAQ
 │   │   ├── AboutPage.tsx    # About page — hero, mission, why Texas, differentiators
 │   │   ├── ContactPage.tsx  # Contact page — hero, form, contact info, group callout
@@ -66,7 +67,7 @@ temp-repo/
 │   │   ├── wordpress.ts     # getLandingPage(slug), getSiteConfig() — WP API client (re-exports from providers)
 │   │   └── landing-icons.ts # Icon name → Lucide component map (33 icons)
 │   ├── hooks/
-│   │   └── useWordPress.ts  # useLandingPage(slug) — React Query
+│   │   └── useWordPress.ts  # useLandingPage(slug), useSiteConfig(), useMenus() — React Query
 │   ├── types/
 │   │   └── wordpress.ts     # TypeScript types — LandingPageContent (legacy) + new page types
 │   ├── content/
@@ -163,6 +164,8 @@ temp-repo/
 29. **Landing Page admin UX** — Disabled Gutenberg for `landing_page`, removed unused metaboxes, title placeholder update, live URL notice, and slug hint.
 30. **CORS update** — Added `http://localhost:3000` to allowed origins.
 31. **Frontend provider cleanup** — Removed `getPricingContent` from providers/hooks and removed dead call-site merging in `Index.tsx`.
+32. **Homepage live API wiring + schema alignment** — HomePage now merges `landing-page/default`, `site-config`, and `menus` with mock fallback data; added `PricingContentV2`, global config/menu types, ecosystem field rename (`providerAction`/`groupOutcome`), and `PricingSection` guard to prevent `/:slug` crash when `packs` is absent.
+33. **Dynamic header logo rendering** — `Header.tsx` now prefers API `headerData.logoUrl`, falls back to static asset, then falls back to text; `HeaderData` includes optional `logoUrl`.
 
 ---
 
@@ -190,14 +193,14 @@ temp-repo/
 
 | Path | Page | Data source |
 |------|------|-------------|
-| `/` | HomePage | `mockHomePage` from `mockData.ts` |
+| `/` | HomePage | WordPress API (`landing-page/default` + `site-config` + `menus`) merged with `mockHomePage` + `mockSiteSettings` fallback |
 | `/pricing` | PricingPage | `mockPricingPage` from `mockData.ts` |
 | `/about` | AboutPage | `mockAboutPage` from `mockData.ts` |
 | `/contact` | ContactPage | `mockContactPage` from `mockData.ts` |
 | `/:slug` | Index (legacy) | WordPress API or `defaultLandingPageContent` fallback |
 | `*` | NotFound | — |
 
-Header and Footer on all new pages use `mockSiteSettings.header` and `mockSiteSettings.footer`.
+Header/Footer on `/` are API-driven with fallback; header logo rendering now uses dynamic `logoUrl` when provided by site-config, with static/text fallbacks.
 
 ---
 
@@ -239,4 +242,4 @@ Header and Footer on all new pages use `mockSiteSettings.header` and `mockSiteSe
 
 ---
 
-*Last updated after Phase 2 MU-plugin patching and provider cleanup.*
+*Last updated after homepage API wiring, dynamic header logo support, and docs/rules sync policy updates.*

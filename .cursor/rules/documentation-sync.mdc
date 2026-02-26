@@ -1,0 +1,26 @@
+---
+description: Keep project docs in sync with code changes
+alwaysApply: true
+---
+
+# Documentation Sync
+
+When making substantive code changes, update relevant documentation in the same session.
+
+## Required doc review
+
+- Always review and update as needed:
+  - `context.md`
+  - `architecture.md`
+  - `changelog.md`
+
+## Update criteria
+
+- Behavior changes: update architecture/data-flow descriptions.
+- Type/API contract changes: update context/architecture type notes.
+- Bug fixes: add concise `Fixed` item in `changelog.md`.
+- New/changed workflows or conventions: update `claude.md`.
+
+## Completion check
+
+Before final response, confirm that any required markdown docs were updated or explicitly state why no doc changes were needed.

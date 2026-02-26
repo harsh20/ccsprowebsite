@@ -46,7 +46,7 @@ export function EcosystemSection({ data }: EcosystemSectionProps) {
               >
                 <div className="rounded-2xl border border-indigo-200 bg-indigo-50 shadow-md px-6 py-5 text-center min-h-[64px] flex items-center justify-center">
                   <p className="text-sm font-medium text-indigo-800">
-                    {pair.provider}
+                    {pair.providerAction}
                   </p>
                 </div>
                 <div className="flex items-center justify-center">
@@ -60,7 +60,7 @@ export function EcosystemSection({ data }: EcosystemSectionProps) {
                 </div>
                 <div className="rounded-2xl border border-emerald-200 bg-emerald-50 shadow-md px-6 py-5 text-center min-h-[64px] flex items-center justify-center">
                   <p className="text-sm font-medium text-emerald-800">
-                    {pair.group}
+                    {pair.groupOutcome}
                   </p>
                 </div>
               </div>
@@ -74,7 +74,7 @@ export function EcosystemSection({ data }: EcosystemSectionProps) {
             <div key={index}>
               <div className="rounded-2xl border border-indigo-200 bg-indigo-50 shadow-md px-6 py-5 text-center min-h-[64px] flex items-center justify-center">
                 <p className="text-sm font-medium text-indigo-800">
-                  {pair.provider}
+                  {pair.providerAction}
                 </p>
               </div>
               <div className="flex justify-center py-2">
@@ -84,7 +84,7 @@ export function EcosystemSection({ data }: EcosystemSectionProps) {
               </div>
               <div className="rounded-2xl border border-emerald-200 bg-emerald-50 shadow-md px-6 py-5 text-center min-h-[64px] flex items-center justify-center">
                 <p className="text-sm font-medium text-emerald-800">
-                  {pair.group}
+                  {pair.groupOutcome}
                 </p>
               </div>
               {index < data.pairs.length - 1 && (

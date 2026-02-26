@@ -181,24 +181,24 @@ export const mockHomePage: HomePageContent = {
     subheadline: "Providers build it once. Groups use it everywhere.",
     pairs: [
       {
-        provider: "Signs LHL234 in under 10 minutes",
+        providerAction: "Signs LHL234 in under 10 minutes",
         connector: "enables",
-        group: "Generates any payer packet on demand",
+        groupOutcome: "Generates any payer packet on demand",
       },
       {
-        provider: "Keeps documents and licenses current",
+        providerAction: "Keeps documents and licenses current",
         connector: "means",
-        group: "Always has a compliant, submission-ready roster",
+        groupOutcome: "Always has a compliant, submission-ready roster",
       },
       {
-        provider: "Attests CAQH profile once",
+        providerAction: "Attests CAQH profile once",
         connector: "so",
-        group: "Submits to any payer without chasing anyone",
+        groupOutcome: "Submits to any payer without chasing anyone",
       },
       {
-        provider: "Joins CCS Pro once",
+        providerAction: "Joins CCS Pro once",
         connector: "and",
-        group: "Every future group gets instant access with one consent",
+        groupOutcome: "Every future group gets instant access with one consent",
       },
     ],
   },

@@ -1,5 +1,9 @@
-import type { LandingPageContent } from "@/types/wordpress";
-import type { ContentProvider, SiteConfigResponse } from "./types";
+import type {
+  LandingPageContent,
+  MenusResponse,
+  SiteConfigResponse,
+} from "@/types/wordpress";
+import type { ContentProvider } from "./types";
 
 const WP_API_URL =
   import.meta.env.VITE_WP_API_URL ?? "https://wpcms.ccsprocert.com/wp-json";
@@ -39,20 +43,54 @@ async function getLandingPage(slug: string = "default"): Promise<LandingPageCont
 }
 
 async function getSiteConfig(): Promise<SiteConfigResponse> {
-  const url = `${WP_API_URL}/ccspro/v1/site-config?t=${Date.now()}`;
-  const response = await fetch(url, {
-    method: "GET",
-    headers: { Accept: "application/json" },
-    cache: "no-store",
-  });
+  const response = await fetch(
+    `${WP_API_URL}/ccspro/v1/site-config`,
+    { cache: "no-store" }
+  );
+  if (!response.ok) {
+    return {
+      comingSoon: false,
+      header: {
+        logoUrl: null,
+        logoText: "CCS Pro",
+        ctaButton: { label: "Get Started", href: "#" },
+        signinLink: { label: "Sign In", href: "#" },
+      },
+      footer: {
+        brandName: "CCS Pro",
+        tagline: "Credentialing packets. Done once. Ready always.",
+        trustBadges: [],
+        copyright: "© 2025 CCS Pro. All rights reserved.",
+      },
+    };
+  }
+  return response.json();
+}
 
-  if (!response.ok) return { comingSoon: false };
-
-  const data = await response.json();
-  return { comingSoon: Boolean(data?.comingSoon) };
+async function getMenus(): Promise<MenusResponse> {
+  try {
+    const response = await fetch(`${WP_API_URL}/ccspro/v1/menus`);
+    if (!response.ok) {
+      return {
+        primaryNav: [],
+        footerCol1: [],
+        footerCol2: [],
+        footerCol3: [],
+      };
+    }
+    return response.json();
+  } catch {
+    return {
+      primaryNav: [],
+      footerCol1: [],
+      footerCol2: [],
+      footerCol3: [],
+    };
+  }
 }
 
 export const restProvider: ContentProvider = {
   getLandingPage,
   getSiteConfig,
+  getMenus,
 };

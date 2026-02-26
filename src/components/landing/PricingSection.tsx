@@ -7,7 +7,14 @@ interface PricingSectionProps {
 }
 
 export function PricingSection({ content }: PricingSectionProps) {
-  const data = content?.pricingContent ?? pricingContent;
+  const pricingData = content?.pricingContent ?? pricingContent;
+
+  // If new card-based schema, skip old PricingSection entirely.
+  if (!("packs" in pricingData) || !pricingData.packs || pricingData.packs.length === 0) {
+    return null;
+  }
+
+  const data = pricingData;
   const packs = data.packs;
   const hasOneTimePlans = packs.some((pack) => pack.billingType === "one_time");
   const gridClass = packs.length <= 2 ? "grid gap-6 md:grid-cols-2" : "grid gap-6 lg:grid-cols-3";

@@ -4,7 +4,7 @@
 
 The system is a **headless CMS** setup: a static React frontend (Vercel) consumes content from a WordPress REST API (Hostinger). There is no server-side rendering; all content is fetched at runtime in the browser.
 
-**Current status:** Four new page templates (Homepage, Pricing, About, Contact) still use typed mock data. The legacy `/:slug` route fetches from WordPress. Phase 2 MU-plugin and provider patches are now applied in-repo.
+**Current status:** Homepage now uses live WordPress API data merged with typed mock fallbacks. Pricing/About/Contact still use typed mock data. The legacy `/:slug` route fetches from WordPress. Phase 2 MU-plugin and provider/type/hook patches are applied in-repo.
 
 ```mermaid
 flowchart LR
@@ -25,8 +25,8 @@ flowchart LR
     end
     User[User] --> App
     App --> Static
-    App -->|"/:slug route"| REST
-    App -->|"/, /pricing, /about, /contact"| MockTS
+    App -->|"/ and /:slug routes"| REST
+    App -->|"/pricing, /about, /contact"| MockTS
     WP --> REST
     REST --> ACF
     REST --> CPT
@@ -53,7 +53,7 @@ flowchart LR
 - **Runtime:** React 18, TypeScript.
 - **Build:** Vite.
 - **Routing:** React Router (`/`, `/pricing`, `/about`, `/contact`, `/:slug`, `*`).
-- **Data:** TanStack Query (for `/:slug` route), typed mock data (for new pages).
+- **Data:** TanStack Query (`/:slug`, homepage `landing-page/default`, `site-config`, `menus`), typed mock fallbacks for homepage and named pages.
 - **UI:** Tailwind CSS, shadcn/ui (Radix primitives), Lucide icons.
 
 ### 3.2 Entry and routing flow
@@ -72,7 +72,9 @@ flowchart TD
     Router --> Contact[/contact → ContactPage]
     Router --> Slug[/:slug → Index]
     Router --> NotFound["* → NotFound"]
-    Home --> MockData[mockData.ts]
+    Home --> HomeAPI[useLandingPage("default"), useSiteConfig, useMenus]
+    HomeAPI --> WPAPIHome[WordPress API]
+    Home --> MockData[mockData.ts fallback]
     Pricing --> MockData
     About --> MockData
     Contact --> MockData
@@ -82,22 +84,28 @@ flowchart TD
 ```
 
 - **App.tsx:** On mount, fetches `GET /ccspro/v1/site-config`. Initial state uses `buildTimeComingSoon` if available; while loading (`null`), renders a blank splash to avoid flashing the Coming Soon page. Routes are ordered so `/pricing`, `/about`, `/contact` take priority over `/:slug`.
-- **New pages (HomePage, PricingPage, AboutPage, ContactPage):** Import typed mock data directly from `mockData.ts`. Each renders a global Header and Footer plus page-specific sections. Each sets `document.title` via `useEffect`.
+- **HomePage (`/`):** Fetches `landing-page/default`, `site-config`, and `menus`, then merges that data with `mockData.ts` fallbacks before rendering sections. Header now consumes `site-config` logo fields (`logoUrl`, `logoText`) with fallback behavior.
+- **Other named pages (PricingPage, AboutPage, ContactPage):** Import typed mock data directly from `mockData.ts`. Each renders a global Header and Footer plus page-specific sections. Each sets `document.title` via `useEffect`.
 - **Legacy route (Index):** Resolves slug from `useParams()`, calls `useLandingPage(slug)`, shows skeleton while loading, then passes content into section components.
 
-### 3.3 Data flow — new pages (mock data)
+### 3.3 Data flow — homepage (`/`) with API + fallback
 
 ```mermaid
 sequenceDiagram
     participant Browser
-    participant Page as HomePage / PricingPage / etc.
+    participant HomePage
+    participant WP as WordPress REST
     participant MockData as mockData.ts
-    Page->>MockData: import mockHomePage, mockSiteSettings
-    MockData-->>Page: typed content objects
-    Page->>Page: Pass to Header, Footer, sections
+    HomePage->>WP: GET /landing-page/default
+    HomePage->>WP: GET /site-config
+    HomePage->>WP: GET /menus
+    WP-->>HomePage: API payloads
+    HomePage->>MockData: read fallback content
+    HomePage->>HomePage: map + merge API with fallback
+    HomePage->>HomePage: Pass merged data to Header, Footer, sections
 ```
 
-No network requests for page content on the new pages. Mock data is bundled at build time.
+Homepage content is now API-driven with fallback. Pricing/About/Contact remain mock-data driven.
 
 ### 3.4 Data flow — legacy route (WordPress)
 
@@ -119,7 +127,8 @@ sequenceDiagram
 | Path | Responsibility |
 |------|-----------------|
 | `src/App.tsx` | Site-config fetch, coming-soon gate with flash fix, router with 6 routes. |
-| `src/pages/HomePage.tsx` | Homepage — assembles hero, pain point, how it works, ecosystem, CTAs, pricing, support, FAQ. |
+| `src/pages/HomePage.tsx` | Homepage — fetches `landing-page/default`, `site-config`, `menus`; maps/merges with fallback; renders hero, pain point, how it works, ecosystem, CTAs, pricing, support, FAQ. |
+| `src/components/landing/Header.tsx` | Global header with route-aware nav/CTA and dynamic logo resolution (`logoUrl` -> static asset -> text fallback). |
 | `src/pages/PricingPage.tsx` | Pricing — hero, extended cards, feature comparison table, FAQ, CTA. |
 | `src/pages/AboutPage.tsx` | About — hero, mission, why Texas, differentiators, CTA. |
 | `src/pages/ContactPage.tsx` | Contact — hero, form, contact info, group callout. |
@@ -128,7 +137,7 @@ sequenceDiagram
 | `src/content/landing.ts` | Static fallback for `/:slug` route. |
 | `src/types/wordpress.ts` | TypeScript interfaces for all content structures (legacy + new). |
 | `src/lib/wordpress.ts` | getLandingPage(slug), getSiteConfig() — API client. |
-| `src/hooks/useWordPress.ts` | useLandingPage(slug) — React Query wrapper. |
+| `src/hooks/useWordPress.ts` | useLandingPage(slug), useSiteConfig(), useMenus() — React Query wrappers. |
 | `src/lib/landing-icons.ts` | Map icon name strings to Lucide components (33 icons). |
 | `src/components/landing/*` | All presentational section components. |
 | `src/components/landing/archived/*` | 7 components removed from homepage, preserved for future use. |
@@ -203,14 +212,14 @@ Each section component accepts both a legacy `content?: LandingPageContent` prop
 
 `LandingPageContent` — monolithic interface containing all section data for a single landing page variant. Used by `Index.tsx` and all section components in their `content` prop path.
 
-### 5.2 New types (for Phase 1 pages)
+### 5.2 New and updated types (Phase 1 + Phase 2 integration)
 
-Added to `src/types/wordpress.ts` without modifying existing interfaces:
+Core page types defined in `src/types/wordpress.ts`:
 
 | Interface | Used by |
 |-----------|---------|
 | `MenuLink`, `CtaLink` | Header, Footer navigation |
-| `HeaderData` | Header component |
+| `HeaderData` | Header component (`logo` text + optional `logoUrl`) |
 | `FooterColumn`, `FooterData` | Footer component |
 | `SiteSettings` | Top-level container (header + footer) |
 | `HeroContent`, `HeroDashboard` | HeroSection |
@@ -224,6 +233,14 @@ Added to `src/types/wordpress.ts` without modifying existing interfaces:
 | `PricingPlanExtended`, `FeatureComparisonRow`, `FeatureComparisonCategory`, `PricingPageContent` | PricingPage |
 | `AboutPageContent` | AboutPage |
 | `ContactPageContent` | ContactPage |
+
+Additional integration types now used by homepage/provider wiring:
+
+| Interface | Used by |
+|-----------|---------|
+| `PricingCardData`, `PricingContentV2` | New WordPress pricing schema (`providerCard` / `groupCard`) |
+| `GlobalHeaderData`, `GlobalFooterData`, `SiteConfigResponse` | Site-config endpoint payload |
+| `MenusResponse` | Menus endpoint payload |
 
 ---
 

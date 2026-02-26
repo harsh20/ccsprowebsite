@@ -35,7 +35,7 @@ Before making any changes, read these files for full context:
 - shadcn/ui components (Radix primitives) — imported from `@/components/ui/`
 - Lucide React for icons
 - React Router for client-side routing
-- TanStack Query for async data fetching (legacy route only)
+- TanStack Query for async data fetching (`/:slug`, homepage site-config/menus/default landing)
 
 ---
 
@@ -52,8 +52,9 @@ Before making any changes, read these files for full context:
 
 - Section components live in `src/components/landing/`.
 - Each section component accepts **both** a legacy `content?: LandingPageContent` prop (for `/:slug`) and new typed props (for new pages). Branch internally based on which prop is present.
-- New page components live in `src/pages/` and assemble sections with mock data.
-- Every page must include `<Header headerData={mockSiteSettings.header} />` and `<Footer footerData={mockSiteSettings.footer} />`.
+- New page components live in `src/pages/`. HomePage merges live WordPress data with mock fallbacks; other named pages still use typed mock data.
+- Header logo rendering order is: `headerData.logoUrl` when present, then static asset fallback, then text fallback from `headerData.logo`.
+- Every page must include `<Header />` and `<Footer />` with the page's selected data source (mock or API-merged).
 - Every page must set `document.title` via `useEffect` (format: "Page Name | CCS Pro").
 
 ### Styling
@@ -85,12 +86,10 @@ Before making any changes, read these files for full context:
 Unless explicitly instructed:
 
 - `src/lib/wordpress.ts` — API client
-- `src/hooks/useWordPress.ts` — React Query hooks
 - `src/content/landing.ts` — `defaultLandingPageContent` static fallback
-- `src/content/providers/` — content provider abstraction
 - `wordpress/mu-plugins/ccspro-cpt-acf.php` — WordPress MU-plugin
 - `vercel.json` — SPA rewrite and cache headers
-- Existing interfaces in `src/types/wordpress.ts` (add new ones, don't modify `LandingPageContent` or its children)
+- Existing interfaces in `src/types/wordpress.ts` should only be changed when required by API schema updates
 
 ---
 
@@ -109,25 +108,40 @@ Unless explicitly instructed:
 2. Make changes one step at a time.
 3. Confirm compilation (`npm run build`) after each meaningful step.
 4. Check for linter errors after edits.
-5. Do not batch unrelated changes.
+5. Update relevant documentation in the same change set (`context.md`, `architecture.md`, `changelog.md`, and any affected docs under `docs/`).
+6. Do not batch unrelated changes.
+
+---
+
+## Documentation sync rule
+
+- Every substantive code edit must include corresponding doc updates in the same session.
+- Minimum docs to review for each substantive change: `context.md`, `architecture.md`, `changelog.md`.
+- If behavior, contracts, or workflows changed, update the relevant section immediately rather than leaving TODO notes.
+- `changelog.md` entries should use date-based sections and capture Added/Changed/Fixed impact.
 
 ---
 
 ## Phase status
 
 - **Phase 1 (complete):** Four page templates with typed mock data, global Header/Footer, new routing, archived components, coming-soon flash fix.
-- **Phase 2 (in progress):** MU-plugin patched for menu endpoints, global header/footer options pages, pricing v2 fields on `landing_page`, ecosystem section, tabbed how-it-works fields, extended `site-config`, admin edit-screen customization, and updated CORS.
+- **Phase 2 (in progress):** MU-plugin patched for menu endpoints, global header/footer options pages, pricing v2 fields on `landing_page`, ecosystem section, tabbed how-it-works fields, extended `site-config`, admin edit-screen customization, CORS updates, homepage API wiring with mock fallbacks, and `/:slug` pricing crash guard.
 
 ---
 
 ## Data flow summary
 
 ```
-New pages (/, /pricing, /about, /contact):
-  Page component → imports from mockData.ts → passes typed props to sections
+Homepage (/):
+  HomePage.tsx → useLandingPage("default") + useSiteConfig() + useMenus()
+              → map/merge with mockData.ts fallbacks
+              → Header/Footer + sections
 
 Legacy route (/:slug):
   Index.tsx → useLandingPage(slug) → WordPress API → LandingPageContent → sections
                                     ↓ (on failure)
                               landing.ts fallback
+
+Other named pages (/pricing, /about, /contact):
+  Page component → imports from mockData.ts → passes typed props to sections
 ```
