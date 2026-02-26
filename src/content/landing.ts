@@ -39,6 +39,7 @@ export const navCtas = {
 export const heroContent = {
   headline: "Automated Credentialing Packets for",
   headlineHighlight: "Texas Independent Providers",
+  headlineSuffix: "Ready Always.",
   subheadline: "Complete your Texas-specific profile, track expiries with AI, and generate submission-ready packets in minutes. All for $25/month.",
   primaryCta: { label: "Start My Texas Profile for Free", href: "#pricing" },
   secondaryCta: { label: "View sample Texas packet", href: "#sample" },

@@ -166,6 +166,7 @@ temp-repo/
 31. **Frontend provider cleanup** — Removed `getPricingContent` from providers/hooks and removed dead call-site merging in `Index.tsx`.
 32. **Homepage live API wiring + schema alignment** — HomePage now merges `landing-page/default`, `site-config`, and `menus` with mock fallback data; added `PricingContentV2`, global config/menu types, ecosystem field rename (`providerAction`/`groupOutcome`), and `PricingSection` guard to prevent `/:slug` crash when `packs` is absent.
 33. **Dynamic header logo rendering** — `Header.tsx` now prefers API `headerData.logoUrl`, falls back to static asset, then falls back to text; `HeaderData` includes optional `logoUrl`.
+34. **Hero ACF gap fixes** — Added `hero_headline_suffix` ACF field and wired it through the REST response, `HeroContent` type, mock data, and `HeroSection.tsx` to replace the hardcoded "Ready Always." suffix. Also wired `heroDashboard` through the API-first + mock fallback pattern in `HomePage.tsx`; previously dashboard card edits in WordPress had no effect on the live page.
 
 ---
 
@@ -242,4 +243,4 @@ Header/Footer on `/` are API-driven with fallback; header logo rendering now use
 
 ---
 
-*Last updated after homepage API wiring, dynamic header logo support, and docs/rules sync policy updates.*
+*Last updated after hero ACF gap fixes: `hero_headline_suffix` field, dashboard data wiring.*

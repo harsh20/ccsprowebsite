@@ -22,7 +22,7 @@ export function HeroSection({ content, heroData, dashboardData }: HeroSectionPro
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground text-balance">
               {hero.headline}{" "}
               <span className="text-gradient">{hero.headlineHighlight}</span>
-              {" "}Ready Always.
+              {hero.headlineSuffix && ` ${hero.headlineSuffix}`}
             </h1>
 
             <p className="text-lg text-muted-foreground max-w-xl">

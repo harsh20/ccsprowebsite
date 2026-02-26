@@ -63,6 +63,10 @@ const HomePage = () => {
     ? mapApiHeroToMock(landingData.heroContent)
     : mockHomePage.hero;
 
+  const dashboardData = landingData?.heroDashboard?.title
+    ? landingData.heroDashboard
+    : mockHomePage.heroDashboard;
+
   const howItWorksData =
     landingData?.howItWorksContent?.providerSteps?.length &&
     landingData?.howItWorksContent?.groupSteps?.length
@@ -124,7 +128,7 @@ const HomePage = () => {
     <div className="min-h-screen bg-background">
       <Header headerData={headerData} />
       <main>
-        <HeroSection heroData={heroData} dashboardData={mockHomePage.heroDashboard} />
+        <HeroSection heroData={heroData} dashboardData={dashboardData} />
         <ProblemOutcome painPointData={mockHomePage.painPoint} />
         <HowItWorks tabData={howItWorksData} />
         <EcosystemSection data={ecosystemData} />

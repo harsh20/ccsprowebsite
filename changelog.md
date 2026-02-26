@@ -2,6 +2,22 @@
 
 All notable changes to this repository are documented in this file.
 
+## 2026-02-26 (hero ACF gap fixes)
+
+### Added
+- `hero_headline_suffix` ACF text field (Hero tab, after Highlight Word) with default value `"Ready Always."`. Registered in MU-plugin with PHP `?: 'Ready Always.'` fallback in the REST response so it degrades safely on fresh installs before the field is saved.
+- `headlineSuffix: string` property added to the `HeroContent` TypeScript interface in `src/types/wordpress.ts`.
+- `headlineSuffix: "Ready Always."` added to `mockHomePage.hero` in `src/content/mockData.ts` and to `heroContent` in `src/content/landing.ts`.
+
+### Changed
+- `HeroSection.tsx` line 25: replaced hardcoded `{" "}Ready Always.` with `{hero.headlineSuffix && \` ${hero.headlineSuffix}\`}`. The suffix is now fully CMS-editable.
+- `HomePage.tsx`: `dashboardData` is now derived from `landingData?.heroDashboard` (API-first with `mockHomePage.heroDashboard` fallback guarded by `heroDashboard.title`), matching the same pattern used for `heroData`. Previously it was always hardcoded to the mock.
+
+### Fixed
+- Hero dashboard fields (`Dashboard Title`, `Subtitle`, `Completion %`, `Documents`, `Buttons`) edited in WordPress admin now actually update the live homepage hero card.
+
+---
+
 ## 2026-02-26
 
 ### Added

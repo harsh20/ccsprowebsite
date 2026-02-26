@@ -29,6 +29,7 @@ export interface NavCtas {
 export interface HeroContent {
   headline: string;
   headlineHighlight: string;
+  headlineSuffix: string;
   subheadline: string;
   primaryCta: CtaLink;
   secondaryCta: CtaLink;

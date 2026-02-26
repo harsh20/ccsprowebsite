@@ -347,8 +347,9 @@ function ccspro_get_field_group_config() {
                     'open' => 1,
                     'multi_expand' => 1,
                 ),
-                array('key' => 'field_hero_headline', 'label' => 'Headline', 'name' => 'hero_headline', 'type' => 'text', 'wrapper' => array('width' => '60')),
-                array('key' => 'field_hero_headline_highlight', 'label' => 'Highlight Word', 'name' => 'hero_headline_highlight', 'type' => 'text', 'instructions' => 'Word to highlight in the headline', 'wrapper' => array('width' => '40')),
+                array('key' => 'field_hero_headline', 'label' => 'Headline', 'name' => 'hero_headline', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_hero_headline_highlight', 'label' => 'Highlight Word', 'name' => 'hero_headline_highlight', 'type' => 'text', 'instructions' => 'Word to highlight in the headline', 'wrapper' => array('width' => '30')),
+                array('key' => 'field_hero_headline_suffix', 'label' => 'Headline Suffix', 'name' => 'hero_headline_suffix', 'type' => 'text', 'instructions' => 'Text appended after the highlight word (e.g. "Ready Always.")', 'default_value' => 'Ready Always.', 'wrapper' => array('width' => '20')),
                 array('key' => 'field_hero_subheadline', 'label' => 'Subheadline', 'name' => 'hero_subheadline', 'type' => 'textarea', 'rows' => 2),
                 array(
                     'key' => 'field_hero_ctas_message',
@@ -1507,6 +1508,7 @@ function ccspro_transform_landing_page_to_frontend($post_id) {
         'heroContent' => array(
             'headline' => get_field('hero_headline', $post_id) ?: '',
             'headlineHighlight' => get_field('hero_headline_highlight', $post_id) ?: '',
+            'headlineSuffix' => get_field('hero_headline_suffix', $post_id) ?: 'Ready Always.',
             'subheadline' => get_field('hero_subheadline', $post_id) ?: '',
             'primaryCta' => array('label' => get_field('hero_primary_label', $post_id) ?: '', 'href' => get_field('hero_primary_href', $post_id) ?: '#'),
             'secondaryCta' => array('label' => get_field('hero_secondary_label', $post_id) ?: '', 'href' => get_field('hero_secondary_href', $post_id) ?: '#'),

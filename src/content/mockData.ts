@@ -71,6 +71,7 @@ export const mockHomePage: HomePageContent = {
   hero: {
     headline: "Credentialing Packets.",
     headlineHighlight: "Done Once.",
+    headlineSuffix: "Ready Always.",
     subheadline:
       "CCS Pro lets Texas providers build their credentialing profile once and hand it off anywhere — in under 10 minutes.",
     primaryCta: { label: "Start as a Provider — $99/year", href: "/pricing#provider" },

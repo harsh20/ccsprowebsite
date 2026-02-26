@@ -105,7 +105,7 @@ sequenceDiagram
     HomePage->>HomePage: Pass merged data to Header, Footer, sections
 ```
 
-Homepage content is now API-driven with fallback. Pricing/About/Contact remain mock-data driven.
+Homepage content is now API-driven with fallback. Pricing/About/Contact remain mock-data driven. Both `heroContent` (including the new `headlineSuffix` field) and `heroDashboard` use the API-first + mock fallback pattern in `HomePage.tsx`.
 
 ### 3.4 Data flow — legacy route (WordPress)
 
@@ -222,7 +222,7 @@ Core page types defined in `src/types/wordpress.ts`:
 | `HeaderData` | Header component (`logo` text + optional `logoUrl`) |
 | `FooterColumn`, `FooterData` | Footer component |
 | `SiteSettings` | Top-level container (header + footer) |
-| `HeroContent`, `HeroDashboard` | HeroSection |
+| `HeroContent` (`headline`, `headlineHighlight`, `headlineSuffix`, `subheadline`, CTAs, `trustIndicators`), `HeroDashboard` | HeroSection |
 | `PainPointContent` | ProblemOutcome |
 | `HowItWorksTabContent` | HowItWorks (tabbed) |
 | `EcosystemPair`, `EcosystemContent` | EcosystemSection |
