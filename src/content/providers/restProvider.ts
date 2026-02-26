@@ -2,6 +2,9 @@ import type {
   LandingPageContent,
   MenusResponse,
   SiteConfigResponse,
+  PricingPageContent,
+  AboutPageContent,
+  ContactPageContent,
 } from "@/types/wordpress";
 import type { ContentProvider } from "./types";
 
@@ -89,8 +92,44 @@ async function getMenus(): Promise<MenusResponse> {
   }
 }
 
+async function getPricingPage(): Promise<PricingPageContent> {
+  const response = await fetch(`${WP_API_URL}/ccspro/v1/page/pricing`, {
+    method: "GET",
+    headers: { Accept: "application/json" },
+  });
+  if (!response.ok) {
+    throw new WordPressAPIError("Failed to fetch pricing page", response.status);
+  }
+  return response.json();
+}
+
+async function getAboutPage(): Promise<AboutPageContent> {
+  const response = await fetch(`${WP_API_URL}/ccspro/v1/page/about`, {
+    method: "GET",
+    headers: { Accept: "application/json" },
+  });
+  if (!response.ok) {
+    throw new WordPressAPIError("Failed to fetch about page", response.status);
+  }
+  return response.json();
+}
+
+async function getContactPage(): Promise<ContactPageContent> {
+  const response = await fetch(`${WP_API_URL}/ccspro/v1/page/contact`, {
+    method: "GET",
+    headers: { Accept: "application/json" },
+  });
+  if (!response.ok) {
+    throw new WordPressAPIError("Failed to fetch contact page", response.status);
+  }
+  return response.json();
+}
+
 export const restProvider: ContentProvider = {
   getLandingPage,
   getSiteConfig,
   getMenus,
+  getPricingPage,
+  getAboutPage,
+  getContactPage,
 };

@@ -1,193 +1,7 @@
 <?php
-/**
- * Plugin Name: CCS Pro Landing Page CPT & ACF
- * Description: Registers Landing Page CPT, ACF fields, and REST API for headless frontend.
- * Version: 1.0.0
- * Author: CCS Pro
- */
 
 if (!defined('ABSPATH')) {
     exit;
-}
-
-// ---------------------------------------------------------------------------
-// 1. CUSTOM POST TYPE
-// ---------------------------------------------------------------------------
-
-add_action('init', 'ccspro_register_landing_page_cpt');
-
-function ccspro_register_landing_page_cpt() {
-    register_post_type('landing_page', array(
-        'labels' => array(
-            'name' => 'Landing Pages',
-            'singular_name' => 'Landing Page',
-            'add_new' => 'Add New',
-            'add_new_item' => 'Add New Landing Page',
-            'edit_item' => 'Edit Landing Page',
-            'new_item' => 'New Landing Page',
-            'view_item' => 'View Landing Page',
-            'search_items' => 'Search Landing Pages',
-            'not_found' => 'No landing pages found',
-            'not_found_in_trash' => 'No landing pages found in Trash',
-        ),
-        'public' => true,
-        'has_archive' => false,
-        'show_in_rest' => true,
-        'supports' => array('title', 'editor', 'thumbnail', 'revisions'),
-        'menu_icon' => 'dashicons-welcome-view-site',
-        'rewrite' => array('slug' => 'landing'),
-    ));
-}
-
-add_action('init', 'ccspro_register_menus');
-
-function ccspro_register_menus() {
-    register_nav_menus(array(
-        'ccspro-primary-nav' => 'Primary Navigation',
-        'ccspro-footer-col1' => 'Footer: Product Links',
-        'ccspro-footer-col2' => 'Footer: Company Links',
-        'ccspro-footer-col3' => 'Footer: Legal & Support',
-    ));
-}
-
-add_filter('use_block_editor_for_post_type', 'ccspro_disable_block_editor_for_landing_page', 10, 2);
-add_action('add_meta_boxes', 'ccspro_customize_landing_page_edit_screen', 100);
-add_filter('enter_title_here', 'ccspro_landing_page_title_placeholder', 10, 2);
-add_action('edit_form_top', 'ccspro_render_landing_page_edit_notice');
-add_action('edit_form_after_title', 'ccspro_render_landing_page_slug_hint');
-
-function ccspro_disable_block_editor_for_landing_page($use_block_editor, $post_type) {
-    if ($post_type === 'landing_page') {
-        return false;
-    }
-    return $use_block_editor;
-}
-
-function ccspro_customize_landing_page_edit_screen() {
-    remove_meta_box('commentstatusdiv', 'landing_page', 'normal');
-    remove_meta_box('commentsdiv', 'landing_page', 'normal');
-    remove_meta_box('trackbacksdiv', 'landing_page', 'normal');
-    remove_meta_box('postcustom', 'landing_page', 'normal');
-    remove_meta_box('authordiv', 'landing_page', 'normal');
-    remove_meta_box('revisionsdiv', 'landing_page', 'normal');
-    remove_meta_box('pageparentdiv', 'landing_page', 'side');
-    remove_meta_box('postimagediv', 'landing_page', 'side');
-}
-
-function ccspro_landing_page_title_placeholder($text, $post) {
-    if ($post && isset($post->post_type) && $post->post_type === 'landing_page') {
-        return 'Page Name (internal)';
-    }
-    return $text;
-}
-
-function ccspro_render_landing_page_edit_notice($post) {
-    if (!$post || !isset($post->post_type) || $post->post_type !== 'landing_page') {
-        return;
-    }
-
-    $slug = isset($post->post_name) ? $post->post_name : '';
-    $title = isset($post->post_title) && $post->post_title !== '' ? $post->post_title : '(untitled)';
-    echo '<div class="notice notice-info inline"><p><strong>Editing: ' . esc_html($title) . '</strong> — This page is live at ccsprocert.com/' . esc_html($slug) . '</p></div>';
-}
-
-function ccspro_render_landing_page_slug_hint($post) {
-    if (!$post || !isset($post->post_type) || $post->post_type !== 'landing_page') {
-        return;
-    }
-
-    echo '<p class="description" style="margin:8px 0 14px;">URL path: e.g. <code>groups</code> for <code>ccsprocert.com/groups</code></p>';
-}
-
-// ---------------------------------------------------------------------------
-// 2. COMING SOON MODE (site-config API + admin toggle)
-// ---------------------------------------------------------------------------
-
-add_action('admin_menu', 'ccspro_add_coming_soon_menu');
-
-function ccspro_add_coming_soon_menu() {
-    add_options_page(
-        'CCS Pro Site',
-        'CCS Pro Site',
-        'manage_options',
-        'ccspro-site',
-        'ccspro_render_coming_soon_page'
-    );
-}
-
-function ccspro_render_coming_soon_page() {
-    // Form submitted: nonce is always sent; checkbox is only sent when checked
-    if (isset($_POST['_wpnonce']) && current_user_can('manage_options')) {
-        check_admin_referer('ccspro_coming_soon');
-        $value = !empty($_POST['ccspro_coming_soon']) ? '1' : '0';
-        update_option('ccspro_coming_soon', $value);
-        echo '<div class="notice notice-success"><p>Coming soon mode ' . ($value === '1' ? 'enabled' : 'disabled') . '.</p></div>';
-    }
-    $current = get_option('ccspro_coming_soon', '0') === '1';
-    ?>
-    <div class="wrap">
-        <h1>CCS Pro Site</h1>
-        <form method="post" action="">
-            <?php wp_nonce_field('ccspro_coming_soon'); ?>
-            <table class="form-table">
-                <tr>
-                    <th scope="row">Coming soon mode</th>
-                    <td>
-                        <label>
-                            <input type="checkbox" name="ccspro_coming_soon" value="1" <?php checked($current); ?> />
-                            Show "Coming Soon" page on the live site instead of the full landing page
-                        </label>
-                        <p class="description">The frontend (ccsprocert.com) fetches this setting at runtime. Toggling here takes effect immediately; no redeploy needed.</p>
-                    </td>
-                </tr>
-            </table>
-            <?php submit_button('Save'); ?>
-        </form>
-    </div>
-    <?php
-}
-
-// ---------------------------------------------------------------------------
-// 3. CORS HEADERS
-// ---------------------------------------------------------------------------
-
-add_action('rest_api_init', 'ccspro_add_cors_headers', 15);
-
-function ccspro_add_cors_headers() {
-    remove_filter('rest_pre_serve_request', 'rest_send_cors_headers');
-    add_filter('rest_pre_serve_request', function ($value) {
-        $origin = get_http_origin();
-        $allowed = array(
-            'https://ccsprocert.com',
-            'https://www.ccsprocert.com',
-            'http://localhost:5173',
-            'http://localhost:3000',
-            'http://127.0.0.1:5173',
-        );
-        if ($origin && in_array($origin, $allowed, true)) {
-            header('Access-Control-Allow-Origin: ' . $origin);
-        }
-        header('Access-Control-Allow-Methods: GET, OPTIONS');
-        header('Access-Control-Allow-Credentials: true');
-        header('Access-Control-Allow-Headers: Authorization, Content-Type');
-        return $value;
-    });
-}
-
-add_action('init', 'ccspro_handle_preflight');
-
-function ccspro_handle_preflight() {
-    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS' && isset($_SERVER['HTTP_ORIGIN'])) {
-        $allowed = array('https://ccsprocert.com', 'https://www.ccsprocert.com', 'http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173');
-        if (in_array($_SERVER['HTTP_ORIGIN'], $allowed, true)) {
-            header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
-            header('Access-Control-Allow-Methods: GET, OPTIONS');
-            header('Access-Control-Allow-Credentials: true');
-            header('Access-Control-Allow-Headers: Authorization, Content-Type');
-            status_header(200);
-            exit;
-        }
-    }
 }
 
 // ---------------------------------------------------------------------------
@@ -224,6 +38,30 @@ function ccspro_register_acf_options_pages() {
         'page_title' => 'Footer Settings',
         'menu_title' => 'Footer',
         'menu_slug' => 'ccspro-footer',
+        'parent_slug' => 'ccspro-settings',
+        'capability' => 'manage_options',
+    ));
+
+    acf_add_options_sub_page(array(
+        'page_title' => 'Pricing Page',
+        'menu_title' => 'Pricing Page',
+        'menu_slug' => 'ccspro-pricing-page',
+        'parent_slug' => 'ccspro-settings',
+        'capability' => 'manage_options',
+    ));
+
+    acf_add_options_sub_page(array(
+        'page_title' => 'About Page',
+        'menu_title' => 'About Page',
+        'menu_slug' => 'ccspro-about-page',
+        'parent_slug' => 'ccspro-settings',
+        'capability' => 'manage_options',
+    ));
+
+    acf_add_options_sub_page(array(
+        'page_title' => 'Contact Page',
+        'menu_title' => 'Contact Page',
+        'menu_slug' => 'ccspro-contact-page',
         'parent_slug' => 'ccspro-settings',
         'capability' => 'manage_options',
     ));
@@ -1127,508 +965,249 @@ function ccspro_get_field_group_config() {
             'instruction_placement' => 'label',
             'active' => true,
         ),
+        // =====================================================================
+        // PRICING PAGE
+        // =====================================================================
+        array(
+            'key' => 'group_ccspro_pricing_page',
+            'title' => 'Pricing Page Content',
+            'fields' => array(
+                array('key' => 'field_pricing_tab_hero', 'label' => 'Hero', 'type' => 'tab', 'placement' => 'top'),
+                array('key' => 'field_pricing_hero_headline', 'label' => 'Headline', 'name' => 'pricing_hero_headline', 'type' => 'text'),
+                array('key' => 'field_pricing_hero_subheadline', 'label' => 'Subheadline', 'name' => 'pricing_hero_subheadline', 'type' => 'text'),
+
+                array('key' => 'field_pricing_tab_provider', 'label' => 'Provider Card', 'type' => 'tab', 'placement' => 'top'),
+                array('key' => 'field_pricing_provider_badge', 'label' => 'Badge', 'name' => 'pricing_provider_badge', 'type' => 'text', 'wrapper' => array('width' => '33')),
+                array('key' => 'field_pricing_provider_price', 'label' => 'Price', 'name' => 'pricing_provider_price', 'type' => 'text', 'wrapper' => array('width' => '33')),
+                array('key' => 'field_pricing_provider_price_sub', 'label' => 'Price Subtext', 'name' => 'pricing_provider_price_sub', 'type' => 'text', 'wrapper' => array('width' => '34')),
+                array('key' => 'field_pricing_provider_highlighted', 'label' => 'Highlighted', 'name' => 'pricing_provider_highlighted', 'type' => 'true_false', 'ui' => 1),
+                array(
+                    'key' => 'field_pricing_provider_bullets',
+                    'label' => 'Bullets',
+                    'name' => 'pricing_provider_bullets',
+                    'type' => 'repeater',
+                    'layout' => 'table',
+                    'button_label' => 'Add Bullet',
+                    'sub_fields' => array(
+                        array('key' => 'field_pricing_provider_bullet_text', 'label' => 'Text', 'name' => 'bullet_text', 'type' => 'text'),
+                    ),
+                ),
+                array('key' => 'field_pricing_provider_cta_label', 'label' => 'CTA Label', 'name' => 'pricing_provider_cta_label', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_pricing_provider_cta_href', 'label' => 'CTA Href', 'name' => 'pricing_provider_cta_href', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_pricing_provider_fine_print', 'label' => 'Fine Print', 'name' => 'pricing_provider_fine_print', 'type' => 'text'),
+                array(
+                    'key' => 'field_pricing_provider_extras',
+                    'label' => 'Extras',
+                    'name' => 'pricing_provider_extras',
+                    'type' => 'repeater',
+                    'layout' => 'table',
+                    'button_label' => 'Add Extra',
+                    'sub_fields' => array(
+                        array('key' => 'field_pricing_provider_extra_text', 'label' => 'Text', 'name' => 'extra_text', 'type' => 'text'),
+                    ),
+                ),
+                array('key' => 'field_pricing_provider_secondary_link_label', 'label' => 'Secondary Link Label', 'name' => 'pricing_provider_secondary_link_label', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_pricing_provider_secondary_link_href', 'label' => 'Secondary Link Href', 'name' => 'pricing_provider_secondary_link_href', 'type' => 'text', 'wrapper' => array('width' => '50')),
+
+                array('key' => 'field_pricing_tab_group', 'label' => 'Group Card', 'type' => 'tab', 'placement' => 'top'),
+                array('key' => 'field_pricing_group_badge', 'label' => 'Badge', 'name' => 'pricing_group_badge', 'type' => 'text', 'wrapper' => array('width' => '33')),
+                array('key' => 'field_pricing_group_price', 'label' => 'Price', 'name' => 'pricing_group_price', 'type' => 'text', 'wrapper' => array('width' => '33')),
+                array('key' => 'field_pricing_group_price_sub', 'label' => 'Price Subtext', 'name' => 'pricing_group_price_sub', 'type' => 'text', 'wrapper' => array('width' => '34')),
+                array('key' => 'field_pricing_group_highlighted', 'label' => 'Highlighted', 'name' => 'pricing_group_highlighted', 'type' => 'true_false', 'ui' => 1),
+                array(
+                    'key' => 'field_pricing_group_bullets',
+                    'label' => 'Bullets',
+                    'name' => 'pricing_group_bullets',
+                    'type' => 'repeater',
+                    'layout' => 'table',
+                    'button_label' => 'Add Bullet',
+                    'sub_fields' => array(
+                        array('key' => 'field_pricing_group_bullet_text', 'label' => 'Text', 'name' => 'bullet_text', 'type' => 'text'),
+                    ),
+                ),
+                array('key' => 'field_pricing_group_cta_label', 'label' => 'CTA Label', 'name' => 'pricing_group_cta_label', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_pricing_group_cta_href', 'label' => 'CTA Href', 'name' => 'pricing_group_cta_href', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_pricing_group_fine_print', 'label' => 'Fine Print', 'name' => 'pricing_group_fine_print', 'type' => 'text'),
+                array(
+                    'key' => 'field_pricing_group_extras',
+                    'label' => 'Extras',
+                    'name' => 'pricing_group_extras',
+                    'type' => 'repeater',
+                    'layout' => 'table',
+                    'button_label' => 'Add Extra',
+                    'sub_fields' => array(
+                        array('key' => 'field_pricing_group_extra_text', 'label' => 'Text', 'name' => 'extra_text', 'type' => 'text'),
+                    ),
+                ),
+                array('key' => 'field_pricing_group_secondary_link_label', 'label' => 'Secondary Link Label', 'name' => 'pricing_group_secondary_link_label', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_pricing_group_secondary_link_href', 'label' => 'Secondary Link Href', 'name' => 'pricing_group_secondary_link_href', 'type' => 'text', 'wrapper' => array('width' => '50')),
+
+                array('key' => 'field_pricing_tab_features', 'label' => 'Feature Comparison', 'type' => 'tab', 'placement' => 'top'),
+                array(
+                    'key' => 'field_pricing_feature_table',
+                    'label' => 'Feature Table',
+                    'name' => 'pricing_feature_table',
+                    'type' => 'repeater',
+                    'layout' => 'block',
+                    'button_label' => 'Add Category',
+                    'sub_fields' => array(
+                        array('key' => 'field_pricing_ft_category', 'label' => 'Category', 'name' => 'category', 'type' => 'text'),
+                        array(
+                            'key' => 'field_pricing_ft_rows',
+                            'label' => 'Rows',
+                            'name' => 'rows',
+                            'type' => 'repeater',
+                            'layout' => 'table',
+                            'button_label' => 'Add Row',
+                            'sub_fields' => array(
+                                array('key' => 'field_pricing_ft_row_feature', 'label' => 'Feature', 'name' => 'feature', 'type' => 'text'),
+                                array('key' => 'field_pricing_ft_row_provider', 'label' => 'Provider', 'name' => 'provider', 'type' => 'true_false', 'ui' => 1),
+                                array('key' => 'field_pricing_ft_row_group', 'label' => 'Group', 'name' => 'group', 'type' => 'true_false', 'ui' => 1),
+                            ),
+                        ),
+                    ),
+                ),
+
+                array('key' => 'field_pricing_tab_faq', 'label' => 'FAQ', 'type' => 'tab', 'placement' => 'top'),
+                array('key' => 'field_pricing_faq_title', 'label' => 'Section Title', 'name' => 'pricing_faq_title', 'type' => 'text'),
+                array('key' => 'field_pricing_faq_subtitle', 'label' => 'Section Subtitle', 'name' => 'pricing_faq_subtitle', 'type' => 'text'),
+                array(
+                    'key' => 'field_pricing_faq_items',
+                    'label' => 'FAQ Items',
+                    'name' => 'pricing_faq_items',
+                    'type' => 'repeater',
+                    'layout' => 'block',
+                    'button_label' => 'Add FAQ',
+                    'sub_fields' => array(
+                        array('key' => 'field_pricing_faq_question', 'label' => 'Question', 'name' => 'question', 'type' => 'text'),
+                        array('key' => 'field_pricing_faq_answer', 'label' => 'Answer', 'name' => 'answer', 'type' => 'wysiwyg', 'tabs' => 'all', 'toolbar' => 'basic', 'media_upload' => 0),
+                    ),
+                ),
+
+                array('key' => 'field_pricing_tab_final_cta', 'label' => 'Final CTA', 'type' => 'tab', 'placement' => 'top'),
+                array('key' => 'field_pricing_final_cta_headline', 'label' => 'Headline', 'name' => 'pricing_final_cta_headline', 'type' => 'text'),
+                array('key' => 'field_pricing_final_cta_provider_label', 'label' => 'Provider CTA Label', 'name' => 'pricing_final_cta_provider_label', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_pricing_final_cta_provider_href', 'label' => 'Provider CTA Href', 'name' => 'pricing_final_cta_provider_href', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_pricing_final_cta_group_label', 'label' => 'Group CTA Label', 'name' => 'pricing_final_cta_group_label', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_pricing_final_cta_group_href', 'label' => 'Group CTA Href', 'name' => 'pricing_final_cta_group_href', 'type' => 'text', 'wrapper' => array('width' => '50')),
+            ),
+            'location' => array(
+                array(
+                    array('param' => 'options_page', 'operator' => '==', 'value' => 'ccspro-pricing-page'),
+                ),
+            ),
+            'menu_order' => 0,
+            'position' => 'normal',
+            'style' => 'default',
+            'label_placement' => 'top',
+            'instruction_placement' => 'label',
+            'active' => true,
+        ),
+        // =====================================================================
+        // ABOUT PAGE
+        // =====================================================================
+        array(
+            'key' => 'group_ccspro_about_page',
+            'title' => 'About Page Content',
+            'fields' => array(
+                array('key' => 'field_about_tab_hero', 'label' => 'Hero', 'type' => 'tab', 'placement' => 'top'),
+                array('key' => 'field_about_hero_headline', 'label' => 'Headline', 'name' => 'about_hero_headline', 'type' => 'text'),
+                array('key' => 'field_about_hero_subheadline', 'label' => 'Subheadline', 'name' => 'about_hero_subheadline', 'type' => 'text'),
+
+                array('key' => 'field_about_tab_mission', 'label' => 'Mission', 'type' => 'tab', 'placement' => 'top'),
+                array('key' => 'field_about_mission', 'label' => 'Mission Statement', 'name' => 'about_mission', 'type' => 'textarea', 'rows' => 4),
+
+                array('key' => 'field_about_tab_why_texas', 'label' => 'Why Texas', 'type' => 'tab', 'placement' => 'top'),
+                array('key' => 'field_about_why_texas_paragraph', 'label' => 'Paragraph', 'name' => 'about_why_texas_paragraph', 'type' => 'textarea', 'rows' => 4),
+                array(
+                    'key' => 'field_about_why_texas_stats',
+                    'label' => 'Stats',
+                    'name' => 'about_why_texas_stats',
+                    'type' => 'repeater',
+                    'layout' => 'table',
+                    'button_label' => 'Add Stat',
+                    'sub_fields' => array(
+                        array('key' => 'field_about_stat_value', 'label' => 'Value', 'name' => 'value', 'type' => 'text', 'wrapper' => array('width' => '40')),
+                        array('key' => 'field_about_stat_label', 'label' => 'Label', 'name' => 'label', 'type' => 'text', 'wrapper' => array('width' => '60')),
+                    ),
+                ),
+
+                array('key' => 'field_about_tab_differentiators', 'label' => 'Differentiators', 'type' => 'tab', 'placement' => 'top'),
+                array(
+                    'key' => 'field_about_differentiators',
+                    'label' => 'Differentiators',
+                    'name' => 'about_differentiators',
+                    'type' => 'repeater',
+                    'layout' => 'block',
+                    'button_label' => 'Add Differentiator',
+                    'sub_fields' => array(
+                        array('key' => 'field_about_diff_title', 'label' => 'Title', 'name' => 'title', 'type' => 'text'),
+                        array('key' => 'field_about_diff_description', 'label' => 'Description', 'name' => 'description', 'type' => 'textarea', 'rows' => 3),
+                    ),
+                ),
+
+                array('key' => 'field_about_tab_cta', 'label' => 'CTA', 'type' => 'tab', 'placement' => 'top'),
+                array('key' => 'field_about_cta_text', 'label' => 'CTA Text', 'name' => 'about_cta_text', 'type' => 'text'),
+                array('key' => 'field_about_cta_link_label', 'label' => 'Link Label', 'name' => 'about_cta_link_label', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_about_cta_link_href', 'label' => 'Link Href', 'name' => 'about_cta_link_href', 'type' => 'text', 'wrapper' => array('width' => '50')),
+            ),
+            'location' => array(
+                array(
+                    array('param' => 'options_page', 'operator' => '==', 'value' => 'ccspro-about-page'),
+                ),
+            ),
+            'menu_order' => 0,
+            'position' => 'normal',
+            'style' => 'default',
+            'label_placement' => 'top',
+            'instruction_placement' => 'label',
+            'active' => true,
+        ),
+        // =====================================================================
+        // CONTACT PAGE
+        // =====================================================================
+        array(
+            'key' => 'group_ccspro_contact_page',
+            'title' => 'Contact Page Content',
+            'fields' => array(
+                array('key' => 'field_contact_tab_hero', 'label' => 'Hero', 'type' => 'tab', 'placement' => 'top'),
+                array('key' => 'field_contact_hero_headline', 'label' => 'Headline', 'name' => 'contact_hero_headline', 'type' => 'text'),
+                array('key' => 'field_contact_hero_subheadline', 'label' => 'Subheadline', 'name' => 'contact_hero_subheadline', 'type' => 'text'),
+
+                array('key' => 'field_contact_tab_form', 'label' => 'Form Settings', 'type' => 'tab', 'placement' => 'top'),
+                array(
+                    'key' => 'field_contact_role_options',
+                    'label' => 'Role Options',
+                    'name' => 'contact_role_options',
+                    'type' => 'repeater',
+                    'layout' => 'table',
+                    'button_label' => 'Add Role',
+                    'sub_fields' => array(
+                        array('key' => 'field_contact_role_option_text', 'label' => 'Option Text', 'name' => 'option_text', 'type' => 'text'),
+                    ),
+                ),
+
+                array('key' => 'field_contact_tab_info', 'label' => 'Contact Info', 'type' => 'tab', 'placement' => 'top'),
+                array('key' => 'field_contact_email', 'label' => 'Email', 'name' => 'contact_email', 'type' => 'email'),
+                array('key' => 'field_contact_response_time', 'label' => 'Response Time', 'name' => 'contact_response_time', 'type' => 'text'),
+                array('key' => 'field_contact_business_hours', 'label' => 'Business Hours', 'name' => 'contact_business_hours', 'type' => 'text'),
+
+                array('key' => 'field_contact_tab_group_callout', 'label' => 'Group Callout', 'type' => 'tab', 'placement' => 'top'),
+                array('key' => 'field_contact_group_callout_headline', 'label' => 'Headline', 'name' => 'contact_group_callout_headline', 'type' => 'text'),
+                array('key' => 'field_contact_group_callout_body', 'label' => 'Body', 'name' => 'contact_group_callout_body', 'type' => 'textarea', 'rows' => 4),
+            ),
+            'location' => array(
+                array(
+                    array('param' => 'options_page', 'operator' => '==', 'value' => 'ccspro-contact-page'),
+                ),
+            ),
+            'menu_order' => 0,
+            'position' => 'normal',
+            'style' => 'default',
+            'label_placement' => 'top',
+            'instruction_placement' => 'label',
+            'active' => true,
+        ),
     );
 }
 
-// ---------------------------------------------------------------------------
-// 4. REST API ENDPOINT
-// ---------------------------------------------------------------------------
-
-add_action('rest_api_init', 'ccspro_register_rest_routes');
-
-function ccspro_register_rest_routes() {
-    register_rest_route('ccspro/v1', '/site-config', array(
-        'methods' => 'GET',
-        'callback' => 'ccspro_rest_get_site_config',
-        'permission_callback' => '__return_true',
-    ));
-    register_rest_route('ccspro/v1', '/landing-page/(?P<slug>[a-z0-9\-]+)', array(
-        'methods' => 'GET',
-        'callback' => 'ccspro_rest_get_landing_page',
-        'permission_callback' => '__return_true',
-        'args' => array(
-            'slug' => array(
-                'required' => true,
-                'validate_callback' => function ($param) {
-                    return is_string($param) && preg_match('/^[a-z0-9\-]+$/', $param);
-                },
-            ),
-        ),
-    ));
-    register_rest_route('ccspro/v1', '/menus', array(
-        'methods' => 'GET',
-        'callback' => 'ccspro_rest_get_menus',
-        'permission_callback' => '__return_true',
-    ));
-}
-
-function ccspro_rest_get_site_config($request) {
-    $coming_soon = get_option('ccspro_coming_soon', '0') === '1';
-
-    if (!function_exists('get_field')) {
-        return rest_ensure_response(array('comingSoon' => $coming_soon));
-    }
-
-    $site_logo = get_field('site_logo', 'option');
-    $logo_url = null;
-    if (is_array($site_logo) && isset($site_logo['url']) && $site_logo['url'] !== '') {
-        $logo_url = $site_logo['url'];
-    }
-
-    $trust_badges = get_field('footer_trust_badges', 'option') ?: array();
-    $trust_badges = array_values(array_filter(array_map(function ($row) {
-        $icon = isset($row['icon']) ? $row['icon'] : '';
-        $text = isset($row['text']) ? $row['text'] : '';
-        if ($icon === '' && $text === '') {
-            return null;
-        }
-        return array(
-            'icon' => $icon,
-            'text' => $text,
-        );
-    }, $trust_badges)));
-
-    return rest_ensure_response(array(
-        'comingSoon' => $coming_soon,
-        'header' => array(
-            'logoUrl' => $logo_url,
-            'logoText' => get_field('site_logo_text', 'option') ?: 'CCS Pro',
-            'ctaButton' => array(
-                'label' => get_field('header_cta_label', 'option') ?: 'Get Started',
-                'href' => get_field('header_cta_href', 'option') ?: '#',
-            ),
-            'signinLink' => array(
-                'label' => get_field('header_signin_label', 'option') ?: 'Sign In',
-                'href' => get_field('header_signin_href', 'option') ?: '#',
-            ),
-        ),
-        'footer' => array(
-            'brandName' => get_field('footer_brand_name', 'option') ?: 'CCS Pro',
-            'tagline' => get_field('footer_tagline', 'option') ?: 'Credentialing packets. Done once. Ready always.',
-            'trustBadges' => $trust_badges,
-            'copyright' => get_field('footer_copyright', 'option') ?: '© 2025 CCS Pro. All rights reserved.',
-        ),
-    ));
-}
-
-function ccspro_get_menu_links_by_location($location) {
-    $locations = get_nav_menu_locations();
-    if (!is_array($locations) || !isset($locations[$location])) {
-        return array();
-    }
-
-    $menu_items = wp_get_nav_menu_items($locations[$location]);
-    if (!is_array($menu_items)) {
-        return array();
-    }
-
-    $links = array();
-    foreach ($menu_items as $item) {
-        $links[] = array(
-            'label' => isset($item->title) ? $item->title : '',
-            'href' => isset($item->url) ? $item->url : '#',
-            'openInNewTab' => isset($item->target) && $item->target === '_blank',
-        );
-    }
-
-    return $links;
-}
-
-function ccspro_rest_get_menus($request) {
-    return rest_ensure_response(array(
-        'primaryNav' => ccspro_get_menu_links_by_location('ccspro-primary-nav'),
-        'footerCol1' => ccspro_get_menu_links_by_location('ccspro-footer-col1'),
-        'footerCol2' => ccspro_get_menu_links_by_location('ccspro-footer-col2'),
-        'footerCol3' => ccspro_get_menu_links_by_location('ccspro-footer-col3'),
-    ));
-}
-
-function ccspro_rest_get_landing_page($request) {
-    $slug = $request->get_param('slug');
-
-    $posts = get_posts(array(
-        'post_type' => 'landing_page',
-        'name' => $slug,
-        'post_status' => 'publish',
-        'posts_per_page' => 1,
-    ));
-
-    if (empty($posts)) {
-        return new WP_Error('not_found', 'Landing page not found', array('status' => 404));
-    }
-
-    $post = $posts[0];
-    $post_id = $post->ID;
-
-    if (!function_exists('get_field')) {
-        return new WP_Error('acf_missing', 'ACF is required', array('status' => 500));
-    }
-
-    $data = ccspro_transform_landing_page_to_frontend($post_id);
-    return rest_ensure_response($data);
-}
-
-/**
- * Transform ACF fields to match frontend TypeScript structure (landing.ts).
- */
-function ccspro_transform_landing_page_to_frontend($post_id) {
-    $g = function ($name, $default = '') {
-        $v = get_field($name, $post_id);
-        return $v !== false && $v !== null && $v !== '' ? $v : $default;
-    };
-
-    $nav_links = get_field('nav_links', $post_id) ?: array();
-    $nav_links = array_map(function ($row) {
-        return array('label' => isset($row['label']) ? $row['label'] : '', 'href' => isset($row['href']) ? $row['href'] : '#');
-    }, $nav_links);
-
-    $hero_trust = get_field('hero_trust_indicators', $post_id) ?: array();
-    $hero_trust = array_map(function ($row) {
-        return array('icon' => isset($row['icon']) ? $row['icon'] : 'Circle', 'text' => isset($row['text']) ? $row['text'] : '');
-    }, $hero_trust);
-
-    $hero_docs = get_field('hero_dashboard_documents', $post_id) ?: array();
-    $hero_docs = array_map(function ($row) {
-        return array(
-            'name' => isset($row['name']) ? $row['name'] : '',
-            'status' => isset($row['status']) ? $row['status'] : '',
-            'statusColor' => isset($row['status_color']) ? $row['status_color'] : 'gray',
-        );
-    }, $hero_docs);
-
-    $readiness_states = array(
-        array('label' => 'Missing', 'color' => 'red'),
-        array('label' => 'Uploaded', 'color' => 'blue'),
-        array('label' => 'Expiring Soon', 'color' => 'orange'),
-        array('label' => 'Expired', 'color' => 'gray'),
-        array('label' => 'Complete', 'color' => 'green'),
-    );
-    $how_states = get_field('how_readiness_states', $post_id);
-    if (is_array($how_states) && !empty($how_states)) {
-        $readiness_states = array_map(function ($row) {
-            return array('label' => isset($row['label']) ? $row['label'] : '', 'color' => isset($row['color']) ? $row['color'] : 'gray');
-        }, $how_states);
-    }
-
-    $verification_items = get_field('verification_items', $post_id) ?: array();
-    $verification_items = array_map(function ($row) {
-        return array('icon' => isset($row['icon']) ? $row['icon'] : 'Circle', 'label' => isset($row['label']) ? $row['label'] : '');
-    }, $verification_items);
-
-    $founder_bullets = get_field('founder_bullets', $post_id) ?: array();
-    $founder_bullets = array_map(function ($row) {
-        return isset($row['bullet_text']) ? $row['bullet_text'] : '';
-    }, $founder_bullets);
-
-    $problems = get_field('problems', $post_id) ?: array();
-    $problems = array_map(function ($row) {
-        return array(
-            'icon' => isset($row['icon']) ? $row['icon'] : 'Circle',
-            'title' => isset($row['title']) ? $row['title'] : '',
-            'description' => isset($row['description']) ? $row['description'] : '',
-        );
-    }, $problems);
-
-    $how_steps = get_field('how_it_works_steps', $post_id) ?: array();
-    $how_steps = array_map(function ($row) {
-        return array(
-            'icon' => isset($row['icon']) ? $row['icon'] : 'Circle',
-            'step' => isset($row['step_number']) ? $row['step_number'] : '',
-            'title' => isset($row['title']) ? $row['title'] : '',
-            'description' => isset($row['description']) ? $row['description'] : '',
-        );
-    }, $how_steps);
-
-    $provider_steps = get_field('provider_steps', $post_id) ?: array();
-    $provider_steps = array_map(function ($row) {
-        return array(
-            'icon' => isset($row['icon']) ? $row['icon'] : 'Circle',
-            'step' => isset($row['step_number']) ? $row['step_number'] : '',
-            'title' => isset($row['title']) ? $row['title'] : '',
-            'description' => isset($row['description']) ? $row['description'] : '',
-        );
-    }, $provider_steps);
-    if (empty($provider_steps)) {
-        $provider_steps = $how_steps;
-    }
-
-    $group_steps = get_field('group_steps', $post_id) ?: array();
-    $group_steps = array_map(function ($row) {
-        return array(
-            'icon' => isset($row['icon']) ? $row['icon'] : 'Circle',
-            'step' => isset($row['step_number']) ? $row['step_number'] : '',
-            'title' => isset($row['title']) ? $row['title'] : '',
-            'description' => isset($row['description']) ? $row['description'] : '',
-        );
-    }, $group_steps);
-
-    $features_items = get_field('features_items', $post_id) ?: array();
-    $features_items = array_map(function ($row) {
-        return array(
-            'icon' => isset($row['icon']) ? $row['icon'] : 'Circle',
-            'title' => isset($row['title']) ? $row['title'] : '',
-            'description' => isset($row['description']) ? $row['description'] : '',
-            'link' => isset($row['link']) ? $row['link'] : '#',
-        );
-    }, $features_items);
-
-    $packet_checklist = get_field('packet_checklist', $post_id) ?: array();
-    $packet_checklist = array_map(function ($row) {
-        return isset($row['item_text']) ? $row['item_text'] : '';
-    }, $packet_checklist);
-
-    $security_features = get_field('security_features', $post_id) ?: array();
-    $security_features = array_map(function ($row) {
-        return array('icon' => isset($row['icon']) ? $row['icon'] : 'Shield', 'text' => isset($row['text']) ? $row['text'] : '');
-    }, $security_features);
-
-    $security_badges = get_field('security_floating_badges', $post_id) ?: array();
-    $security_badges = array_map(function ($row) {
-        return isset($row['badge_text']) ? $row['badge_text'] : '';
-    }, $security_badges);
-
-    $caqh_benefits = get_field('caqh_benefits', $post_id) ?: array();
-    $caqh_benefits = array_map(function ($row) {
-        return isset($row['benefit_text']) ? $row['benefit_text'] : '';
-    }, $caqh_benefits);
-
-    $caqh_consent = get_field('caqh_consent_modes', $post_id) ?: array();
-    $caqh_consent = array_map(function ($row) {
-        return array(
-            'icon' => isset($row['icon']) ? $row['icon'] : 'Circle',
-            'title' => isset($row['title']) ? $row['title'] : '',
-            'description' => isset($row['description']) ? $row['description'] : '',
-        );
-    }, $caqh_consent);
-    $provider_bullets = get_field('provider_bullets', $post_id) ?: array();
-    $provider_bullets = array_values(array_filter(array_map(function ($row) {
-        return isset($row['bullet_text']) ? $row['bullet_text'] : '';
-    }, $provider_bullets)));
-
-    $group_bullets = get_field('group_bullets', $post_id) ?: array();
-    $group_bullets = array_values(array_filter(array_map(function ($row) {
-        return isset($row['bullet_text']) ? $row['bullet_text'] : '';
-    }, $group_bullets)));
-
-    $group_notes = get_field('group_notes', $post_id) ?: array();
-    $group_notes = array_values(array_filter(array_map(function ($row) {
-        return isset($row['note_text']) ? $row['note_text'] : '';
-    }, $group_notes)));
-
-    $pricing_content = array(
-        'sectionTitle' => get_field('pricing_section_title', $post_id) ?: 'Simple pricing. No surprises.',
-        'sectionSubtitle' => get_field('pricing_section_subtitle', $post_id) ?: "Whether you're a solo provider or managing a 50-person group...",
-        'providerCard' => array(
-            'badge' => get_field('provider_badge', $post_id) ?: 'For Individual Providers',
-            'price' => get_field('provider_price', $post_id) ?: '$99/year',
-            'priceSub' => get_field('provider_price_sub', $post_id) ?: '+ $60 per packet generated',
-            'bullets' => $provider_bullets,
-            'cta' => array(
-                'label' => get_field('provider_cta_label', $post_id) ?: 'Get Started — $99/year',
-                'href' => get_field('provider_cta_href', $post_id) ?: '#',
-            ),
-            'finePrint' => get_field('provider_fine_print', $post_id) ?: 'No contracts. Cancel anytime.',
-            'callout' => get_field('provider_callout', $post_id) ?: 'Most providers pay under $600 total in year one.',
-            'highlighted' => (bool) get_field('provider_highlighted', $post_id),
-        ),
-        'groupCard' => array(
-            'badge' => get_field('group_badge', $post_id) ?: 'For Groups & Facilities',
-            'price' => get_field('group_price', $post_id) ?: '$1,199/seat/year',
-            'priceSub' => get_field('group_price_sub', $post_id) ?: 'All payer packet workflows included',
-            'bullets' => $group_bullets,
-            'cta' => array(
-                'label' => get_field('group_cta_label', $post_id) ?: 'Talk to Us',
-                'href' => get_field('group_cta_href', $post_id) ?: '/contact',
-            ),
-            'finePrint' => get_field('group_fine_print', $post_id) ?: "Up to 50 seats. More than 50? Let's talk.",
-            'notes' => $group_notes,
-            'secondaryLink' => array(
-                'label' => get_field('group_secondary_link_label', $post_id) ?: 'See full feature comparison →',
-                'href' => get_field('group_secondary_link_href', $post_id) ?: '/pricing',
-            ),
-            'highlighted' => (bool) get_field('group_highlighted', $post_id),
-        ),
-    );
-
-    $ecosystem_pairs = get_field('ecosystem_pairs', $post_id) ?: array();
-    $ecosystem_pairs = array_values(array_filter(array_map(function ($row) {
-        $provider_action = isset($row['provider_action']) ? $row['provider_action'] : '';
-        $connector = isset($row['connector']) ? $row['connector'] : '';
-        $group_outcome = isset($row['group_outcome']) ? $row['group_outcome'] : '';
-        if ($provider_action === '' && $connector === '' && $group_outcome === '') {
-            return null;
-        }
-        return array(
-            'providerAction' => $provider_action,
-            'connector' => $connector,
-            'groupOutcome' => $group_outcome,
-        );
-    }, $ecosystem_pairs)));
-
-    $support_features = get_field('support_features', $post_id) ?: array();
-    $support_features = array_map(function ($row) {
-        return array('icon' => isset($row['icon']) ? $row['icon'] : 'Circle', 'text' => isset($row['text']) ? $row['text'] : '');
-    }, $support_features);
-
-    $support_links = get_field('support_links', $post_id) ?: array();
-    $support_links = array_map(function ($row) {
-        return array('label' => isset($row['label']) ? $row['label'] : '', 'href' => isset($row['href']) ? $row['href'] : '#');
-    }, $support_links);
-
-    $team_members = get_field('team_members', $post_id) ?: array();
-    $team_members = array_map(function ($row) {
-        return array(
-            'name' => isset($row['name']) ? $row['name'] : '',
-            'role' => isset($row['role']) ? $row['role'] : '',
-            'icon' => isset($row['icon']) ? $row['icon'] : 'User',
-            'bio' => isset($row['bio']) ? $row['bio'] : '',
-        );
-    }, $team_members);
-
-    $faq_items = get_field('faq_items', $post_id) ?: array();
-    $faq_items = array_map(function ($row) {
-        return array(
-            'question' => isset($row['question']) ? $row['question'] : '',
-            'answer' => isset($row['answer']) ? $row['answer'] : '',
-        );
-    }, $faq_items);
-
-    return array(
-        'siteConfig' => array(
-            'name' => get_field('site_name', $post_id) ?: 'CCS Pro',
-            'tagline' => get_field('site_tagline', $post_id) ?: '',
-            'description' => get_field('site_description', $post_id) ?: '',
-        ),
-        'navLinks' => $nav_links,
-        'navCtas' => array(
-            'primary' => array('label' => get_field('nav_primary_label', $post_id) ?: 'Start free', 'href' => get_field('nav_primary_href', $post_id) ?: '#pricing'),
-            'secondary' => array('label' => get_field('nav_secondary_label', $post_id) ?: 'Book a demo', 'href' => get_field('nav_secondary_href', $post_id) ?: '#demo'),
-            'signIn' => array('label' => get_field('nav_signin_label', $post_id) ?: 'Sign in', 'href' => get_field('nav_signin_href', $post_id) ?: '#'),
-        ),
-        'heroContent' => array(
-            'headline' => get_field('hero_headline', $post_id) ?: '',
-            'headlineHighlight' => get_field('hero_headline_highlight', $post_id) ?: '',
-            'headlineSuffix' => get_field('hero_headline_suffix', $post_id) ?: 'Ready Always.',
-            'subheadline' => get_field('hero_subheadline', $post_id) ?: '',
-            'primaryCta' => array('label' => get_field('hero_primary_label', $post_id) ?: '', 'href' => get_field('hero_primary_href', $post_id) ?: '#'),
-            'secondaryCta' => array('label' => get_field('hero_secondary_label', $post_id) ?: '', 'href' => get_field('hero_secondary_href', $post_id) ?: '#'),
-            'tertiaryCta' => array('label' => get_field('hero_tertiary_label', $post_id) ?: '', 'href' => get_field('hero_tertiary_href', $post_id) ?: '#'),
-            'trustIndicators' => $hero_trust,
-        ),
-        'heroDashboard' => array(
-            'title' => get_field('hero_dashboard_title', $post_id) ?: 'Credential Packet',
-            'subtitle' => get_field('hero_dashboard_subtitle', $post_id) ?: '',
-            'completionPercent' => (int) get_field('hero_dashboard_completion', $post_id) ?: 0,
-            'stateValue' => get_field('hero_dashboard_state', $post_id) ?: '',
-            'npiValue' => get_field('hero_dashboard_npi', $post_id) ?: '',
-            'readinessStates' => $readiness_states,
-            'documents' => $hero_docs,
-            'buttons' => array(
-                'primary' => get_field('hero_dashboard_btn_primary', $post_id) ?: 'Generate Signed PDF',
-                'secondary' => get_field('hero_dashboard_btn_secondary', $post_id) ?: 'Generate Packet PDF',
-            ),
-        ),
-        'verificationContent' => array(
-            'headline' => get_field('verification_headline', $post_id) ?: '',
-            'items' => $verification_items,
-        ),
-        'founderContent' => array(
-            'name' => get_field('founder_name', $post_id) ?: '',
-            'title' => get_field('founder_title', $post_id) ?: '',
-            'initials' => get_field('founder_initials', $post_id) ?: 'DR',
-            'quote' => get_field('founder_quote', $post_id) ?: '',
-            'bullets' => $founder_bullets,
-        ),
-        'problemOutcomeContent' => array(
-            'problems' => $problems,
-            'outcomeText' => array(
-                'prefix' => get_field('outcome_prefix', $post_id) ?: '',
-                'middle' => get_field('outcome_middle', $post_id) ?: '',
-                'suffix' => get_field('outcome_suffix', $post_id) ?: '',
-            ),
-        ),
-        'howItWorksContent' => array(
-            'sectionTitle' => get_field('how_it_works_title', $post_id) ?: 'How it works',
-            'sectionSubtitle' => get_field('how_it_works_subtitle', $post_id) ?: '',
-            'steps' => $how_steps,
-            'providerSteps' => $provider_steps,
-            'groupSteps' => $group_steps,
-            'readinessNote' => array(
-                'label' => get_field('how_readiness_label', $post_id) ?: '5 Readiness States:',
-                'states' => $readiness_states,
-            ),
-        ),
-        'ecosystemContent' => array(
-            'headline' => get_field('ecosystem_headline', $post_id) ?: 'One profile. Two sides of credentialing. Finally connected.',
-            'subheadline' => get_field('ecosystem_subheadline', $post_id) ?: 'Providers build it once. Groups use it everywhere.',
-            'pairs' => $ecosystem_pairs,
-        ),
-        'featuresContent' => array(
-            'sectionTitle' => get_field('features_title', $post_id) ?: "What's included",
-            'sectionSubtitle' => get_field('features_subtitle', $post_id) ?: '',
-            'features' => $features_items,
-        ),
-        'packetPreviewContent' => array(
-            'sectionTitle' => get_field('packet_title', $post_id) ?: '',
-            'sectionSubtitle' => get_field('packet_subtitle', $post_id) ?: '',
-            'fileName' => get_field('packet_filename', $post_id) ?: '',
-            'checklist' => $packet_checklist,
-            'cta' => array(
-                'label' => get_field('packet_cta_label', $post_id) ?: '',
-                'href' => get_field('packet_cta_href', $post_id) ?: '#',
-            ),
-        ),
-        'securityContent' => array(
-            'badge' => get_field('security_badge', $post_id) ?: '',
-            'sectionTitle' => get_field('security_title', $post_id) ?: '',
-            'sectionSubtitle' => get_field('security_subtitle', $post_id) ?: '',
-            'features' => $security_features,
-            'cta' => array(
-                'label' => get_field('security_cta_label', $post_id) ?: '',
-                'href' => get_field('security_cta_href', $post_id) ?: '#',
-            ),
-            'floatingBadges' => $security_badges,
-        ),
-        'caqhConciergeContent' => array(
-            'badge' => get_field('caqh_badge', $post_id) ?: '',
-            'sectionTitle' => get_field('caqh_title', $post_id) ?: '',
-            'sectionSubtitle' => get_field('caqh_subtitle', $post_id) ?: '',
-            'benefitsTitle' => get_field('caqh_benefits_title', $post_id) ?: 'What we do for you:',
-            'benefits' => $caqh_benefits,
-            'cta' => array(
-                'label' => get_field('caqh_cta_label', $post_id) ?: '',
-                'href' => get_field('caqh_cta_href', $post_id) ?: '#',
-            ),
-            'consentTitle' => get_field('caqh_consent_title', $post_id) ?: 'Choose your consent mode:',
-            'consentModes' => $caqh_consent,
-            'alwaysIncluded' => array(
-                'icon' => get_field('caqh_always_icon', $post_id) ?: 'Bell',
-                'title' => get_field('caqh_always_title', $post_id) ?: 'Always included:',
-                'description' => get_field('caqh_always_description', $post_id) ?: '',
-            ),
-        ),
-        'pricingContent' => $pricing_content,
-        'supportContent' => array(
-            'sectionTitle' => get_field('support_title', $post_id) ?: "We're here when you need us",
-            'sectionSubtitle' => get_field('support_subtitle', $post_id) ?: '',
-            'features' => $support_features,
-            'links' => $support_links,
-        ),
-        'teamContent' => array(
-            'sectionTitle' => get_field('team_title', $post_id) ?: 'The team behind CCS Pro',
-            'sectionSubtitle' => get_field('team_subtitle', $post_id) ?: '',
-            'members' => $team_members,
-        ),
-        'faqContent' => array(
-            'sectionTitle' => get_field('faq_title', $post_id) ?: 'Frequently asked questions',
-            'sectionSubtitle' => get_field('faq_subtitle', $post_id) ?: '',
-            'items' => $faq_items,
-        ),
-        'finalCtaContent' => array(
-            'headline' => get_field('final_cta_headline', $post_id) ?: '',
-            'subheadline' => get_field('final_cta_subheadline', $post_id) ?: '',
-            'primaryCta' => array('label' => get_field('final_cta_primary_label', $post_id) ?: '', 'href' => get_field('final_cta_primary_href', $post_id) ?: '#'),
-            'secondaryCta' => array('label' => get_field('final_cta_secondary_label', $post_id) ?: '', 'href' => get_field('final_cta_secondary_href', $post_id) ?: '#'),
-        ),
-    );
-}

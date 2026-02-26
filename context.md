@@ -36,16 +36,16 @@ User → ccsprocert.com (Vercel)
          ↓
     React Router renders:
       /           → HomePage.tsx (live WP + mock fallback merge)
-      /pricing    → PricingPage.tsx (mock data)
-      /about      → AboutPage.tsx (mock data)
-      /contact    → ContactPage.tsx (mock data)
+      /pricing    → PricingPage.tsx (REST API + mock fallback)
+      /about      → AboutPage.tsx (REST API + mock fallback)
+      /contact    → ContactPage.tsx (REST API + mock fallback)
       /:slug      → Index.tsx (WP API or static fallback)
 ```
 
 - **Homepage (`/`):** Uses live `useLandingPage("default")`, `useSiteConfig()`, and `useMenus()` data with `mockData.ts` fallback when API fields are missing.
-- **Other named pages (`/pricing`, `/about`, `/contact`):** Still driven by `src/content/mockData.ts`.
+- **Other named pages (`/pricing`, `/about`, `/contact`):** Use WordPress API (`page/pricing`, `page/about`, `page/contact`) with `mockData.ts` fallback.
 - **Legacy route:** `/:slug` still works via `Index.tsx`, which fetches from WordPress or falls back to `src/content/landing.ts`.
-- **REST:** Custom namespace `ccspro/v1`. Key routes: `GET /site-config`, `GET /menus`, `GET /landing-page/{slug}`. CORS allows ccsprocert.com and localhost (5173, 3000, 127.0.0.1:5173).
+- **REST:** Custom namespace `ccspro/v1`. Key routes: `GET /site-config`, `GET /menus`, `GET /landing-page/{slug}`, `GET /page/pricing`, `GET /page/about`, `GET /page/contact`. CORS allows ccsprocert.com and localhost (5173, 3000, 127.0.0.1:5173).
 
 ---
 
@@ -100,7 +100,13 @@ temp-repo/
 │               └── TeamSection.tsx
 ├── wordpress/
 │   └── mu-plugins/
-│       └── ccspro-cpt-acf.php   # CPT, ACF groups, REST, CORS, menus, admin edit-screen customizations
+│       ├── ccspro.php           # MU-plugin loader
+│       └── ccspro/
+│           ├── cpt.php          # CPT, nav menus, landing-page admin UX
+│           ├── admin.php        # Coming soon settings page
+│           ├── cors.php         # CORS headers and preflight handling
+│           ├── acf.php          # ACF options pages + field groups
+│           └── rest-api.php     # REST route registration and handlers
 ├── docs/
 │   └── WORDPRESS_SETUP_GUIDE.md
 ├── .env.example
@@ -119,7 +125,7 @@ temp-repo/
 
 1. **WordPress headless plan** — Designed integration: single Landing Page CPT with ACF (no Options Pages), custom REST, CORS.
 2. **WordPress setup guide** — Added `docs/WORDPRESS_SETUP_GUIDE.md`.
-3. **MU-plugin** — `ccspro-cpt-acf.php`: CPT, ACF field groups, REST routes, CORS, Coming Soon admin.
+3. **MU-plugin** — Modularized MU-plugin (`ccspro.php` loader + `ccspro/*.php` modules): CPT, ACF field groups, REST routes, CORS, Coming Soon admin.
 4. **Frontend API and types** — `wordpress.ts`, `types/wordpress.ts`, `useWordPress.ts`, static fallback in `landing.ts`.
 5. **Dynamic landing page** — `Index.tsx` with `useLandingPage(slug)`, skeleton, fallback.
 6. **Lovable branding removed**.
@@ -168,6 +174,8 @@ temp-repo/
 33. **Dynamic header logo rendering** — `Header.tsx` now prefers API `headerData.logoUrl`, falls back to static asset, then falls back to text; `HeaderData` includes optional `logoUrl`.
 34. **Hero ACF gap fixes** — Added `hero_headline_suffix` ACF field and wired it through the REST response, `HeroContent` type, mock data, and `HeroSection.tsx` to replace the hardcoded "Ready Always." suffix. Also wired `heroDashboard` through the API-first + mock fallback pattern in `HomePage.tsx`; previously dashboard card edits in WordPress had no effect on the live page.
 
+35. **Pricing/About/Contact ACF integration** — Added 3 new ACF Options Sub-Pages (Pricing Page, About Page, Contact Page) under CCS Pro Settings with full field groups matching TypeScript interfaces. Added REST endpoints (`/page/pricing`, `/page/about`, `/page/contact`). Extended `ContentProvider`, `restProvider`, hooks with `usePricingPage()`, `useAboutPage()`, `useContactPage()`. All three pages now fetch from WordPress API with `mockData.ts` fallback. Header/Footer on all pages are now API-driven with fallback.
+
 ---
 
 ## 6. Environment variables
@@ -195,13 +203,13 @@ temp-repo/
 | Path | Page | Data source |
 |------|------|-------------|
 | `/` | HomePage | WordPress API (`landing-page/default` + `site-config` + `menus`) merged with `mockHomePage` + `mockSiteSettings` fallback |
-| `/pricing` | PricingPage | `mockPricingPage` from `mockData.ts` |
-| `/about` | AboutPage | `mockAboutPage` from `mockData.ts` |
-| `/contact` | ContactPage | `mockContactPage` from `mockData.ts` |
+| `/pricing` | PricingPage | WordPress API (`page/pricing`) with `mockPricingPage` fallback + `site-config` + `menus` |
+| `/about` | AboutPage | WordPress API (`page/about`) with `mockAboutPage` fallback + `site-config` + `menus` |
+| `/contact` | ContactPage | WordPress API (`page/contact`) with `mockContactPage` fallback + `site-config` + `menus` |
 | `/:slug` | Index (legacy) | WordPress API or `defaultLandingPageContent` fallback |
 | `*` | NotFound | — |
 
-Header/Footer on `/` are API-driven with fallback; header logo rendering now uses dynamic `logoUrl` when provided by site-config, with static/text fallbacks.
+Header/Footer on all four pages are API-driven with fallback; header logo rendering uses dynamic `logoUrl` when provided by site-config, with static/text fallbacks.
 
 ---
 
@@ -210,7 +218,7 @@ Header/Footer on `/` are API-driven with fallback; header logo rendering now use
 - **Run locally:** `npm i` then `npm run dev`. Set `VITE_WP_API_URL` in `.env` (see `.env.example`).
 - **Build:** `npm run build` → `dist/`.
 - **Deploy:** Push to `other` (e.g. `git push other main`). Vercel builds from connected repo; ensure `VITE_WP_API_URL` is set in Vercel project env.
-- **WordPress:** Upload/replace `wordpress/mu-plugins/ccspro-cpt-acf.php` on wpcms.ccsprocert.com; permalinks = Post name. Full steps in `docs/WORDPRESS_SETUP_GUIDE.md`.
+- **WordPress:** Upload/replace `wordpress/mu-plugins/ccspro.php` plus the `wordpress/mu-plugins/ccspro/` module folder on wpcms.ccsprocert.com; permalinks = Post name. Full steps in `docs/WORDPRESS_SETUP_GUIDE.md`.
 
 ---
 
@@ -229,6 +237,7 @@ Header/Footer on `/` are API-driven with fallback; header logo rendering now use
 - `src/content/landing.ts` — `defaultLandingPageContent` still exists for `/:slug` fallback.
 - `vercel.json` — SPA rewrite unchanged.
 - Core route structure in `App.tsx` remains unchanged (`/`, `/pricing`, `/about`, `/contact`, `/:slug`, `*`).
+- **HomePage sections:** `painPoint`, `ctaBlockA`, `ctaBlockB` still use mock data; the existing ACF schema uses a legacy format that doesn't match the new component props. Wiring them would require new ACF fields.
 
 ---
 
@@ -243,4 +252,4 @@ Header/Footer on `/` are API-driven with fallback; header logo rendering now use
 
 ---
 
-*Last updated after hero ACF gap fixes: `hero_headline_suffix` field, dashboard data wiring.*
+*Last updated after MU-plugin modularization (loader + module files).*

@@ -10,8 +10,14 @@ export type { SiteConfigResponse } from "@/content/providers/types";
 
 export const getLandingPage = restProvider.getLandingPage;
 export const getSiteConfig = restProvider.getSiteConfig;
+export const getPricingPage = restProvider.getPricingPage;
+export const getAboutPage = restProvider.getAboutPage;
+export const getContactPage = restProvider.getContactPage;
 
 export const wpClient = {
   getLandingPage,
   getSiteConfig,
+  getPricingPage,
+  getAboutPage,
+  getContactPage,
 };

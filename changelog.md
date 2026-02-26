@@ -2,6 +2,26 @@
 
 All notable changes to this repository are documented in this file.
 
+## 2026-02-27 (mu-plugin modularization)
+
+### Added
+- New MU-plugin loader: `wordpress/mu-plugins/ccspro.php`.
+- New MU-plugin module files:
+  - `wordpress/mu-plugins/ccspro/cpt.php`
+  - `wordpress/mu-plugins/ccspro/admin.php`
+  - `wordpress/mu-plugins/ccspro/cors.php`
+  - `wordpress/mu-plugins/ccspro/acf.php`
+  - `wordpress/mu-plugins/ccspro/rest-api.php`
+
+### Changed
+- Refactored the monolithic MU-plugin into a modular structure with a single loader entrypoint and focused module files; existing hook names, function names, routes, field keys, and behavior remain unchanged.
+- Updated documentation references and deployment instructions to upload `ccspro.php` plus the `ccspro/` module directory.
+
+### Fixed
+- Reduced maintenance risk from single-file edits by isolating CPT/admin/CORS/ACF/REST concerns into separate files.
+
+---
+
 ## 2026-02-26 (hero ACF gap fixes)
 
 ### Added

@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { mockSiteSettings, mockAboutPage } from "@/content/mockData";
+import { useAboutPage, useSiteConfig, useMenus } from "@/hooks/useWordPress";
 import { Header } from "@/components/landing/Header";
 import { Footer } from "@/components/landing/Footer";
 
@@ -10,11 +11,42 @@ const AboutPage = () => {
     document.title = "About Us | CCS Pro";
   }, []);
 
-  const page = mockAboutPage;
+  const { data: apiData } = useAboutPage();
+  const { data: siteConfig } = useSiteConfig();
+  const { data: menus } = useMenus();
+
+  const page = apiData ?? mockAboutPage;
+
+  const headerData = siteConfig?.header
+    ? {
+        logo: siteConfig.header.logoText,
+        logoUrl: siteConfig.header.logoUrl,
+        ctaButton: siteConfig.header.ctaButton,
+        secondaryLink: siteConfig.header.signinLink,
+        primaryNav: menus?.primaryNav ?? mockSiteSettings.header.primaryNav,
+      }
+    : mockSiteSettings.header;
+
+  const [defaultCol1, defaultCol2, defaultCol3] = mockSiteSettings.footer.columns;
+  const footerData = siteConfig?.footer
+    ? {
+        brand: {
+          name: siteConfig.footer.brandName,
+          tagline: siteConfig.footer.tagline,
+        },
+        trustBadges: siteConfig.footer.trustBadges,
+        copyright: siteConfig.footer.copyright,
+        columns: [
+          { title: defaultCol1.title, links: menus?.footerCol1 ?? defaultCol1.links },
+          { title: defaultCol2.title, links: menus?.footerCol2 ?? defaultCol2.links },
+          { title: defaultCol3.title, links: menus?.footerCol3 ?? defaultCol3.links },
+        ],
+      }
+    : mockSiteSettings.footer;
 
   return (
     <div className="min-h-screen bg-background">
-      <Header headerData={mockSiteSettings.header} />
+      <Header headerData={headerData} />
       <main>
         {/* Hero */}
         <section className="pt-32 pb-16 px-4">
@@ -106,7 +138,7 @@ const AboutPage = () => {
           </div>
         </section>
       </main>
-      <Footer footerData={mockSiteSettings.footer} />
+      <Footer footerData={footerData} />
     </div>
   );
 };

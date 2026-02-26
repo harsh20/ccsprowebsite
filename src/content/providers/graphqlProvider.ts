@@ -3,6 +3,9 @@ import type {
   LandingPageContent,
   MenusResponse,
   SiteConfigResponse,
+  PricingPageContent,
+  AboutPageContent,
+  ContactPageContent,
 } from "@/types/wordpress";
 
 const WP_GRAPHQL_ENDPOINT = import.meta.env.VITE_WP_GRAPHQL_ENDPOINT ?? "";
@@ -68,8 +71,23 @@ async function getMenus(): Promise<MenusResponse> {
   };
 }
 
+async function getPricingPage(): Promise<PricingPageContent> {
+  notConfigured("GraphQL pricing page provider");
+}
+
+async function getAboutPage(): Promise<AboutPageContent> {
+  notConfigured("GraphQL about page provider");
+}
+
+async function getContactPage(): Promise<ContactPageContent> {
+  notConfigured("GraphQL contact page provider");
+}
+
 export const wordpressGraphqlProvider: ContentProvider = {
   getLandingPage,
   getSiteConfig,
   getMenus,
+  getPricingPage,
+  getAboutPage,
+  getContactPage,
 };

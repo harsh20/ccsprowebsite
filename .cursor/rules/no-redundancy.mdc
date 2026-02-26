@@ -1,0 +1,28 @@
+---
+description: Prevent duplicated logic, dead code, and reinvented utilities
+alwaysApply: true
+---
+
+# No Redundancy
+
+Before adding code, check whether it already exists in the project.
+
+## Before you write
+
+- New utility function → check `src/lib/` for existing helpers
+- New icon mapping → check `src/lib/landing-icons.ts` before adding
+- New type/interface → check `src/types/wordpress.ts` for similar shapes
+- New shared UI pattern → check `src/components/landing/shared/` and `src/components/ui/`
+- New fallback logic → reuse the mock-data-merge pattern established in `HomePage.tsx`
+
+## While you write
+
+- When the same Tailwind class pattern appears 3+ times across files, extract to a utility in `src/index.css`
+- Remove unused imports and variables in every file you touch
+- Do not create a new file for logic that belongs in an existing one
+
+## What counts as duplication
+
+- Two components rendering the same layout with minor prop differences → extract a shared component
+- The same API-to-mock fallback chain repeated → use the established merge pattern
+- Identical conditional rendering logic across sections → extract to a helper or shared component

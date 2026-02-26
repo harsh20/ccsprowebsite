@@ -1,0 +1,23 @@
+---
+description: Pre-code planning step — declare intent before touching any files
+alwaysApply: true
+---
+
+# Task Planning
+
+Before writing, modifying, or deleting any code, complete this planning step.
+
+## Required plan
+
+1. **Goal:** State what you are doing in one sentence.
+2. **Files:** List every file that will be touched and why.
+3. **Risk:** Identify the riskiest part of the change — the most likely place for breakage or unintended side effects.
+4. **Ambiguities:** Flag anything unclear. If ambiguities exist, ask one clarifying question and wait for the answer before proceeding.
+
+## Split threshold
+
+If the plan requires touching more than 6 files, or cannot be summarized in half a page, the task must be split into smaller steps. Confirm the split with the user before proceeding.
+
+## Enforcement
+
+This rule fires before any code is written. No file should be edited until the plan is stated.

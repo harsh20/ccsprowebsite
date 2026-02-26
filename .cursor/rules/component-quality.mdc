@@ -1,0 +1,48 @@
+---
+description: React component structure and quality patterns
+globs: src/components/**/*.tsx,src/pages/**/*.tsx
+alwaysApply: false
+---
+
+# Component Quality
+
+## Dual-prop pattern
+
+Each section component accepts both `content?: LandingPageContent` (legacy `/:slug`) and typed props (new pages). Branch internally based on which prop is present.
+
+## Page requirements
+
+- Every page includes `<Header />` and `<Footer />` with the page's data source
+- Every page sets `document.title` via `useEffect` (format: `"Page Name | CCS Pro"`)
+- Header logo order: `headerData.logoUrl` → static asset fallback → text fallback from `headerData.logo`
+
+## Structure
+
+- Max ~200 lines per component. Extract sub-sections or custom hooks if larger.
+- Destructure props at the function signature, not inside the body.
+- Prefer early returns over nested ternaries for conditional rendering.
+- Inline event handlers over 2 lines → extract to a named function.
+- No prop drilling deeper than 2 levels — lift state to page level or use composition.
+
+## Async data
+
+- Every component using async data must handle loading and error states.
+- Use the established skeleton/loading patterns from `LandingPageSkeleton.tsx`.
+
+## Color conventions
+
+- Indigo tones → Provider-related UI
+- Emerald tones → Group/Facility-related UI
+- CTA blocks: `style: "indigo"` or `style: "emerald"` determines background color
+
+## Routing in components
+
+- Internal navigation: React Router `<Link>`, not `<a>`
+- Anchor links (e.g. `/#how-it-works`): standard `<a>` tags
+
+## Performance
+
+- No inline object or array literals in JSX props on frequently-rendered components (causes unnecessary re-renders).
+- Expensive computations inside frequently-rendered components must be wrapped in `useMemo`.
+- Images and asset elements must have explicit `width` and `height` to prevent layout shift.
+- Avoid anonymous functions as event handlers in JSX on list items or table rows — extract to named handlers.

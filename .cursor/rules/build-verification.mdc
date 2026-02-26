@@ -1,0 +1,28 @@
+---
+description: Post-change quality gate — verify builds and lint
+alwaysApply: true
+---
+
+# Build Verification
+
+## Before editing
+
+- Read relevant files before editing them.
+- Do not batch unrelated changes in a single step.
+
+## After editing
+
+- After meaningful changes, run `npm run build` to verify TypeScript compilation.
+- Run `ReadLints` on all edited files after edits.
+- If build or lint fails, fix the issue before responding to the user.
+
+## Type change impact
+
+When changing types in `src/types/wordpress.ts`, also verify that consumers still compile:
+- Components that import the changed type
+- `src/content/mockData.ts`
+- `src/hooks/useWordPress.ts`
+
+## Judgment
+
+This is judgment-based. A one-line text fix does not need a full build. A new component, type change, or structural refactor does.

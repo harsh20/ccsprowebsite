@@ -1,0 +1,38 @@
+---
+description: Efficient context usage — compact, reuse, avoid redundant exploration
+alwaysApply: true
+---
+
+# Context Management
+
+## Reuse prior results
+
+If you already explored the codebase or read a file earlier in this session, reference your prior findings instead of re-reading or re-exploring.
+
+## Don't re-explore what's documented
+
+Project structure is in `context.md`. Architecture and data flow are in `architecture.md`. Read those files once per session; do not launch explore agents to rediscover the same information.
+
+## Compact working memory
+
+When a task is complete, mentally discard intermediate details (exploration paths, rejected approaches) and retain only the outcome. Do not carry verbose debug context into a new task.
+
+## Use subagents to offload
+
+For exploration-heavy tasks, use an explore subagent to gather context. This keeps the main conversation focused on the actual work.
+
+## Progressive detail
+
+Start with file names and signatures. Only read full file contents when you need to make changes or understand specific logic. Do not read 500-line files "just in case."
+
+## No redundant confirmation
+
+Do not repeat the user's instructions back unless clarification is genuinely needed. Acknowledge and act.
+
+## Session checkpoints
+
+After every 3-5 file changes within a single session, emit a compact checkpoint summary before continuing. Format: `Checkpoint: changed [files], outcome [one line], next [one line], blocked on [one line or "nothing"].` Keep checkpoint summaries under 4 lines total. No verbose recaps.
+
+## Scope confirmation on drift
+
+If Claude realizes mid-task that the original plan was incomplete or incorrect, stop immediately, summarize what changed about the understanding, and confirm the updated plan with the user before continuing.

@@ -1,147 +1,62 @@
-# CCS Pro — AI Assistant Rules
-
-Project rules and conventions for AI assistants working on this codebase.
-
----
+# CCS Pro — AI Rules
 
 ## Read first
 
-Before making any changes, read these files for full context:
-
-1. `context.md` — project overview, repo structure, what was done, env vars
+1. `context.md` — project overview, repo structure, env vars, phase status
 2. `requirements.md` — functional and non-functional requirements for all pages
-3. `architecture.md` — technical architecture, routing, data flow, type system
+3. `architecture.md` — technical architecture, data flow, routing, type system
 
 ---
 
-## Project structure
+## Quick reference
 
-- **Pages:** `src/pages/` — one file per route (HomePage, PricingPage, AboutPage, ContactPage, Index)
-- **Section components:** `src/components/landing/` — presentational components used by pages
-- **Archived components:** `src/components/landing/archived/` — removed from homepage but preserved for future use
-- **Mock data:** `src/content/mockData.ts` — typed content for all new pages
-- **Static fallback:** `src/content/landing.ts` — fallback for `/:slug` route when WordPress API fails
-- **Types:** `src/types/wordpress.ts` — all TypeScript interfaces (legacy + new)
-- **Icons:** `src/lib/landing-icons.ts` — maps string names to Lucide React components
-- **API client:** `src/lib/wordpress.ts` — WordPress REST API functions
-- **Hooks:** `src/hooks/useWordPress.ts` — React Query wrappers
-
----
-
-## Tech stack
-
-- React 18, TypeScript strict, Vite
-- Tailwind CSS for styling (utility-first, no CSS modules)
-- shadcn/ui components (Radix primitives) — imported from `@/components/ui/`
-- Lucide React for icons
-- React Router for client-side routing
-- TanStack Query for async data fetching (`/:slug`, homepage site-config/menus/default landing)
+- **Tech:** React 18 + TypeScript + Vite + Tailwind CSS + shadcn/ui + React Router + TanStack Query
+- **Path alias:** `@/` maps to `src/`
+- **Pages:** `src/pages/` — one file per route
+- **Section components:** `src/components/landing/`
+- **Archived components:** `src/components/landing/archived/`
+- **Types:** `src/types/wordpress.ts` — all TypeScript interfaces
+- **Mock data:** `src/content/mockData.ts` | **Static fallback:** `src/content/landing.ts`
+- **Icons:** `src/lib/landing-icons.ts` — string-name-to-Lucide map, use `getLandingIcon(name)`
+- **API client:** `src/lib/wordpress.ts` | **Hooks:** `src/hooks/useWordPress.ts`
 
 ---
 
-## Code conventions
+## Build & verify
 
-### TypeScript
-
-- All content structures must be typed — add interfaces to `src/types/wordpress.ts`.
-- Mock data in `src/content/mockData.ts` must satisfy its declared type.
-- Use explicit return types on exported functions.
-- Import path alias: `@/` maps to `src/`.
-
-### Components
-
-- Section components live in `src/components/landing/`.
-- Each section component accepts **both** a legacy `content?: LandingPageContent` prop (for `/:slug`) and new typed props (for new pages). Branch internally based on which prop is present.
-- New page components live in `src/pages/`. HomePage merges live WordPress data with mock fallbacks; other named pages still use typed mock data.
-- Header logo rendering order is: `headerData.logoUrl` when present, then static asset fallback, then text fallback from `headerData.logo`.
-- Every page must include `<Header />` and `<Footer />` with the page's selected data source (mock or API-merged).
-- Every page must set `document.title` via `useEffect` (format: "Page Name | CCS Pro").
-
-### Styling
-
-- Use Tailwind utility classes directly in JSX.
-- Color coding conventions: indigo tones for Provider-related UI, emerald tones for Group/Facility-related UI.
-- Responsive: mobile-first. Use `sm:`, `md:`, `lg:` breakpoints. Test both layouts.
-- For CTA blocks: `style: "indigo"` or `style: "emerald"` determines background color.
-
-### Icons
-
-- Icons referenced in mock data use string names (e.g. `"Shield"`, `"Clock"`).
-- Map must exist in `src/lib/landing-icons.ts`. Add new Lucide icons there as needed.
-- Use `getLandingIcon(name)` to resolve icon components at render time.
+```
+npm run dev        # local dev server (port 8080)
+npm run build      # verify TS compilation
+npm run lint       # ESLint
+```
 
 ---
 
-## Routing rules
-
-- Named routes (`/pricing`, `/about`, `/contact`) must be defined **before** `/:slug` in `App.tsx` so they are not captured by the wildcard.
-- The `/:slug` route must remain functional — it serves WordPress-driven landing pages.
-- Internal navigation between new pages must use React Router `<Link>`, not `<a>`.
-- Anchor links (e.g. `/#how-it-works`) use standard `<a>` tags.
-
----
-
-## What NOT to change
-
-Unless explicitly instructed:
+## Do not change (without explicit instruction)
 
 - `src/lib/wordpress.ts` — API client
-- `src/content/landing.ts` — `defaultLandingPageContent` static fallback
-- `wordpress/mu-plugins/ccspro-cpt-acf.php` — WordPress MU-plugin
+- `src/content/landing.ts` — static fallback
+- `wordpress/mu-plugins/ccspro.php` and `wordpress/mu-plugins/ccspro/` — WordPress MU-plugin loader + modules
 - `vercel.json` — SPA rewrite and cache headers
-- Existing interfaces in `src/types/wordpress.ts` should only be changed when required by API schema updates
+- Existing interfaces in `src/types/wordpress.ts` (unless API schema changed)
 
 ---
 
-## Shell environment
+## Shell
 
 - **OS:** Windows 10, PowerShell
-- Use `;` not `&&` to chain shell commands (PowerShell does not support `&&` in all versions)
+- Use `;` not `&&` to chain shell commands
 - Use `git mv` for moving files to preserve git history
-- Run `npm run build` to verify TypeScript compilation after changes
 
 ---
 
-## Implementation workflow
+## Routing (critical)
 
-1. Read relevant files before editing.
-2. Make changes one step at a time.
-3. Confirm compilation (`npm run build`) after each meaningful step.
-4. Check for linter errors after edits.
-5. Update relevant documentation in the same change set (`context.md`, `architecture.md`, `changelog.md`, and any affected docs under `docs/`).
-6. Do not batch unrelated changes.
+- Named routes (`/pricing`, `/about`, `/contact`) must be defined **before** `/:slug` in `App.tsx`
+- Internal nav: React Router `<Link>`. Anchor links: standard `<a>` tags.
 
 ---
 
-## Documentation sync rule
+## Corrections log
 
-- Every substantive code edit must include corresponding doc updates in the same session.
-- Minimum docs to review for each substantive change: `context.md`, `architecture.md`, `changelog.md`.
-- If behavior, contracts, or workflows changed, update the relevant section immediately rather than leaving TODO notes.
-- `changelog.md` entries should use date-based sections and capture Added/Changed/Fixed impact.
-
----
-
-## Phase status
-
-- **Phase 1 (complete):** Four page templates with typed mock data, global Header/Footer, new routing, archived components, coming-soon flash fix.
-- **Phase 2 (in progress):** MU-plugin patched for menu endpoints, global header/footer options pages, pricing v2 fields on `landing_page`, ecosystem section, tabbed how-it-works fields, extended `site-config`, admin edit-screen customization, CORS updates, homepage API wiring with mock fallbacks, and `/:slug` pricing crash guard.
-
----
-
-## Data flow summary
-
-```
-Homepage (/):
-  HomePage.tsx → useLandingPage("default") + useSiteConfig() + useMenus()
-              → map/merge with mockData.ts fallbacks
-              → Header/Footer + sections
-
-Legacy route (/:slug):
-  Index.tsx → useLandingPage(slug) → WordPress API → LandingPageContent → sections
-                                    ↓ (on failure)
-                              landing.ts fallback
-
-Other named pages (/pricing, /about, /contact):
-  Page component → imports from mockData.ts → passes typed props to sections
-```
+<!-- Add one-liners here when Claude makes a mistake so it never repeats it -->

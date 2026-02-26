@@ -72,11 +72,17 @@ Optional (for performance):
 
 ### 2.3 Install the MU-Plugin
 
-1. In your project, the MU-plugin file is at:  
-   `wordpress/mu-plugins/ccspro-cpt-acf.php`
+1. In your project, the MU-plugin is modular and lives at:
+   - `wordpress/mu-plugins/ccspro.php`
+   - `wordpress/mu-plugins/ccspro/` (folder with module files)
 2. Upload it to your WordPress site:
-   - Via FTP/SFTP: Upload to `wp-content/mu-plugins/ccspro-cpt-acf.php`
-   - Or via Hostinger File Manager: Navigate to `public_html/wp-content/`, create folder `mu-plugins` if it doesn’t exist, and upload `ccspro-cpt-acf.php` there.
+   - Via FTP/SFTP:
+     - Upload `ccspro.php` to `wp-content/mu-plugins/ccspro.php`
+     - Upload the `ccspro/` folder to `wp-content/mu-plugins/ccspro/`
+   - Or via Hostinger File Manager:
+     - Navigate to `public_html/wp-content/`, create folder `mu-plugins` if it doesn’t exist
+     - Upload `ccspro.php` into `mu-plugins`
+     - Upload `ccspro/` folder into `mu-plugins`
 3. MU-plugins load automatically; no need to activate in the Plugins screen.
 4. Confirm in Admin: you should see **Landing Pages** in the sidebar.
 
@@ -105,7 +111,7 @@ define('XMLRPC_ENABLED', false);
 
 ### 3.3 CORS (Cross-Origin Requests)
 
-The MU-plugin adds CORS headers so the Vercel frontend (ccsprocert.com) can call the WordPress API. Allowed origin is set in the plugin; if you use a different frontend domain, update the CORS origin in `ccspro-cpt-acf.php`.
+The MU-plugin adds CORS headers so the Vercel frontend (ccsprocert.com) can call the WordPress API. Allowed origin is set in the plugin; if you use a different frontend domain, update the CORS origin in `ccspro/cors.php`.
 
 ---
 
@@ -132,7 +138,7 @@ To add another variation (e.g. Texas):
 3. If you get 404, check that:
    - Permalinks are set to “Post name”.
    - A landing page with slug `default` exists and is published.
-   - The MU-plugin is in `wp-content/mu-plugins/ccspro-cpt-acf.php`.
+   - The MU-plugin loader is in `wp-content/mu-plugins/ccspro.php` and module files exist in `wp-content/mu-plugins/ccspro/`.
 
 ---
 

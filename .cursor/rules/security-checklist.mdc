@@ -1,0 +1,31 @@
+---
+description: Security verification for API, hook, and utility files
+globs: src/lib/*.ts,src/hooks/*.ts,src/api/**/*
+alwaysApply: false
+---
+
+# Security Checklist
+
+Before completing any task that touches these files, verify all of the following.
+
+## No hardcoded secrets
+
+No API keys, tokens, passwords, or secrets anywhere in the changed files. Environment variables via `import.meta.env.VITE_*` only.
+
+## No unsanitized DOM output
+
+No unvalidated or unsanitized data passed directly to the DOM (e.g. via `dangerouslySetInnerHTML`). If HTML rendering is needed, sanitize first.
+
+## Async cleanup
+
+No dangling async operations left without cleanup:
+- `useEffect` that fetches data must return a cleanup function or use `AbortController`
+- Timers (`setTimeout`, `setInterval`) must be cleared on unmount
+
+## Dependency arrays
+
+All `useEffect` dependency arrays must include every value referenced inside the effect. No suppression comments (`// eslint-disable-next-line`) for exhaustive-deps without explicit justification.
+
+## No sensitive console logging
+
+No sensitive data (tokens, user PII, API responses containing credentials) logged to the console. Debug logs must be removed before completing the task.

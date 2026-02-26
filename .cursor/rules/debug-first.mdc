@@ -1,0 +1,28 @@
+---
+description: Root-cause-first debug workflow — read errors before writing fixes
+alwaysApply: true
+---
+
+# Debug First
+
+When something is broken or an error is reported, follow this process.
+
+## 1. Read first
+
+Read the full error output before proposing any fix. Do not guess from a partial message.
+
+## 2. Root cause
+
+Identify the root cause before writing any code. Trace the error back to its origin — do not fix symptoms.
+
+## 3. Smallest fix
+
+Propose the smallest possible fix that resolves the root cause. One targeted change is better than a broad refactor.
+
+## 4. No opportunistic refactoring
+
+Do not refactor surrounding code as part of a bug fix unless the bug is directly caused by the structure of that code.
+
+## 5. Uncertain fixes
+
+If the fix is uncertain, propose it as a hypothesis. Explain what to check to confirm it before applying. Format: "Hypothesis: [cause]. To confirm: [check]. Proposed fix: [change]."

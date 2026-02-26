@@ -1,0 +1,21 @@
+---
+description: Prevent unplanned scope creep during implementation
+alwaysApply: true
+---
+
+# Scope Control
+
+## Unlisted files need confirmation
+
+Any file not listed in the task plan that Claude wants to touch requires explicit user confirmation before proceeding.
+
+## Out-of-scope changes need approval
+
+If a fix requires changes beyond the original scope, Claude must:
+1. Stop
+2. Explain what additional change is needed and why
+3. Wait for confirmation before continuing
+
+## No opportunistic cleanup
+
+Do not refactor, rename, reorganize, or clean up anything not directly related to the current task unless explicitly asked.

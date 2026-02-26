@@ -1,0 +1,30 @@
+---
+description: TypeScript rigor and type placement conventions
+globs: "**/*.ts,**/*.tsx"
+alwaysApply: false
+---
+
+# Type Discipline
+
+Even though `tsconfig.json` has strict mode off, enforce these patterns.
+
+## No `any`
+
+Never use `any`. Use `unknown` with type guards, or define a proper interface. If a third-party type is truly untyped, cast through `unknown` with a comment explaining why.
+
+## Explicit types
+
+- All exported function parameters and return types must be explicit.
+- All content structures must be typed — interfaces go in `src/types/wordpress.ts`.
+- Mock data in `src/content/mockData.ts` must satisfy its declared type.
+
+## Null safety
+
+- Optional chaining must have a meaningful fallback, not silent `undefined` propagation.
+- Use nullish coalescing (`??`) not logical OR (`||`) for API-to-mock merges. `||` swallows `0`, `""`, and `false`.
+
+## Conventions
+
+- Prefer `interface` over `type` for object shapes.
+- Import path alias: `@/` maps to `src/`.
+- New interfaces go in `src/types/wordpress.ts`, not inline or scattered across component files.
