@@ -29,6 +29,7 @@ async function getLandingPage(slug: string = "default"): Promise<LandingPageCont
   const response = await fetch(url, {
     method: "GET",
     headers: { Accept: "application/json" },
+    cache: "no-store",
   });
 
   if (!response.ok) {
@@ -74,7 +75,7 @@ async function getSiteConfig(): Promise<SiteConfigResponse> {
 
 async function getMenus(): Promise<MenusResponse> {
   try {
-    const response = await fetch(`${WP_API_URL}/ccspro/v1/menus`);
+    const response = await fetch(`${WP_API_URL}/ccspro/v1/menus`, { cache: "no-store" });
     if (!response.ok) {
       return {
         primaryNav: [],
@@ -98,6 +99,7 @@ async function getPricingPage(): Promise<PricingPageContent> {
   const response = await fetch(`${WP_API_URL}/ccspro/v1/page/pricing`, {
     method: "GET",
     headers: { Accept: "application/json" },
+    cache: "no-store",
   });
   if (!response.ok) {
     throw new WordPressAPIError("Failed to fetch pricing page", response.status);
@@ -109,6 +111,7 @@ async function getAboutPage(): Promise<AboutPageContent> {
   const response = await fetch(`${WP_API_URL}/ccspro/v1/page/about`, {
     method: "GET",
     headers: { Accept: "application/json" },
+    cache: "no-store",
   });
   if (!response.ok) {
     throw new WordPressAPIError("Failed to fetch about page", response.status);
@@ -120,6 +123,7 @@ async function getContactPage(): Promise<ContactPageContent> {
   const response = await fetch(`${WP_API_URL}/ccspro/v1/page/contact`, {
     method: "GET",
     headers: { Accept: "application/json" },
+    cache: "no-store",
   });
   if (!response.ok) {
     throw new WordPressAPIError("Failed to fetch contact page", response.status);

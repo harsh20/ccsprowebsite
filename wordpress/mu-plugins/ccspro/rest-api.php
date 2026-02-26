@@ -9,6 +9,15 @@ if (!defined('ABSPATH')) {
 // ---------------------------------------------------------------------------
 
 add_action('rest_api_init', 'ccspro_register_rest_routes');
+add_filter('rest_post_dispatch', 'ccspro_rest_no_cache_headers', 10, 3);
+
+function ccspro_rest_no_cache_headers($response, $server, $request) {
+    if (strpos($request->get_route(), '/ccspro/v1/') === 0) {
+        $response->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+        $response->header('Pragma', 'no-cache');
+    }
+    return $response;
+}
 
 function ccspro_register_rest_routes() {
     register_rest_route('ccspro/v1', '/site-config', array(

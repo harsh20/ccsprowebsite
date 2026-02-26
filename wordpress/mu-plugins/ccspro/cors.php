@@ -19,7 +19,9 @@ function ccspro_add_cors_headers() {
             'https://www.ccsprocert.com',
             'http://localhost:5173',
             'http://localhost:3000',
+            'http://localhost:8080',
             'http://127.0.0.1:5173',
+            'http://127.0.0.1:8080',
         );
         if ($origin && in_array($origin, $allowed, true)) {
             header('Access-Control-Allow-Origin: ' . $origin);
@@ -35,7 +37,7 @@ add_action('init', 'ccspro_handle_preflight');
 
 function ccspro_handle_preflight() {
     if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS' && isset($_SERVER['HTTP_ORIGIN'])) {
-        $allowed = array('https://ccsprocert.com', 'https://www.ccsprocert.com', 'http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173');
+        $allowed = array('https://ccsprocert.com', 'https://www.ccsprocert.com', 'http://localhost:5173', 'http://localhost:3000', 'http://localhost:8080', 'http://127.0.0.1:5173', 'http://127.0.0.1:8080');
         if (in_array($_SERVER['HTTP_ORIGIN'], $allowed, true)) {
             header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
             header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
