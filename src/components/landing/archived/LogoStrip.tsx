@@ -1,6 +1,6 @@
 import { verificationContent } from "@/content/landing";
 import { getLandingIcon } from "@/lib/landing-icons";
-import { VerificationBadge } from "./shared/Cards";
+import { VerificationBadge } from "../shared/Cards";
 import type { LandingPageContent } from "@/types/wordpress";
 
 interface LogoStripProps {

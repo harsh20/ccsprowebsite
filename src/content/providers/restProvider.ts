@@ -1,4 +1,4 @@
-import type { LandingPageContent, PricingContent } from "@/types/wordpress";
+import type { LandingPageContent } from "@/types/wordpress";
 import type { ContentProvider, SiteConfigResponse } from "./types";
 
 const WP_API_URL =
@@ -52,28 +52,7 @@ async function getSiteConfig(): Promise<SiteConfigResponse> {
   return { comingSoon: Boolean(data?.comingSoon) };
 }
 
-async function getPricingContent(): Promise<PricingContent> {
-  const url = `${WP_API_URL}/ccspro/v1/pricing?t=${Date.now()}`;
-  const response = await fetch(url, {
-    method: "GET",
-    headers: { Accept: "application/json" },
-    cache: "no-store",
-  });
-
-  if (!response.ok) {
-    throw new WordPressAPIError("Pricing API error. Try again later.", response.status);
-  }
-
-  const data = await response.json();
-  if (!data || typeof data !== "object") {
-    throw new WordPressAPIError("Invalid pricing API response", response.status);
-  }
-
-  return data as PricingContent;
-}
-
 export const restProvider: ContentProvider = {
   getLandingPage,
-  getPricingContent,
   getSiteConfig,
 };

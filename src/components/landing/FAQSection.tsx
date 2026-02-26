@@ -6,14 +6,15 @@ import {
 } from "@/components/ui/accordion";
 import { faqContent } from "@/content/landing";
 import { SectionHeader } from "./shared/Cards";
-import type { LandingPageContent } from "@/types/wordpress";
+import type { LandingPageContent, FaqContent } from "@/types/wordpress";
 
 interface FAQSectionProps {
   content?: LandingPageContent;
+  faqData?: FaqContent;
 }
 
-export function FAQSection({ content }: FAQSectionProps) {
-  const data = content?.faqContent ?? faqContent;
+export function FAQSection({ content, faqData }: FAQSectionProps) {
+  const data = faqData ?? content?.faqContent ?? faqContent;
   return (
     <section id="faq" className="py-16 sm:py-20 lg:py-24 bg-background">
       <div className="container mx-auto px-4">

@@ -1,6 +1,6 @@
 import { FileText, CheckCircle, Download } from "lucide-react";
 import { packetPreviewContent } from "@/content/landing";
-import { SectionHeader } from "./shared/Cards";
+import { SectionHeader } from "../shared/Cards";
 import type { LandingPageContent } from "@/types/wordpress";
 
 interface PacketPreviewProps {

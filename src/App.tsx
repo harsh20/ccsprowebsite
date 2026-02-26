@@ -6,7 +6,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { getContentProvider } from "@/content/providers";
 import PasswordGate from "@/components/PasswordGate";
+import HomePage from "./pages/HomePage";
 import Index from "./pages/Index";
+import PricingPage from "./pages/PricingPage";
+import AboutPage from "./pages/AboutPage";
+import ContactPage from "./pages/ContactPage";
 import NotFound from "./pages/NotFound";
 import ComingSoon from "./pages/ComingSoon";
 
@@ -20,14 +24,15 @@ const queryClient = new QueryClient({
 });
 const contentProvider = getContentProvider();
 
-// Build-time fallback (Vercel env). Runtime check from WordPress takes precedence.
 const buildTimeComingSoon =
   String(import.meta.env.VITE_COMING_SOON ?? "").toLowerCase().trim() === "true";
 
 const SITE_CONFIG_TIMEOUT_MS = 8000;
 
 const App = () => {
-  const [comingSoon, setComingSoon] = useState<boolean | null>(null);
+  const [comingSoon, setComingSoon] = useState<boolean | null>(
+    buildTimeComingSoon || null,
+  );
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -42,21 +47,24 @@ const App = () => {
     return () => clearTimeout(timeout);
   }, []);
 
-  // Show Coming Soon while loading (null) or when API says true; show full site only when API says false or after timeout/failure
-  const showComingSoon = comingSoon !== false;
-
   return (
     <PasswordGate>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          {showComingSoon ? (
+          {comingSoon === null ? (
+            // Loading splash — avoids flashing <ComingSoon /> while API is in flight
+            <div className="min-h-screen bg-background" />
+          ) : comingSoon ? (
             <ComingSoon />
           ) : (
             <BrowserRouter>
               <Routes>
-                <Route path="/" element={<Index />} />
+                <Route path="/" element={<HomePage />} />
+                <Route path="/pricing" element={<PricingPage />} />
+                <Route path="/about" element={<AboutPage />} />
+                <Route path="/contact" element={<ContactPage />} />
                 <Route path="/:slug" element={<Index />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>

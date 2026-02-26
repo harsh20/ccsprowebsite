@@ -1,6 +1,6 @@
 import { teamContent } from "@/content/landing";
 import { getLandingIcon } from "@/lib/landing-icons";
-import { TeamMemberCard, SectionHeader } from "./shared/Cards";
+import { TeamMemberCard, SectionHeader } from "../shared/Cards";
 import type { LandingPageContent } from "@/types/wordpress";
 
 interface TeamSectionProps {

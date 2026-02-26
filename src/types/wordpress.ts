@@ -249,3 +249,172 @@ export interface LandingPageContent {
   finalCtaContent: FinalCtaContent;
   footerContent: FooterContent;
 }
+
+// ============================================================================
+// NEW PAGE TYPES — Phase 1 (mock data driven)
+// ============================================================================
+
+export interface MenuLink {
+  label: string;
+  href: string;
+  openInNewTab?: boolean;
+}
+
+export interface HeaderData {
+  logo: string;
+  primaryNav: MenuLink[];
+  ctaButton: CtaLink;
+  secondaryLink: CtaLink;
+}
+
+export interface FooterColumn {
+  title: string;
+  links: MenuLink[];
+}
+
+export interface FooterData {
+  brand: { name: string; tagline: string };
+  columns: FooterColumn[];
+  trustBadges: Array<{ icon: string; text: string }>;
+  copyright: string;
+}
+
+export interface SiteSettings {
+  header: HeaderData;
+  footer: FooterData;
+}
+
+export interface PainPointContent {
+  sectionLabel: string;
+  headline: string;
+  cards: Array<{
+    icon: string;
+    title: string;
+    body: string;
+  }>;
+  summaryText: string;
+}
+
+export interface HowItWorksTabContent {
+  sectionTitle: string;
+  sectionSubtitle: string;
+  providerSteps: HowItWorksStep[];
+  groupSteps: HowItWorksStep[];
+}
+
+export interface EcosystemPair {
+  provider: string;
+  connector: string;
+  group: string;
+}
+
+export interface EcosystemContent {
+  headline: string;
+  subheadline: string;
+  pairs: EcosystemPair[];
+}
+
+export interface HomePricingCardData {
+  badge: string;
+  price: string;
+  subtext: string;
+  bullets: string[];
+  cta: CtaLink;
+  finePrint: string;
+  highlighted: boolean;
+  secondaryLink?: CtaLink;
+}
+
+export interface CtaBlockContent {
+  headline: string;
+  subheadline: string;
+  primaryCta: CtaLink;
+  secondaryCta: CtaLink;
+  style: "indigo" | "emerald";
+}
+
+export interface SupportChannel {
+  icon: string;
+  title: string;
+  description: string;
+  link?: string;
+}
+
+export interface SupportSectionContent {
+  headline: string;
+  channels: SupportChannel[];
+}
+
+export interface HomePageContent {
+  hero: HeroContent;
+  heroDashboard: HeroDashboard;
+  painPoint: PainPointContent;
+  howItWorks: HowItWorksTabContent;
+  ecosystem: EcosystemContent;
+  ctaBlockA: CtaBlockContent;
+  pricing: {
+    provider: HomePricingCardData;
+    group: HomePricingCardData;
+  };
+  ctaBlockB: CtaBlockContent;
+  support: SupportSectionContent;
+  faq: FaqContent;
+}
+
+export interface PricingPlanExtended extends HomePricingCardData {
+  extras: string[];
+}
+
+export interface FeatureComparisonRow {
+  feature: string;
+  provider: boolean;
+  group: boolean;
+}
+
+export interface FeatureComparisonCategory {
+  category: string;
+  rows: FeatureComparisonRow[];
+}
+
+export interface PricingPageContent {
+  hero: { headline: string; subheadline: string };
+  provider: PricingPlanExtended;
+  group: PricingPlanExtended;
+  featureTable: FeatureComparisonCategory[];
+  faq: FaqContent;
+  finalCta: {
+    headline: string;
+    providerCta: CtaLink;
+    groupCta: CtaLink;
+  };
+}
+
+export interface AboutPageContent {
+  hero: { headline: string; subheadline: string };
+  mission: string;
+  whyTexas: {
+    paragraph: string;
+    stats: Array<{ value: string; label: string }>;
+  };
+  differentiators: Array<{
+    title: string;
+    description: string;
+  }>;
+  cta: { text: string; link: CtaLink };
+}
+
+export interface ContactPageContent {
+  hero: { headline: string; subheadline: string };
+  formFields: {
+    roleOptions: string[];
+  };
+  contactInfo: {
+    email: string;
+    responseTime: string;
+    businessHours: string;
+  };
+  groupCallout: {
+    headline: string;
+    body: string;
+  };
+}

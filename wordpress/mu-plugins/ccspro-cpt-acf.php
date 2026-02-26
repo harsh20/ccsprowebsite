@@ -39,6 +39,66 @@ function ccspro_register_landing_page_cpt() {
     ));
 }
 
+add_action('init', 'ccspro_register_menus');
+
+function ccspro_register_menus() {
+    register_nav_menus(array(
+        'ccspro-primary-nav' => 'Primary Navigation',
+        'ccspro-footer-col1' => 'Footer: Product Links',
+        'ccspro-footer-col2' => 'Footer: Company Links',
+        'ccspro-footer-col3' => 'Footer: Legal & Support',
+    ));
+}
+
+add_filter('use_block_editor_for_post_type', 'ccspro_disable_block_editor_for_landing_page', 10, 2);
+add_action('add_meta_boxes', 'ccspro_customize_landing_page_edit_screen', 100);
+add_filter('enter_title_here', 'ccspro_landing_page_title_placeholder', 10, 2);
+add_action('edit_form_top', 'ccspro_render_landing_page_edit_notice');
+add_action('edit_form_after_title', 'ccspro_render_landing_page_slug_hint');
+
+function ccspro_disable_block_editor_for_landing_page($use_block_editor, $post_type) {
+    if ($post_type === 'landing_page') {
+        return false;
+    }
+    return $use_block_editor;
+}
+
+function ccspro_customize_landing_page_edit_screen() {
+    remove_meta_box('commentstatusdiv', 'landing_page', 'normal');
+    remove_meta_box('commentsdiv', 'landing_page', 'normal');
+    remove_meta_box('trackbacksdiv', 'landing_page', 'normal');
+    remove_meta_box('postcustom', 'landing_page', 'normal');
+    remove_meta_box('authordiv', 'landing_page', 'normal');
+    remove_meta_box('revisionsdiv', 'landing_page', 'normal');
+    remove_meta_box('pageparentdiv', 'landing_page', 'side');
+    remove_meta_box('postimagediv', 'landing_page', 'side');
+}
+
+function ccspro_landing_page_title_placeholder($text, $post) {
+    if ($post && isset($post->post_type) && $post->post_type === 'landing_page') {
+        return 'Page Name (internal)';
+    }
+    return $text;
+}
+
+function ccspro_render_landing_page_edit_notice($post) {
+    if (!$post || !isset($post->post_type) || $post->post_type !== 'landing_page') {
+        return;
+    }
+
+    $slug = isset($post->post_name) ? $post->post_name : '';
+    $title = isset($post->post_title) && $post->post_title !== '' ? $post->post_title : '(untitled)';
+    echo '<div class="notice notice-info inline"><p><strong>Editing: ' . esc_html($title) . '</strong> — This page is live at ccsprocert.com/' . esc_html($slug) . '</p></div>';
+}
+
+function ccspro_render_landing_page_slug_hint($post) {
+    if (!$post || !isset($post->post_type) || $post->post_type !== 'landing_page') {
+        return;
+    }
+
+    echo '<p class="description" style="margin:8px 0 14px;">URL path: e.g. <code>groups</code> for <code>ccsprocert.com/groups</code></p>';
+}
+
 // ---------------------------------------------------------------------------
 // 2. COMING SOON MODE (site-config API + admin toggle)
 // ---------------------------------------------------------------------------
@@ -101,6 +161,7 @@ function ccspro_add_cors_headers() {
             'https://ccsprocert.com',
             'https://www.ccsprocert.com',
             'http://localhost:5173',
+            'http://localhost:3000',
             'http://127.0.0.1:5173',
         );
         if ($origin && in_array($origin, $allowed, true)) {
@@ -117,7 +178,7 @@ add_action('init', 'ccspro_handle_preflight');
 
 function ccspro_handle_preflight() {
     if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS' && isset($_SERVER['HTTP_ORIGIN'])) {
-        $allowed = array('https://ccsprocert.com', 'https://www.ccsprocert.com', 'http://localhost:5173', 'http://127.0.0.1:5173');
+        $allowed = array('https://ccsprocert.com', 'https://www.ccsprocert.com', 'http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173');
         if (in_array($_SERVER['HTTP_ORIGIN'], $allowed, true)) {
             header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
             header('Access-Control-Allow-Methods: GET, OPTIONS');
@@ -142,12 +203,29 @@ function ccspro_register_acf_options_pages() {
     }
 
     acf_add_options_page(array(
-        'page_title' => 'CCS Pro Pricing Settings',
-        'menu_title' => 'CCS Pro Pricing',
-        'menu_slug' => 'ccspro-pricing-settings',
+        'page_title' => 'CCS Pro Settings',
+        'menu_title' => 'CCS Pro',
+        'menu_slug' => 'ccspro-settings',
         'capability' => 'manage_options',
-        'redirect' => false,
-        'position' => 61,
+        'redirect' => true,
+        'icon_url' => 'dashicons-shield-alt',
+        'position' => 3,
+    ));
+
+    acf_add_options_sub_page(array(
+        'page_title' => 'Header Settings',
+        'menu_title' => 'Header',
+        'menu_slug' => 'ccspro-header',
+        'parent_slug' => 'ccspro-settings',
+        'capability' => 'manage_options',
+    ));
+
+    acf_add_options_sub_page(array(
+        'page_title' => 'Footer Settings',
+        'menu_title' => 'Footer',
+        'menu_slug' => 'ccspro-footer',
+        'parent_slug' => 'ccspro-settings',
+        'capability' => 'manage_options',
     ));
 }
 
@@ -451,6 +529,34 @@ function ccspro_get_field_group_config() {
                         array('key' => 'field_how_step_description', 'label' => 'Description', 'name' => 'description', 'type' => 'textarea', 'rows' => 2),
                     ),
                 ),
+                array(
+                    'key' => 'field_provider_steps',
+                    'label' => 'How It Works: Provider steps',
+                    'name' => 'provider_steps',
+                    'type' => 'repeater',
+                    'layout' => 'block',
+                    'button_label' => 'Add Provider Step',
+                    'sub_fields' => array(
+                        array('key' => 'field_provider_step_number', 'label' => 'Step #', 'name' => 'step_number', 'type' => 'text', 'placeholder' => '01', 'wrapper' => array('width' => '15')),
+                        array('key' => 'field_provider_step_icon', 'label' => 'Icon', 'name' => 'icon', 'type' => 'text', 'placeholder' => 'Upload', 'wrapper' => array('width' => '20')),
+                        array('key' => 'field_provider_step_title', 'label' => 'Title', 'name' => 'title', 'type' => 'text', 'wrapper' => array('width' => '65')),
+                        array('key' => 'field_provider_step_description', 'label' => 'Description', 'name' => 'description', 'type' => 'textarea', 'rows' => 2),
+                    ),
+                ),
+                array(
+                    'key' => 'field_group_steps',
+                    'label' => 'How It Works: Group & Facility steps',
+                    'name' => 'group_steps',
+                    'type' => 'repeater',
+                    'layout' => 'block',
+                    'button_label' => 'Add Group Step',
+                    'sub_fields' => array(
+                        array('key' => 'field_group_step_number', 'label' => 'Step #', 'name' => 'step_number', 'type' => 'text', 'placeholder' => '01', 'wrapper' => array('width' => '15')),
+                        array('key' => 'field_group_step_icon', 'label' => 'Icon', 'name' => 'icon', 'type' => 'text', 'placeholder' => 'Users', 'wrapper' => array('width' => '20')),
+                        array('key' => 'field_group_step_title', 'label' => 'Title', 'name' => 'title', 'type' => 'text', 'wrapper' => array('width' => '65')),
+                        array('key' => 'field_group_step_description', 'label' => 'Description', 'name' => 'description', 'type' => 'textarea', 'rows' => 2),
+                    ),
+                ),
                 array('key' => 'field_how_readiness_label', 'label' => 'Readiness Note Label', 'name' => 'how_readiness_label', 'type' => 'text', 'placeholder' => '5 Readiness States:'),
                 array(
                     'key' => 'field_how_readiness_states',
@@ -639,12 +745,6 @@ function ccspro_get_field_group_config() {
                     'type' => 'tab',
                     'placement' => 'top',
                 ),
-                array(
-                    'key' => 'field_pricing_global_notice',
-                    'label' => '',
-                    'type' => 'message',
-                    'message' => '<strong>Pricing is managed globally.</strong><br/>Use <em>CCS Pro Pricing</em> in the WordPress admin menu to update plans once for all landing pages.',
-                ),
 
                 // =====================================================================
                 // TAB: Support
@@ -826,131 +926,245 @@ function ccspro_get_field_group_config() {
             'location' => $default_location,
             'menu_order' => 0,
             'position' => 'normal',
+            'style' => 'seamless',
+            'label_placement' => 'top',
+            'instruction_placement' => 'label',
+            'active' => true,
+        ),
+        array(
+            'key' => 'group_ccspro_pricing_v2',
+            'title' => 'Pricing Section',
+            'fields' => array(
+                array('key' => 'field_pricing_section_title', 'label' => 'Section headline', 'name' => 'pricing_section_title', 'type' => 'text', 'default_value' => 'Simple pricing. No surprises.'),
+                array('key' => 'field_pricing_section_subtitle', 'label' => 'Section subheadline', 'name' => 'pricing_section_subtitle', 'type' => 'text', 'default_value' => "Whether you're a solo provider or managing a 50-person group..."),
+                array('key' => 'field_provider_badge', 'label' => 'Provider card: badge label', 'name' => 'provider_badge', 'type' => 'text', 'default_value' => 'For Individual Providers'),
+                array('key' => 'field_provider_price', 'label' => 'Provider card: price', 'name' => 'provider_price', 'type' => 'text', 'default_value' => '$99/year', 'wrapper' => array('width' => '33')),
+                array('key' => 'field_provider_price_sub', 'label' => 'Provider card: price subtext', 'name' => 'provider_price_sub', 'type' => 'text', 'default_value' => '+ $60 per packet generated', 'wrapper' => array('width' => '34')),
+                array('key' => 'field_provider_highlighted', 'label' => 'Provider card: highlighted', 'name' => 'provider_highlighted', 'type' => 'true_false', 'ui' => 1, 'default_value' => 0, 'wrapper' => array('width' => '33')),
+                array(
+                    'key' => 'field_provider_bullets',
+                    'label' => 'Provider card: feature bullets',
+                    'name' => 'provider_bullets',
+                    'type' => 'repeater',
+                    'layout' => 'table',
+                    'button_label' => 'Add Bullet',
+                    'sub_fields' => array(
+                        array('key' => 'field_provider_bullet_text', 'label' => 'Bullet', 'name' => 'bullet_text', 'type' => 'text'),
+                    ),
+                ),
+                array('key' => 'field_provider_cta_label', 'label' => 'Provider card: button label', 'name' => 'provider_cta_label', 'type' => 'text', 'default_value' => 'Get Started — $99/year', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_provider_cta_href', 'label' => 'Provider card: button URL', 'name' => 'provider_cta_href', 'type' => 'text', 'default_value' => '#', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_provider_fine_print', 'label' => 'Provider card: fine print below button', 'name' => 'provider_fine_print', 'type' => 'text', 'default_value' => 'No contracts. Cancel anytime.'),
+                array('key' => 'field_provider_callout', 'label' => 'Provider card: callout line (below bullets)', 'name' => 'provider_callout', 'type' => 'text', 'default_value' => 'Most providers pay under $600 total in year one.'),
+                array('key' => 'field_group_badge', 'label' => 'Group card: badge label', 'name' => 'group_badge', 'type' => 'text', 'default_value' => 'For Groups & Facilities'),
+                array('key' => 'field_group_price', 'label' => 'Group card: price', 'name' => 'group_price', 'type' => 'text', 'default_value' => '$1,199/seat/year', 'wrapper' => array('width' => '33')),
+                array('key' => 'field_group_price_sub', 'label' => 'Group card: price subtext', 'name' => 'group_price_sub', 'type' => 'text', 'default_value' => 'All payer packet workflows included', 'wrapper' => array('width' => '34')),
+                array('key' => 'field_group_highlighted', 'label' => 'Group card: highlighted', 'name' => 'group_highlighted', 'type' => 'true_false', 'ui' => 1, 'default_value' => 1, 'wrapper' => array('width' => '33')),
+                array(
+                    'key' => 'field_group_bullets',
+                    'label' => 'Group card: feature bullets',
+                    'name' => 'group_bullets',
+                    'type' => 'repeater',
+                    'layout' => 'table',
+                    'button_label' => 'Add Bullet',
+                    'sub_fields' => array(
+                        array('key' => 'field_group_bullet_text', 'label' => 'Bullet', 'name' => 'bullet_text', 'type' => 'text'),
+                    ),
+                ),
+                array('key' => 'field_group_cta_label', 'label' => 'Group card: button label', 'name' => 'group_cta_label', 'type' => 'text', 'default_value' => 'Talk to Us', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_group_cta_href', 'label' => 'Group card: button URL', 'name' => 'group_cta_href', 'type' => 'text', 'default_value' => '/contact', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_group_fine_print', 'label' => 'Group card: fine print below button', 'name' => 'group_fine_print', 'type' => 'text', 'default_value' => "Up to 50 seats. More than 50? Let's talk."),
+                array(
+                    'key' => 'field_group_notes',
+                    'label' => 'Group card: notes (below bullets)',
+                    'name' => 'group_notes',
+                    'type' => 'repeater',
+                    'layout' => 'table',
+                    'button_label' => 'Add Note',
+                    'default_value' => array(
+                        array('note_text' => 'One seat = one provider in your roster.'),
+                        array('note_text' => 'All payer workflows included, no packet fees.'),
+                        array('note_text' => "Need more than 50 seats? Let's talk."),
+                    ),
+                    'sub_fields' => array(
+                        array('key' => 'field_group_note_text', 'label' => 'Note', 'name' => 'note_text', 'type' => 'text'),
+                    ),
+                ),
+                array('key' => 'field_group_secondary_link_label', 'label' => 'Group card: secondary link label', 'name' => 'group_secondary_link_label', 'type' => 'text', 'default_value' => 'See full feature comparison →', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_group_secondary_link_href', 'label' => 'Group card: secondary link URL', 'name' => 'group_secondary_link_href', 'type' => 'text', 'default_value' => '/pricing', 'wrapper' => array('width' => '50')),
+            ),
+            'location' => $default_location,
+            'menu_order' => 1,
+            'position' => 'normal',
+            'style' => 'seamless',
+            'label_placement' => 'top',
+            'instruction_placement' => 'label',
+            'active' => true,
+        ),
+        array(
+            'key' => 'group_ccspro_ecosystem',
+            'title' => 'Ecosystem Section',
+            'fields' => array(
+                array(
+                    'key' => 'field_ecosystem_headline',
+                    'label' => 'Ecosystem headline',
+                    'name' => 'ecosystem_headline',
+                    'type' => 'text',
+                    'default_value' => 'One profile. Two sides of credentialing. Finally connected.',
+                ),
+                array(
+                    'key' => 'field_ecosystem_subheadline',
+                    'label' => 'Ecosystem subheadline',
+                    'name' => 'ecosystem_subheadline',
+                    'type' => 'text',
+                    'default_value' => 'Providers build it once. Groups use it everywhere.',
+                ),
+                array(
+                    'key' => 'field_ecosystem_pairs',
+                    'label' => 'Provider → Group pairs',
+                    'name' => 'ecosystem_pairs',
+                    'type' => 'repeater',
+                    'layout' => 'block',
+                    'button_label' => 'Add Pair',
+                    'sub_fields' => array(
+                        array('key' => 'field_ecosystem_provider_action', 'label' => 'Provider side (left card)', 'name' => 'provider_action', 'type' => 'text', 'wrapper' => array('width' => '40')),
+                        array('key' => 'field_ecosystem_connector', 'label' => 'Connector word (enables / means / so / and)', 'name' => 'connector', 'type' => 'text', 'wrapper' => array('width' => '20')),
+                        array('key' => 'field_ecosystem_group_outcome', 'label' => 'Group side (right card)', 'name' => 'group_outcome', 'type' => 'text', 'wrapper' => array('width' => '40')),
+                    ),
+                ),
+            ),
+            'location' => $default_location,
+            'menu_order' => 2,
+            'position' => 'normal',
+            'style' => 'seamless',
+            'label_placement' => 'top',
+            'instruction_placement' => 'label',
+            'active' => true,
+        ),
+        array(
+            'key' => 'group_ccspro_header_global',
+            'title' => 'Header Settings',
+            'fields' => array(
+                array(
+                    'key' => 'field_site_logo',
+                    'label' => 'Site logo',
+                    'name' => 'site_logo',
+                    'type' => 'image',
+                    'instructions' => 'Recommended: SVG or PNG, transparent background',
+                    'return_format' => 'array',
+                    'preview_size' => 'medium',
+                    'library' => 'all',
+                ),
+                array(
+                    'key' => 'field_site_logo_text',
+                    'label' => 'Logo text fallback (shown if no logo uploaded)',
+                    'name' => 'site_logo_text',
+                    'type' => 'text',
+                    'default_value' => 'CCS Pro',
+                ),
+                array(
+                    'key' => 'field_header_cta_label',
+                    'label' => 'Header CTA button label',
+                    'name' => 'header_cta_label',
+                    'type' => 'text',
+                    'default_value' => 'Get Started',
+                    'wrapper' => array('width' => '50'),
+                ),
+                array(
+                    'key' => 'field_header_cta_href',
+                    'label' => 'Header CTA button URL',
+                    'name' => 'header_cta_href',
+                    'type' => 'text',
+                    'default_value' => '#',
+                    'wrapper' => array('width' => '50'),
+                ),
+                array(
+                    'key' => 'field_header_signin_label',
+                    'label' => 'Sign in link label',
+                    'name' => 'header_signin_label',
+                    'type' => 'text',
+                    'default_value' => 'Sign In',
+                    'wrapper' => array('width' => '50'),
+                ),
+                array(
+                    'key' => 'field_header_signin_href',
+                    'label' => 'Sign in link URL',
+                    'name' => 'header_signin_href',
+                    'type' => 'text',
+                    'default_value' => '#',
+                    'wrapper' => array('width' => '50'),
+                ),
+            ),
+            'location' => array(
+                array(
+                    array('param' => 'options_page', 'operator' => '==', 'value' => 'ccspro-header'),
+                ),
+            ),
+            'menu_order' => 0,
+            'position' => 'normal',
             'style' => 'default',
             'label_placement' => 'top',
             'instruction_placement' => 'label',
             'active' => true,
         ),
         array(
-            'key' => 'group_ccspro_global_pricing',
-            'title' => 'Global Pricing Settings',
+            'key' => 'group_ccspro_footer_global',
+            'title' => 'Footer Settings',
             'fields' => array(
-                array('key' => 'field_pricing_title', 'label' => 'Section Title', 'name' => 'pricing_title', 'type' => 'text', 'wrapper' => array('width' => '50')),
-                array('key' => 'field_pricing_subtitle', 'label' => 'Section Subtitle', 'name' => 'pricing_subtitle', 'type' => 'text', 'wrapper' => array('width' => '50')),
                 array(
-                    'key' => 'field_pricing_plans',
-                    'label' => 'Credentialing Packs',
-                    'name' => 'pricing_plans',
-                    'type' => 'repeater',
-                    'instructions' => 'Add pack-based pricing cards. Set billing type to one_time for packs and subscription for annual renewing plans.',
-                    'layout' => 'block',
-                    'min' => 1,
-                    'max' => 4,
-                    'button_label' => 'Add Plan',
-                    'sub_fields' => array(
-                        array('key' => 'field_plan_name', 'label' => 'Name', 'name' => 'name', 'type' => 'text', 'wrapper' => array('width' => '30')),
-                        array('key' => 'field_plan_price', 'label' => 'Price', 'name' => 'price', 'type' => 'number', 'wrapper' => array('width' => '20')),
-                        array('key' => 'field_plan_badge', 'label' => 'Badge', 'name' => 'badge', 'type' => 'text', 'placeholder' => 'Most Popular', 'wrapper' => array('width' => '30')),
-                        array('key' => 'field_plan_highlighted', 'label' => 'Highlighted', 'name' => 'highlighted', 'type' => 'true_false', 'ui' => 1, 'wrapper' => array('width' => '20')),
-                        array('key' => 'field_plan_apps', 'label' => 'Applications Included', 'name' => 'applications_included', 'type' => 'number', 'wrapper' => array('width' => '25')),
-                        array('key' => 'field_plan_validity', 'label' => 'Validity Period', 'name' => 'validity_period', 'type' => 'text', 'default_value' => '1 year', 'wrapper' => array('width' => '25')),
-                        array(
-                            'key' => 'field_plan_billing_type',
-                            'label' => 'Billing Type',
-                            'name' => 'billing_type',
-                            'type' => 'select',
-                            'choices' => array('one_time' => 'One-Time', 'subscription' => 'Subscription'),
-                            'default_value' => 'one_time',
-                            'wrapper' => array('width' => '25'),
-                        ),
-                        array(
-                            'key' => 'field_plan_type',
-                            'label' => 'Plan Type',
-                            'name' => 'plan_type',
-                            'type' => 'select',
-                            'choices' => array('pack' => 'Pack', 'unlimited' => 'Unlimited'),
-                            'default_value' => 'pack',
-                            'wrapper' => array('width' => '25'),
-                        ),
-                        array(
-                            'key' => 'field_plan_allow_additional_payers',
-                            'label' => 'Allow Additional Payers',
-                            'name' => 'allow_additional_payers',
-                            'type' => 'true_false',
-                            'ui' => 1,
-                            'wrapper' => array('width' => '50'),
-                        ),
-                        array(
-                            'key' => 'field_plan_additional_payer_price',
-                            'label' => 'Additional Payer Price',
-                            'name' => 'additional_payer_price',
-                            'type' => 'number',
-                            'wrapper' => array('width' => '50'),
-                            'conditional_logic' => array(
-                                array(
-                                    array(
-                                        'field' => 'field_plan_allow_additional_payers',
-                                        'operator' => '==',
-                                        'value' => '1',
-                                    ),
-                                ),
-                            ),
-                        ),
-                        array('key' => 'field_plan_grace_period_days', 'label' => 'Grace Period Days', 'name' => 'grace_period_days', 'type' => 'number', 'default_value' => 30, 'wrapper' => array('width' => '25')),
-                        array('key' => 'field_plan_description', 'label' => 'Description', 'name' => 'description', 'type' => 'textarea', 'rows' => 2, 'wrapper' => array('width' => '75')),
-                        array(
-                            'key' => 'field_plan_features',
-                            'label' => 'Features',
-                            'name' => 'features',
-                            'type' => 'repeater',
-                            'layout' => 'table',
-                            'button_label' => 'Add Feature',
-                            'sub_fields' => array(
-                                array('key' => 'field_plan_feature_text', 'label' => 'Feature', 'name' => 'feature_text', 'type' => 'text'),
-                            ),
-                        ),
-                        array('key' => 'field_plan_cta', 'label' => 'CTA Button Text', 'name' => 'cta', 'type' => 'text', 'placeholder' => 'Get Started'),
-                    ),
+                    'key' => 'field_footer_brand_name_global',
+                    'label' => 'Brand name',
+                    'name' => 'footer_brand_name',
+                    'type' => 'text',
+                    'default_value' => 'CCS Pro',
                 ),
                 array(
-                    'key' => 'field_pricing_post_year_message',
-                    'label' => '',
-                    'type' => 'message',
-                    'message' => '<strong>Post-Year Behavior Copy (shown only when one-time plans are present)</strong>',
+                    'key' => 'field_footer_tagline_global',
+                    'label' => 'Brand tagline (one line)',
+                    'name' => 'footer_tagline',
+                    'type' => 'text',
+                    'default_value' => 'Credentialing packets. Done once. Ready always.',
                 ),
-                array('key' => 'field_post_year_title', 'label' => 'Post-Year Title', 'name' => 'post_year_title', 'type' => 'text', 'default_value' => 'What happens after 1 year?'),
                 array(
-                    'key' => 'field_post_year_items',
-                    'label' => 'Post-Year Items',
-                    'name' => 'post_year_items',
+                    'key' => 'field_footer_trust_badges_global',
+                    'label' => 'Trust badges',
+                    'name' => 'footer_trust_badges',
                     'type' => 'repeater',
                     'layout' => 'table',
-                    'button_label' => 'Add Item',
+                    'button_label' => 'Add Badge',
+                    'default_value' => array(
+                        array('icon' => 'Shield', 'text' => 'HIPAA Compliant'),
+                        array('icon' => 'FileCheck', 'text' => 'BAA Available'),
+                        array('icon' => 'MapPin', 'text' => 'Texas-Based'),
+                    ),
                     'sub_fields' => array(
-                        array('key' => 'field_post_year_item_text', 'label' => 'Text', 'name' => 'text', 'type' => 'text', 'wrapper' => array('width' => '80')),
                         array(
-                            'key' => 'field_post_year_item_kind',
-                            'label' => 'Kind',
-                            'name' => 'kind',
-                            'type' => 'select',
-                            'choices' => array('positive' => 'Positive', 'negative' => 'Negative'),
-                            'default_value' => 'positive',
-                            'wrapper' => array('width' => '20'),
+                            'key' => 'field_footer_trust_badge_icon_global',
+                            'label' => 'Icon',
+                            'name' => 'icon',
+                            'type' => 'text',
+                            'wrapper' => array('width' => '40'),
+                        ),
+                        array(
+                            'key' => 'field_footer_trust_badge_text_global',
+                            'label' => 'Text',
+                            'name' => 'text',
+                            'type' => 'text',
+                            'wrapper' => array('width' => '60'),
                         ),
                     ),
                 ),
-                array('key' => 'field_post_year_renewal_note', 'label' => 'Post-Year Renewal Note', 'name' => 'post_year_renewal_note', 'type' => 'text'),
                 array(
-                    'key' => 'field_pricing_footer_message',
-                    'label' => '',
-                    'type' => 'message',
-                    'message' => '<strong>Pricing Footer Note</strong>',
+                    'key' => 'field_footer_copyright_global',
+                    'label' => 'Copyright text',
+                    'name' => 'footer_copyright',
+                    'type' => 'text',
+                    'default_value' => '© 2025 CCS Pro. All rights reserved.',
                 ),
-                array('key' => 'field_pricing_footer_note', 'label' => 'Footer Note', 'name' => 'pricing_footer_note', 'type' => 'text', 'default_value' => 'Prices shown before sales tax.'),
             ),
             'location' => array(
                 array(
-                    array('param' => 'options_page', 'operator' => '==', 'value' => 'ccspro-pricing-settings'),
+                    array('param' => 'options_page', 'operator' => '==', 'value' => 'ccspro-footer'),
                 ),
             ),
             'menu_order' => 0,
@@ -975,11 +1189,6 @@ function ccspro_register_rest_routes() {
         'callback' => 'ccspro_rest_get_site_config',
         'permission_callback' => '__return_true',
     ));
-    register_rest_route('ccspro/v1', '/pricing', array(
-        'methods' => 'GET',
-        'callback' => 'ccspro_rest_get_pricing',
-        'permission_callback' => '__return_true',
-    ));
     register_rest_route('ccspro/v1', '/landing-page/(?P<slug>[a-z0-9\-]+)', array(
         'methods' => 'GET',
         'callback' => 'ccspro_rest_get_landing_page',
@@ -993,20 +1202,92 @@ function ccspro_register_rest_routes() {
             ),
         ),
     ));
+    register_rest_route('ccspro/v1', '/menus', array(
+        'methods' => 'GET',
+        'callback' => 'ccspro_rest_get_menus',
+        'permission_callback' => '__return_true',
+    ));
 }
 
 function ccspro_rest_get_site_config($request) {
     $coming_soon = get_option('ccspro_coming_soon', '0') === '1';
-    return rest_ensure_response(array('comingSoon' => $coming_soon));
-}
 
-function ccspro_rest_get_pricing($request) {
     if (!function_exists('get_field')) {
-        return new WP_Error('acf_missing', 'ACF is required', array('status' => 500));
+        return rest_ensure_response(array('comingSoon' => $coming_soon));
     }
 
-    $pricing = ccspro_get_pricing_content('option', 0);
-    return rest_ensure_response($pricing);
+    $site_logo = get_field('site_logo', 'option');
+    $logo_url = null;
+    if (is_array($site_logo) && isset($site_logo['url']) && $site_logo['url'] !== '') {
+        $logo_url = $site_logo['url'];
+    }
+
+    $trust_badges = get_field('footer_trust_badges', 'option') ?: array();
+    $trust_badges = array_values(array_filter(array_map(function ($row) {
+        $icon = isset($row['icon']) ? $row['icon'] : '';
+        $text = isset($row['text']) ? $row['text'] : '';
+        if ($icon === '' && $text === '') {
+            return null;
+        }
+        return array(
+            'icon' => $icon,
+            'text' => $text,
+        );
+    }, $trust_badges)));
+
+    return rest_ensure_response(array(
+        'comingSoon' => $coming_soon,
+        'header' => array(
+            'logoUrl' => $logo_url,
+            'logoText' => get_field('site_logo_text', 'option') ?: 'CCS Pro',
+            'ctaButton' => array(
+                'label' => get_field('header_cta_label', 'option') ?: 'Get Started',
+                'href' => get_field('header_cta_href', 'option') ?: '#',
+            ),
+            'signinLink' => array(
+                'label' => get_field('header_signin_label', 'option') ?: 'Sign In',
+                'href' => get_field('header_signin_href', 'option') ?: '#',
+            ),
+        ),
+        'footer' => array(
+            'brandName' => get_field('footer_brand_name', 'option') ?: 'CCS Pro',
+            'tagline' => get_field('footer_tagline', 'option') ?: 'Credentialing packets. Done once. Ready always.',
+            'trustBadges' => $trust_badges,
+            'copyright' => get_field('footer_copyright', 'option') ?: '© 2025 CCS Pro. All rights reserved.',
+        ),
+    ));
+}
+
+function ccspro_get_menu_links_by_location($location) {
+    $locations = get_nav_menu_locations();
+    if (!is_array($locations) || !isset($locations[$location])) {
+        return array();
+    }
+
+    $menu_items = wp_get_nav_menu_items($locations[$location]);
+    if (!is_array($menu_items)) {
+        return array();
+    }
+
+    $links = array();
+    foreach ($menu_items as $item) {
+        $links[] = array(
+            'label' => isset($item->title) ? $item->title : '',
+            'href' => isset($item->url) ? $item->url : '#',
+            'openInNewTab' => isset($item->target) && $item->target === '_blank',
+        );
+    }
+
+    return $links;
+}
+
+function ccspro_rest_get_menus($request) {
+    return rest_ensure_response(array(
+        'primaryNav' => ccspro_get_menu_links_by_location('ccspro-primary-nav'),
+        'footerCol1' => ccspro_get_menu_links_by_location('ccspro-footer-col1'),
+        'footerCol2' => ccspro_get_menu_links_by_location('ccspro-footer-col2'),
+        'footerCol3' => ccspro_get_menu_links_by_location('ccspro-footer-col3'),
+    ));
 }
 
 function ccspro_rest_get_landing_page($request) {
@@ -1032,89 +1313,6 @@ function ccspro_rest_get_landing_page($request) {
 
     $data = ccspro_transform_landing_page_to_frontend($post_id);
     return rest_ensure_response($data);
-}
-
-function ccspro_map_pricing_packs($pricing_plans_raw) {
-    $pricing_packs = array();
-    $has_highlight = false;
-
-    foreach ((array) $pricing_plans_raw as $plan) {
-        $feats = isset($plan['features']) && is_array($plan['features']) ? $plan['features'] : array();
-        $feats = array_filter(array_map(function ($f) {
-            return isset($f['feature_text']) ? $f['feature_text'] : '';
-        }, $feats), function ($f) {
-            return $f !== '';
-        });
-
-        $plan_type = isset($plan['plan_type']) ? $plan['plan_type'] : 'pack';
-        $billing_type = isset($plan['billing_type']) && $plan['billing_type'] === 'subscription' ? 'subscription' : 'one_time';
-        $allow_additional_payers = !empty($plan['allow_additional_payers']);
-        $is_highlighted = !empty($plan['highlighted']) && !$has_highlight;
-        if ($is_highlighted) {
-            $has_highlight = true;
-        }
-
-        $applications_included = isset($plan['applications_included']) && $plan['applications_included'] !== ''
-            ? (int) $plan['applications_included']
-            : null;
-        if ($plan_type === 'unlimited') {
-            $applications_included = null;
-        }
-
-        $pricing_packs[] = array(
-            'name' => isset($plan['name']) ? $plan['name'] : '',
-            'price' => isset($plan['price']) && $plan['price'] !== '' ? (float) $plan['price'] : 0,
-            'badge' => isset($plan['badge']) ? $plan['badge'] : null,
-            'description' => isset($plan['description']) ? $plan['description'] : '',
-            'applicationsIncluded' => $applications_included,
-            'validityPeriod' => !empty($plan['validity_period']) ? $plan['validity_period'] : '1 year',
-            'billingType' => $billing_type,
-            'planType' => $plan_type === 'unlimited' ? 'unlimited' : 'pack',
-            'allowAdditionalPayers' => $allow_additional_payers,
-            'additionalPayerPrice' => $allow_additional_payers && isset($plan['additional_payer_price']) && $plan['additional_payer_price'] !== ''
-                ? (float) $plan['additional_payer_price']
-                : null,
-            'features' => $feats,
-            'cta' => isset($plan['cta']) ? $plan['cta'] : '',
-            'highlighted' => $is_highlighted,
-            'gracePeriodDays' => isset($plan['grace_period_days']) && $plan['grace_period_days'] !== '' ? (int) $plan['grace_period_days'] : 30,
-        );
-    }
-
-    return array_slice($pricing_packs, 0, 4);
-}
-
-function ccspro_get_pricing_content($scope = 'option', $post_id = 0) {
-    $target = $scope === 'option' ? 'option' : $post_id;
-
-    $pricing_plans_raw = get_field('pricing_plans', $target) ?: array();
-    $pricing_packs = ccspro_map_pricing_packs($pricing_plans_raw);
-    $post_year_items_raw = get_field('post_year_items', $target) ?: array();
-    $post_year_items = array_values(array_filter(array_map(function ($row) {
-        if (!isset($row['text']) || $row['text'] === '') {
-            return null;
-        }
-        return array(
-            'text' => $row['text'],
-            'kind' => isset($row['kind']) && $row['kind'] === 'negative' ? 'negative' : 'positive',
-        );
-    }, $post_year_items_raw)));
-
-    if ($scope === 'option' && empty($pricing_packs) && $post_id) {
-        return ccspro_get_pricing_content('post', $post_id);
-    }
-
-    return array(
-        'sectionTitle' => get_field('pricing_title', $target) ?: 'Simple, transparent pricing',
-        'sectionSubtitle' => get_field('pricing_subtitle', $target) ?: '',
-        'packs' => $pricing_packs,
-        'postYearBehavior' => array(
-            'title' => get_field('post_year_title', $target) ?: 'What happens after 1 year?',
-            'items' => $post_year_items,
-            'renewalNote' => get_field('post_year_renewal_note', $target) ?: '',
-        ),
-        'footerNote' => get_field('pricing_footer_note', $target) ?: '',
-    );
 }
 
 /**
@@ -1188,6 +1386,29 @@ function ccspro_transform_landing_page_to_frontend($post_id) {
         );
     }, $how_steps);
 
+    $provider_steps = get_field('provider_steps', $post_id) ?: array();
+    $provider_steps = array_map(function ($row) {
+        return array(
+            'icon' => isset($row['icon']) ? $row['icon'] : 'Circle',
+            'step' => isset($row['step_number']) ? $row['step_number'] : '',
+            'title' => isset($row['title']) ? $row['title'] : '',
+            'description' => isset($row['description']) ? $row['description'] : '',
+        );
+    }, $provider_steps);
+    if (empty($provider_steps)) {
+        $provider_steps = $how_steps;
+    }
+
+    $group_steps = get_field('group_steps', $post_id) ?: array();
+    $group_steps = array_map(function ($row) {
+        return array(
+            'icon' => isset($row['icon']) ? $row['icon'] : 'Circle',
+            'step' => isset($row['step_number']) ? $row['step_number'] : '',
+            'title' => isset($row['title']) ? $row['title'] : '',
+            'description' => isset($row['description']) ? $row['description'] : '',
+        );
+    }, $group_steps);
+
     $features_items = get_field('features_items', $post_id) ?: array();
     $features_items = array_map(function ($row) {
         return array(
@@ -1226,7 +1447,70 @@ function ccspro_transform_landing_page_to_frontend($post_id) {
             'description' => isset($row['description']) ? $row['description'] : '',
         );
     }, $caqh_consent);
-    $pricing_content = ccspro_get_pricing_content('option', $post_id);
+    $provider_bullets = get_field('provider_bullets', $post_id) ?: array();
+    $provider_bullets = array_values(array_filter(array_map(function ($row) {
+        return isset($row['bullet_text']) ? $row['bullet_text'] : '';
+    }, $provider_bullets)));
+
+    $group_bullets = get_field('group_bullets', $post_id) ?: array();
+    $group_bullets = array_values(array_filter(array_map(function ($row) {
+        return isset($row['bullet_text']) ? $row['bullet_text'] : '';
+    }, $group_bullets)));
+
+    $group_notes = get_field('group_notes', $post_id) ?: array();
+    $group_notes = array_values(array_filter(array_map(function ($row) {
+        return isset($row['note_text']) ? $row['note_text'] : '';
+    }, $group_notes)));
+
+    $pricing_content = array(
+        'sectionTitle' => get_field('pricing_section_title', $post_id) ?: 'Simple pricing. No surprises.',
+        'sectionSubtitle' => get_field('pricing_section_subtitle', $post_id) ?: "Whether you're a solo provider or managing a 50-person group...",
+        'providerCard' => array(
+            'badge' => get_field('provider_badge', $post_id) ?: 'For Individual Providers',
+            'price' => get_field('provider_price', $post_id) ?: '$99/year',
+            'priceSub' => get_field('provider_price_sub', $post_id) ?: '+ $60 per packet generated',
+            'bullets' => $provider_bullets,
+            'cta' => array(
+                'label' => get_field('provider_cta_label', $post_id) ?: 'Get Started — $99/year',
+                'href' => get_field('provider_cta_href', $post_id) ?: '#',
+            ),
+            'finePrint' => get_field('provider_fine_print', $post_id) ?: 'No contracts. Cancel anytime.',
+            'callout' => get_field('provider_callout', $post_id) ?: 'Most providers pay under $600 total in year one.',
+            'highlighted' => (bool) get_field('provider_highlighted', $post_id),
+        ),
+        'groupCard' => array(
+            'badge' => get_field('group_badge', $post_id) ?: 'For Groups & Facilities',
+            'price' => get_field('group_price', $post_id) ?: '$1,199/seat/year',
+            'priceSub' => get_field('group_price_sub', $post_id) ?: 'All payer packet workflows included',
+            'bullets' => $group_bullets,
+            'cta' => array(
+                'label' => get_field('group_cta_label', $post_id) ?: 'Talk to Us',
+                'href' => get_field('group_cta_href', $post_id) ?: '/contact',
+            ),
+            'finePrint' => get_field('group_fine_print', $post_id) ?: "Up to 50 seats. More than 50? Let's talk.",
+            'notes' => $group_notes,
+            'secondaryLink' => array(
+                'label' => get_field('group_secondary_link_label', $post_id) ?: 'See full feature comparison →',
+                'href' => get_field('group_secondary_link_href', $post_id) ?: '/pricing',
+            ),
+            'highlighted' => (bool) get_field('group_highlighted', $post_id),
+        ),
+    );
+
+    $ecosystem_pairs = get_field('ecosystem_pairs', $post_id) ?: array();
+    $ecosystem_pairs = array_values(array_filter(array_map(function ($row) {
+        $provider_action = isset($row['provider_action']) ? $row['provider_action'] : '';
+        $connector = isset($row['connector']) ? $row['connector'] : '';
+        $group_outcome = isset($row['group_outcome']) ? $row['group_outcome'] : '';
+        if ($provider_action === '' && $connector === '' && $group_outcome === '') {
+            return null;
+        }
+        return array(
+            'providerAction' => $provider_action,
+            'connector' => $connector,
+            'groupOutcome' => $group_outcome,
+        );
+    }, $ecosystem_pairs)));
 
     $support_features = get_field('support_features', $post_id) ?: array();
     $support_features = array_map(function ($row) {
@@ -1328,10 +1612,17 @@ function ccspro_transform_landing_page_to_frontend($post_id) {
             'sectionTitle' => get_field('how_it_works_title', $post_id) ?: 'How it works',
             'sectionSubtitle' => get_field('how_it_works_subtitle', $post_id) ?: '',
             'steps' => $how_steps,
+            'providerSteps' => $provider_steps,
+            'groupSteps' => $group_steps,
             'readinessNote' => array(
                 'label' => get_field('how_readiness_label', $post_id) ?: '5 Readiness States:',
                 'states' => $readiness_states,
             ),
+        ),
+        'ecosystemContent' => array(
+            'headline' => get_field('ecosystem_headline', $post_id) ?: 'One profile. Two sides of credentialing. Finally connected.',
+            'subheadline' => get_field('ecosystem_subheadline', $post_id) ?: 'Providers build it once. Groups use it everywhere.',
+            'pairs' => $ecosystem_pairs,
         ),
         'featuresContent' => array(
             'sectionTitle' => get_field('features_title', $post_id) ?: "What's included",

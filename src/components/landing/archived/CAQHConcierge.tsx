@@ -1,7 +1,7 @@
 import { Bell, CheckCircle } from "lucide-react";
 import { caqhConciergeContent } from "@/content/landing";
 import { getLandingIcon } from "@/lib/landing-icons";
-import { ConsentModeCard } from "./shared/Cards";
+import { ConsentModeCard } from "../shared/Cards";
 import type { LandingPageContent } from "@/types/wordpress";
 
 interface CAQHConciergeProps {

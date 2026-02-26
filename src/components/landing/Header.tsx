@@ -1,48 +1,114 @@
 import { useState } from "react";
-import { Menu, X, Moon, Sun } from "lucide-react";
+import { Menu, X } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 import { navLinks, navCtas, siteConfig } from "@/content/landing";
-import type { LandingPageContent } from "@/types/wordpress";
+import type { LandingPageContent, HeaderData } from "@/types/wordpress";
 import ccsLogo from "@/assets/ccs-logo.png";
 
 interface HeaderProps {
   content?: LandingPageContent;
+  headerData?: HeaderData;
 }
 
-export function Header({ content }: HeaderProps) {
+export function Header({ content, headerData }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains("dark"));
 
-  const site = content?.siteConfig ?? siteConfig;
-  const links = content?.navLinks ?? navLinks;
-  const ctas = content?.navCtas ?? navCtas;
+  let location: { pathname: string } = { pathname: "/" };
+  try {
+    location = useLocation();
+  } catch {
+    // Outside router context (e.g. legacy usage) — default to "/"
+  }
 
-  const toggleDarkMode = () => {
-    document.documentElement.classList.toggle("dark");
-    setIsDark((prev) => !prev);
+  const isHomepage = location.pathname === "/";
+
+  // Resolve data: prefer headerData, then content (legacy), then static fallback
+  const links = headerData
+    ? headerData.primaryNav
+    : content?.navLinks ?? navLinks;
+  const ctaLabel = headerData
+    ? isHomepage
+      ? "Start Free"
+      : headerData.ctaButton.label
+    : content?.navCtas.primary.label ?? navCtas.primary.label;
+  const ctaHref = headerData
+    ? headerData.ctaButton.href
+    : content?.navCtas.primary.href ?? navCtas.primary.href;
+  const signInLabel = headerData
+    ? headerData.secondaryLink.label
+    : content?.navCtas.signIn.label ?? navCtas.signIn.label;
+  const signInHref = headerData
+    ? headerData.secondaryLink.href
+    : content?.navCtas.signIn.href ?? navCtas.signIn.href;
+  const siteName = headerData
+    ? headerData.logo
+    : content?.siteConfig.name ?? siteConfig.name;
+
+  const isActive = (href: string) => {
+    if (href.startsWith("#") || href.startsWith("/#")) return false;
+    return location.pathname === href;
+  };
+
+  const renderLink = (
+    link: { label: string; href: string; openInNewTab?: boolean },
+    className: string,
+    onClick?: () => void,
+  ) => {
+    const active = isActive(link.href);
+    const activeClass = active ? " text-foreground font-medium" : "";
+    const target = link.openInNewTab ? "_blank" : undefined;
+    const rel = link.openInNewTab ? "noopener noreferrer" : undefined;
+
+    if (link.href.startsWith("/") && !link.openInNewTab) {
+      return (
+        <Link
+          key={link.label}
+          to={link.href}
+          className={`${className}${activeClass}`}
+          onClick={onClick}
+        >
+          {link.label}
+        </Link>
+      );
+    }
+
+    return (
+      <a
+        key={link.label}
+        href={link.href}
+        className={`${className}${activeClass}`}
+        target={target}
+        rel={rel}
+        onClick={onClick}
+      >
+        {link.label}
+      </a>
+    );
   };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/85 backdrop-blur-md border-b border-border">
       <nav className="section-container flex h-16 items-center justify-between">
-        <a href="#" className="flex items-center gap-3">
-          <img src={ccsLogo} alt={site.name} className="h-9 w-auto" />
-          <span className="hidden sm:inline text-sm font-semibold text-muted-foreground">{site.tagline}</span>
-        </a>
+        <Link to="/" className="flex items-center gap-3">
+          <img src={ccsLogo} alt={siteName} className="h-9 w-auto" />
+        </Link>
 
         <div className="hidden lg:flex items-center gap-6">
-          {links.map((link) => (
-            <a key={link.label} href={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-              {link.label}
-            </a>
-          ))}
+          {links.map((link) =>
+            renderLink(
+              link,
+              "text-sm text-muted-foreground hover:text-foreground transition-colors",
+            ),
+          )}
         </div>
 
         <div className="hidden lg:flex items-center gap-3">
-          <button type="button" className="btn-ghost" onClick={toggleDarkMode} aria-label="Toggle dark mode">
-            {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          </button>
-          <a href={ctas.signIn.href} className="btn-ghost">{ctas.signIn.label}</a>
-          <a href={ctas.primary.href} className="btn-primary">{ctas.primary.label}</a>
+          <a href={signInHref} className="btn-ghost">
+            {signInLabel}
+          </a>
+          <a href={ctaHref} className="btn-primary">
+            {ctaLabel}
+          </a>
         </div>
 
         <button
@@ -50,31 +116,35 @@ export function Header({ content }: HeaderProps) {
           onClick={() => setMobileMenuOpen((v) => !v)}
           aria-label="Toggle menu"
         >
-          {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          {mobileMenuOpen ? (
+            <X className="h-6 w-6" />
+          ) : (
+            <Menu className="h-6 w-6" />
+          )}
         </button>
       </nav>
 
       {mobileMenuOpen && (
         <div className="lg:hidden border-t border-border bg-background">
           <div className="section-container py-4 space-y-2">
-            {links.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                className="block py-2 text-muted-foreground hover:text-foreground"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {link.label}
-              </a>
-            ))}
+            {links.map((link) =>
+              renderLink(
+                link,
+                "block py-2 text-muted-foreground hover:text-foreground",
+                () => setMobileMenuOpen(false),
+              ),
+            )}
             <div className="flex items-center justify-between pt-3 border-t border-border mt-3">
-              <a href={ctas.signIn.href} className="btn-ghost">{ctas.signIn.label}</a>
-              <button type="button" className="btn-ghost" onClick={toggleDarkMode} aria-label="Toggle dark mode">
-                {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-              </button>
+              <a href={signInHref} className="btn-ghost">
+                {signInLabel}
+              </a>
             </div>
-            <a href={ctas.primary.href} className="btn-primary w-full text-center mt-2" onClick={() => setMobileMenuOpen(false)}>
-              {ctas.primary.label}
+            <a
+              href={ctaHref}
+              className="btn-primary w-full text-center mt-2"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              {ctaLabel}
             </a>
           </div>
         </div>

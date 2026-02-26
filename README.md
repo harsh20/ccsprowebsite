@@ -1,16 +1,25 @@
-# CCS Pro Landing Page
+# CCS Pro Marketing Site
 
-Landing page for CCS Pro - credentialing packets for US providers. Built with React, Vite, TypeScript, and Tailwind CSS. Content is managed via WordPress (headless CMS).
+Marketing site for CCS Pro — credentialing packets for Texas healthcare providers. Built with React, Vite, TypeScript, and Tailwind CSS. Content is currently mock data (Phase 1); WordPress headless CMS integration is planned for Phase 2.
+
+## Pages
+
+| Route | Page | Description |
+|-------|------|-------------|
+| `/` | Homepage | Hero, pain points, how it works, ecosystem, pricing preview, support, FAQ |
+| `/pricing` | Pricing | Extended pricing cards, feature comparison table, pricing FAQ |
+| `/about` | About | Mission, why Texas, differentiators |
+| `/contact` | Contact | Contact form, direct info, group callout |
+| `/:slug` | Landing (legacy) | WordPress-driven landing page variants |
 
 ## Tech stack
 
-- Vite
-- TypeScript
-- React
-- shadcn/ui
-- Tailwind CSS
-- WordPress REST API (headless CMS)
-- Content provider abstraction (REST active, GraphQL stubbed)
+- **Frontend:** React 18, TypeScript, Vite
+- **UI:** Tailwind CSS, shadcn/ui, Lucide icons
+- **Routing:** React Router
+- **Data (Phase 1):** Typed mock data in `src/content/mockData.ts`
+- **Data (legacy):** WordPress REST API via TanStack Query, fallback in `src/content/landing.ts`
+- **CMS:** WordPress on Hostinger with ACF Free, custom MU-plugin
 
 ## Local development
 
@@ -25,30 +34,45 @@ Set `VITE_WP_API_URL` in `.env` (see `.env.example`) to point at your WordPress 
 
 ## Environment variables
 
-```env
-VITE_WP_API_URL=https://wpcms.ccsprocert.com/wp-json
-VITE_CONTENT_SOURCE=rest
-# VITE_WP_GRAPHQL_ENDPOINT=https://wpcms.ccsprocert.com/graphql
+| Variable | Required | Purpose |
+|----------|----------|---------|
+| `VITE_WP_API_URL` | Yes | WordPress API base URL (e.g. `https://wpcms.ccsprocert.com/wp-json`) |
+| `VITE_COMING_SOON` | No | Build-time fallback: `"true"` shows Coming Soon before API responds |
+| `VITE_CONTENT_SOURCE` | No | `rest` (default) or `wordpress_graphql` (stubbed) |
+| `VITE_DEV_PASSWORD` | No | Password gate for staging; remove to disable |
+
+## Build and deploy
+
+```sh
+npm run build    # outputs to dist/
 ```
 
-`VITE_CONTENT_SOURCE`:
-- `rest` (default, current production path)
-- `wordpress_graphql` (phase 2 target; currently stubbed)
+Deploy the `dist` folder to Vercel or any static host. Required env vars must be set in your deployment platform.
 
-## Deploy
+**Current deploy:** Push to GitHub remote `other` → Vercel auto-builds.
 
-Build: `npm run build`. Deploy the `dist` folder to Vercel or any static host. Add required env vars in your deployment platform.
+## Project docs
+
+| File | Purpose |
+|------|---------|
+| `context.md` | Full project context — domains, repo layout, what was done, env vars |
+| `requirements.md` | Functional and non-functional requirements for all pages |
+| `architecture.md` | Technical architecture, routing flow, data model, deployment |
+| `claude.md` | AI assistant project rules and conventions |
+| `docs/WORDPRESS_SETUP_GUIDE.md` | WordPress and CMS setup guide |
 
 ## WordPress setup
 
 See [docs/WORDPRESS_SETUP_GUIDE.md](docs/WORDPRESS_SETUP_GUIDE.md) for CMS setup, ACF, and the MU-plugin.
 
-## GraphQL cutover checklist (phase 2)
+## Key directories
 
-1. Enable and configure WPGraphQL on `wpcms.ccsprocert.com`.
-2. Implement `src/content/providers/graphqlProvider.ts` queries.
-3. Map GraphQL payloads to `LandingPageContent` in `src/types/wordpress.ts` shape.
-4. Validate `/` and `/:slug` rendering parity against REST.
-5. Set `VITE_CONTENT_SOURCE=wordpress_graphql` in Vercel preview.
-6. Smoke test Coming Soon behavior through provider.
-7. Promote env switch to production after parity verification.
+```
+src/
+├── pages/           # Page components (HomePage, PricingPage, AboutPage, ContactPage, Index)
+├── components/landing/  # Section components (Header, Footer, Hero, etc.)
+├── content/         # Mock data (mockData.ts) and static fallback (landing.ts)
+├── types/           # TypeScript interfaces
+├── lib/             # API client, icon map
+└── hooks/           # React Query hooks
+```

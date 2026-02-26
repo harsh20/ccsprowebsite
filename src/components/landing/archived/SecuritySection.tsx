@@ -1,7 +1,7 @@
 import { Shield, ArrowRight } from "lucide-react";
 import { securityContent } from "@/content/landing";
 import { getLandingIcon } from "@/lib/landing-icons";
-import { SecurityFeature } from "./shared/Cards";
+import { SecurityFeature } from "../shared/Cards";
 import type { LandingPageContent } from "@/types/wordpress";
 
 interface SecuritySectionProps {

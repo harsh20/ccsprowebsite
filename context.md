@@ -1,4 +1,4 @@
-# CCS Pro Landing Page — Project Context
+# CCS Pro Marketing Site — Project Context
 
 Use this file when starting a new chat so the AI has full context without re-reading the whole history.
 
@@ -6,9 +6,10 @@ Use this file when starting a new chat so the AI has full context without re-rea
 
 ## 1. Project overview
 
-- **What it is:** Marketing landing page for **CCS Pro** — credentialing packets for US healthcare providers. Content is driven by a **WordPress headless CMS**; the frontend is a static React app that fetches content at runtime.
+- **What it is:** Marketing site for **CCS Pro** — credentialing packets for Texas healthcare providers. The site has four page templates (Homepage, Pricing, About, Contact) plus a legacy WP-driven landing page route.
 - **Frontend:** React 18, Vite, TypeScript, Tailwind CSS, shadcn/ui, React Router, TanStack Query.
-- **CMS:** WordPress on Hostinger with ACF (Free), custom **Landing Page** CPT, and a **MU-plugin** that registers the CPT, ACF field groups, CORS, and REST endpoints. No ACF Options Pages (ACF Free–compatible).
+- **CMS:** WordPress on Hostinger with custom **Landing Page** CPT and a **MU-plugin** that registers CPT behavior, ACF field groups, CORS, and custom REST endpoints.
+- **Phase status:** Phase 1 complete (mock-data pages), Phase 2 patching in progress (MU-plugin and provider cleanup completed in repo).
 
 ---
 
@@ -20,7 +21,7 @@ Use this file when starting a new chat so the AI has full context without re-rea
 | CMS/API  | https://wpcms.ccsprocert.com | Hostinger |
 
 - **DNS:** GoDaddy domain, managed via **CloudFlare**. A record for `wpcms` → Hostinger; root/www for frontend → Vercel.
-- **Git:** Frontend repo pushed to **GitHub** (`harsh20/ccsprowebsite`). Remote used for deploy: `other` → `https://github.com/harsh20/ccsprowebsite.git`. Vercel is connected to this repo (other Vercel account).
+- **Git:** Frontend repo pushed to **GitHub** (`harsh20/ccsprowebsite`). Remote used for deploy: `other` → `https://github.com/harsh20/ccsprowebsite.git`. Vercel is connected to this repo.
 
 ---
 
@@ -31,14 +32,19 @@ User → ccsprocert.com (Vercel)
          ↓
     React app loads
          ↓
-    GET wpcms.ccsprocert.com/wp-json/ccspro/v1/site-config  → comingSoon? show Coming Soon page
-    GET wpcms.ccsprocert.com/wp-json/ccspro/v1/landing-page/{slug}  → full landing content (default, texas, etc.)
+    GET wpcms.ccsprocert.com/wp-json/ccspro/v1/site-config  → comingSoon? show blank splash while loading
          ↓
-    Renders landing sections (Header, Hero, Features, Pricing, FAQ, Footer, etc.)
+    React Router renders:
+      /           → HomePage.tsx (mock data)
+      /pricing    → PricingPage.tsx (mock data)
+      /about      → AboutPage.tsx (mock data)
+      /contact    → ContactPage.tsx (mock data)
+      /:slug      → Index.tsx (WP API or static fallback)
 ```
 
-- **Landing Page CPT:** One post per variation (e.g. slug `default`, `texas`). Each post holds all ACF fields for that full page (hero, nav, features, pricing, FAQ, etc.).
-- **REST:** Custom namespace `ccspro/v1`. Key routes: `GET /site-config`, `GET /landing-page/{slug}`. CORS allows ccsprocert.com and localhost.
+- **New pages (Phase 1):** Four page templates driven by `src/content/mockData.ts`. Global Header and Footer accept typed props (`HeaderData`, `FooterData`) from mock data.
+- **Legacy route:** `/:slug` still works via `Index.tsx`, which fetches from WordPress or falls back to `src/content/landing.ts`.
+- **REST:** Custom namespace `ccspro/v1`. Key routes: `GET /site-config`, `GET /menus`, `GET /landing-page/{slug}`. CORS allows ccsprocert.com and localhost (5173, 3000, 127.0.0.1:5173).
 
 ---
 
@@ -47,73 +53,116 @@ User → ccsprocert.com (Vercel)
 ```
 temp-repo/
 ├── src/
-│   ├── App.tsx              # Coming-soon gate + router; fetches site-config on load
+│   ├── App.tsx              # Coming-soon gate + router (/, /pricing, /about, /contact, /:slug)
 │   ├── pages/
-│   │   ├── Index.tsx        # Main landing; uses useLandingPage(slug), passes content to sections
-│   │   ├── ComingSoon.tsx   # “Coming soon” page when enabled
+│   │   ├── HomePage.tsx     # New homepage with mock data — hero, pain point, how it works, ecosystem, pricing, support, FAQ
+│   │   ├── PricingPage.tsx  # Full pricing page — hero, extended cards, feature comparison table, FAQ
+│   │   ├── AboutPage.tsx    # About page — hero, mission, why Texas, differentiators
+│   │   ├── ContactPage.tsx  # Contact page — hero, form, contact info, group callout
+│   │   ├── Index.tsx        # Legacy WP-driven landing; uses useLandingPage(slug)
+│   │   ├── ComingSoon.tsx   # "Coming soon" page when enabled
 │   │   └── NotFound.tsx
 │   ├── lib/
-│   │   ├── wordpress.ts     # getLandingPage(slug), getSiteConfig() — WP API client
-│   │   └── landing-icons.ts # Icon name → Lucide component for dynamic content
+│   │   ├── wordpress.ts     # getLandingPage(slug), getSiteConfig() — WP API client (re-exports from providers)
+│   │   └── landing-icons.ts # Icon name → Lucide component map (33 icons)
 │   ├── hooks/
 │   │   └── useWordPress.ts  # useLandingPage(slug) — React Query
 │   ├── types/
-│   │   └── wordpress.ts     # TypeScript types for API responses
+│   │   └── wordpress.ts     # TypeScript types — LandingPageContent (legacy) + new page types
 │   ├── content/
-│   │   └── landing.ts       # Static fallback (defaultLandingPageContent) when WP unavailable
+│   │   ├── landing.ts       # Static fallback (defaultLandingPageContent) for /:slug route
+│   │   ├── mockData.ts      # Mock data for all new pages (mockSiteSettings, mockHomePage, etc.)
+│   │   └── providers/       # Content provider abstraction (REST active, GraphQL stubbed)
 │   └── components/
-│       ├── PasswordGate.tsx # Optional password gate when VITE_DEV_PASSWORD is set
-│       └── landing/         # Header, HeroSection, FeaturesGrid, PricingSection, FAQSection, Footer, etc.
+│       ├── PasswordGate.tsx  # Optional password gate when VITE_DEV_PASSWORD is set
+│       └── landing/
+│           ├── Header.tsx            # Global header — route-aware CTA, active links, mobile menu
+│           ├── Footer.tsx            # Global footer — 4-column layout with brand + menu columns
+│           ├── HeroSection.tsx       # Hero with optional dashboard card mock
+│           ├── ProblemOutcome.tsx     # Pain point section with label + headline + cards
+│           ├── HowItWorks.tsx        # Tabbed (Provider/Group) step cards
+│           ├── EcosystemSection.tsx  # NEW — two-column provider/group paired layout
+│           ├── HomePricingSection.tsx # NEW — simplified 2-card homepage pricing
+│           ├── FinalCTA.tsx          # CTA blocks with indigo/emerald style variants
+│           ├── SupportSection.tsx    # Channel-based support cards
+│           ├── FAQSection.tsx        # Accordion FAQ, accepts direct faqData prop
+│           ├── PricingSection.tsx    # Pack-based pricing (used by /:slug route)
+│           ├── LandingPageSkeleton.tsx
+│           ├── shared/Cards.tsx      # Reusable card components
+│           └── archived/             # Components removed from homepage but preserved
+│               ├── LogoStrip.tsx
+│               ├── FounderSpotlight.tsx
+│               ├── FeaturesGrid.tsx
+│               ├── PacketPreview.tsx
+│               ├── SecuritySection.tsx
+│               ├── CAQHConcierge.tsx
+│               └── TeamSection.tsx
 ├── wordpress/
 │   └── mu-plugins/
-│       └── ccspro-cpt-acf.php   # CPT, ACF groups, site-config + landing-page REST, CORS, Coming Soon admin
+│       └── ccspro-cpt-acf.php   # CPT, ACF groups, REST, CORS, menus, admin edit-screen customizations
 ├── docs/
-│   └── WORDPRESS_SETUP_GUIDE.md # DNS, Hostinger, plugins, MU-plugin, permalinks, coming soon toggle
-├── .env.example             # VITE_WP_API_URL, optional VITE_COMING_SOON, VITE_DEV_PASSWORD
-├── vercel.json              # SPA rewrite (.*) → index.html, asset cache headers
-├── context.md               # This file — project context for new chats
+│   └── WORDPRESS_SETUP_GUIDE.md
+├── .env.example
+├── vercel.json              # SPA rewrite (.*) → index.html, asset cache headers (NOT touched)
+├── context.md               # This file
 ├── requirements.md          # Functional and non-functional requirements
-└── architecture.md          # Technical architecture, data flow, diagrams
+├── architecture.md          # Technical architecture, data flow, diagrams
+└── claude.md                # AI assistant project rules and conventions
 ```
 
 ---
 
 ## 5. What was done (start to now)
 
-1. **WordPress headless plan**  
-   Designed integration: single Landing Page CPT with ACF (no Options Pages), custom REST, CORS. Frontend already had content in `src/content/landing.ts`; plan was to replace that with API-driven data.
+### Pre–Phase 1 (WordPress integration)
 
-2. **WordPress setup guide**  
-   Added `docs/WORDPRESS_SETUP_GUIDE.md`: CloudFlare DNS, Hostinger WordPress, ACF + ACF to REST API, MU-plugin install, permalinks, env vars, troubleshooting.
+1. **WordPress headless plan** — Designed integration: single Landing Page CPT with ACF (no Options Pages), custom REST, CORS.
+2. **WordPress setup guide** — Added `docs/WORDPRESS_SETUP_GUIDE.md`.
+3. **MU-plugin** — `ccspro-cpt-acf.php`: CPT, ACF field groups, REST routes, CORS, Coming Soon admin.
+4. **Frontend API and types** — `wordpress.ts`, `types/wordpress.ts`, `useWordPress.ts`, static fallback in `landing.ts`.
+5. **Dynamic landing page** — `Index.tsx` with `useLandingPage(slug)`, skeleton, fallback.
+6. **Lovable branding removed**.
+7. **Coming soon mode** — Runtime toggle via WordPress admin + site-config API.
+8. **Vercel and GitHub** — Deployed frontend, fixed `vercel.json`.
+9. **DNS / connectivity** — Resolved wpcms DNS issues.
+10. **Project docs** — context.md, requirements.md, architecture.md.
+11. **Password gate** — `PasswordGate` component for staging protection.
 
-3. **MU-plugin**  
-   `wordpress/mu-plugins/ccspro-cpt-acf.php`: registers `landing_page` CPT; many ACF field groups (Site Config, Nav, Hero, Verification, Founder, Problem/Outcome, How It Works, Features, Packet Preview, Security, CAQH Concierge, Pricing, Support, Team, FAQ, Final CTA, Footer); REST routes `ccspro/v1/site-config` and `ccspro/v1/landing-page/{slug}`; CORS for ccsprocert.com and localhost; **Coming Soon** admin under **Settings → CCS Pro Site** (saves `ccspro_coming_soon` option).
+### Phase 1 — Frontend rebuild (mock data only)
 
-4. **Frontend API and types**  
-   `src/lib/wordpress.ts` (getLandingPage, getSiteConfig), `src/types/wordpress.ts`, `src/hooks/useWordPress.ts` (useLandingPage). Static fallback in `src/content/landing.ts` (`defaultLandingPageContent`) when API fails.
+12. **Archived orphaned components** — Moved 7 components (LogoStrip, FounderSpotlight, FeaturesGrid, PacketPreview, SecuritySection, CAQHConcierge, TeamSection) to `src/components/landing/archived/`. Updated Index.tsx imports.
 
-5. **Dynamic landing page**  
-   `Index.tsx` uses `useParams().slug ?? 'default'`, `useLandingPage(slug)`, shows skeleton while loading, passes API/fallback content to all section components. Sections accept optional `content?: LandingPageContent` and use `getLandingIcon()` for icon names from WP. Routes: `/`, `/:slug`.
+13. **New TypeScript interfaces** — Extended `src/types/wordpress.ts` with: `MenuLink`, `HeaderData`, `FooterData`, `SiteSettings`, `PainPointContent`, `HowItWorksTabContent`, `EcosystemContent`, `HomePricingCardData`, `CtaBlockContent`, `SupportChannel`, `SupportSectionContent`, `HomePageContent`, `PricingPlanExtended`, `FeatureComparisonRow`, `FeatureComparisonCategory`, `PricingPageContent`, `AboutPageContent`, `ContactPageContent`. All existing interfaces untouched.
 
-6. **Lovable branding removed**  
-   Replaced Lovable references in index.html, README; removed `lovable-tagger` from package.json and vite.config.ts.
+14. **Mock data file** — Created `src/content/mockData.ts` exporting `mockSiteSettings`, `mockHomePage`, `mockPricingPage`, `mockAboutPage`, `mockContactPage`. Fully typed against new interfaces.
 
-7. **Coming soon mode**  
-   - **Runtime:** App fetches `GET /ccspro/v1/site-config` on load. If `comingSoon === true`, only the Coming Soon page is rendered; otherwise the full site.  
-   - **Toggle:** WordPress **Settings → CCS Pro Site** → “Coming soon mode” checkbox → Save. No redeploy needed.  
-   - **Logic:** Show Coming Soon while config is loading (`comingSoon !== false`); after response or 8s timeout, show full site only when API returns `comingSoon: false` or fetch fails. Cache-busting and `cache: "no-store"` on site-config request.
+15. **Icon map expanded** — Added 7 new Lucide icons: Upload, Send, Users, LayoutDashboard, BookOpen, Check, Minus.
 
-8. **Vercel and GitHub**  
-   Pushed repo to `harsh20/ccsprowebsite` (remote `other`). Fixed `vercel.json` rewrite (invalid regex → `/(.*)`). Frontend deployed on Vercel with env `VITE_WP_API_URL`; optional `VITE_COMING_SOON` for build-time fallback.
+16. **Header rewrite** — Accepts `headerData?: HeaderData`. Uses `useLocation()` for active link highlighting. CTA says "Start Free" on homepage, "Get Started" elsewhere. Internal links use React Router `<Link>`.
 
-9. **DNS / connectivity**  
-   Resolved earlier “site can’t be reached” for wpcms: router/PC reboot and DNS cache (e.g. `ipconfig /flushdns`) fixed resolution; nameservers and A record were correct.
+17. **Footer rewrite** — Accepts `footerData?: FooterData`. New 4+1 column layout (brand + 3 menu columns). Legacy `content` prop path preserved for `/:slug` route.
 
-10. **Project docs**  
-    Added `context.md` (this file), `requirements.md` (functional/non-functional requirements), and `architecture.md` (system overview, frontend/backend architecture, data flow, deployment, mermaid diagrams).
+18. **New components** — `EcosystemSection.tsx` (two-column provider/group pairs, responsive stacking on mobile), `HomePricingSection.tsx` (simplified 2-card layout for homepage).
 
-11. **Password gate for staging**  
-    Added `PasswordGate` component wrapping App. When `VITE_DEV_PASSWORD` env var is set, visitors must enter the password before accessing the site. Auth persists in localStorage. Disable by removing the env var.
+19. **Updated components** — HeroSection (dashboard card), ProblemOutcome (sectionLabel + headline), HowItWorks (Provider/Group tabs via shadcn Tabs), FinalCTA (indigo/emerald style variants), SupportSection (3 channel cards), FAQSection (accepts direct `faqData` prop).
+
+20. **New page templates** — `HomePage.tsx`, `PricingPage.tsx`, `AboutPage.tsx`, `ContactPage.tsx`. Each sets `document.title` via `useEffect`.
+
+21. **Routing** — Added `/pricing`, `/about`, `/contact` routes before `/:slug` in App.tsx. Named routes take priority over the slug wildcard.
+
+22. **Coming-soon flash fix** — `useState` initializes with `buildTimeComingSoon || null`. Renders blank `<div>` during API loading instead of `<ComingSoon />`.
+
+### Phase 2 — MU-plugin and data-flow updates
+
+23. **Menu endpoint and menu locations** — Added `ccspro-primary-nav`, `ccspro-footer-col1/2/3` and `GET /ccspro/v1/menus`.
+24. **Global options pages** — Replaced pricing options page with parent `CCS Pro` settings and `Header`/`Footer` ACF sub-pages.
+25. **Pricing v2 fields on landing_page** — Removed global pricing schema and `/pricing` endpoint; added `group_ccspro_pricing_v2` with provider/group cards and `highlighted` flags.
+26. **How It Works tabs support** — Added `provider_steps` and `group_steps` with fallback from legacy `how_it_works_steps`.
+27. **Ecosystem section support** — Added `group_ccspro_ecosystem` and REST mapping to `ecosystemContent`.
+28. **Extended site-config** — `GET /site-config` now returns `comingSoon` + `header` + `footer` global settings.
+29. **Landing Page admin UX** — Disabled Gutenberg for `landing_page`, removed unused metaboxes, title placeholder update, live URL notice, and slug hint.
+30. **CORS update** — Added `http://localhost:3000` to allowed origins.
+31. **Frontend provider cleanup** — Removed `getPricingContent` from providers/hooks and removed dead call-site merging in `Index.tsx`.
 
 ---
 
@@ -122,47 +171,72 @@ temp-repo/
 | Variable              | Where       | Purpose |
 |-----------------------|------------|---------|
 | `VITE_WP_API_URL`     | Vercel/.env| WordPress API base, e.g. `https://wpcms.ccsprocert.com/wp-json`. Required for live content and site-config. |
-| `VITE_COMING_SOON`    | Optional   | Build-time fallback; `"true"` = show Coming Soon if site-config not yet loaded. Runtime WordPress toggle overrides once response is in. |
-| `VITE_PREVIEW_SECRET` | Optional   | Not used in current flow; was for ?preview= secret to bypass coming soon. |
+| `VITE_COMING_SOON`    | Optional   | Build-time fallback; `"true"` = show Coming Soon if site-config not yet loaded. Runtime WordPress toggle overrides. |
+| `VITE_CONTENT_SOURCE` | Optional   | `rest` (default) or `wordpress_graphql` (stubbed). |
 | `VITE_DEV_PASSWORD`   | Vercel/.env| Optional: password to protect site during development. Remove to disable gate. |
 
 ---
 
 ## 7. Coming soon mode (quick ref)
 
-- **Turn on:** WordPress Admin → **Settings → CCS Pro Site** → check “Coming soon mode” → **Save**.  
-- **Turn off:** Same page → uncheck → **Save**.  
-- **API:** `GET https://wpcms.ccsprocert.com/wp-json/ccspro/v1/site-config` → `{ "comingSoon": true }` or `false`.  
-- **Frontend:** On load, app fetches site-config; if `comingSoon === true` it renders only `ComingSoon.tsx`; otherwise the full app. Timeout 8s then show full site if no response.
+- **Turn on:** WordPress Admin → **Settings → CCS Pro Site** → check "Coming soon mode" → **Save**.
+- **Turn off:** Same page → uncheck → **Save**.
+- **API:** `GET https://wpcms.ccsprocert.com/wp-json/ccspro/v1/site-config` → `{ "comingSoon": true }` or `false`.
+- **Frontend:** On load, app fetches site-config. While loading (`null`), shows blank splash. If `true`, shows `ComingSoon.tsx`. If `false` or timeout/failure, shows full app.
 
 ---
 
-## 8. Local dev and deploy
+## 8. Routes
 
-- **Run locally:** `npm i` then `npm run dev`. Set `VITE_WP_API_URL` in `.env` (see `.env.example`).  
-- **Build:** `npm run build` → `dist/`.  
-- **Deploy:** Push to `other` (e.g. `git push other main`). Vercel builds from connected repo; ensure `VITE_WP_API_URL` is set in Vercel project env.  
+| Path | Page | Data source |
+|------|------|-------------|
+| `/` | HomePage | `mockHomePage` from `mockData.ts` |
+| `/pricing` | PricingPage | `mockPricingPage` from `mockData.ts` |
+| `/about` | AboutPage | `mockAboutPage` from `mockData.ts` |
+| `/contact` | ContactPage | `mockContactPage` from `mockData.ts` |
+| `/:slug` | Index (legacy) | WordPress API or `defaultLandingPageContent` fallback |
+| `*` | NotFound | — |
+
+Header and Footer on all new pages use `mockSiteSettings.header` and `mockSiteSettings.footer`.
+
+---
+
+## 9. Local dev and deploy
+
+- **Run locally:** `npm i` then `npm run dev`. Set `VITE_WP_API_URL` in `.env` (see `.env.example`).
+- **Build:** `npm run build` → `dist/`.
+- **Deploy:** Push to `other` (e.g. `git push other main`). Vercel builds from connected repo; ensure `VITE_WP_API_URL` is set in Vercel project env.
 - **WordPress:** Upload/replace `wordpress/mu-plugins/ccspro-cpt-acf.php` on wpcms.ccsprocert.com; permalinks = Post name. Full steps in `docs/WORDPRESS_SETUP_GUIDE.md`.
 
 ---
 
-## 9. Handy URLs
+## 10. Handy URLs
 
-- Live site: https://ccsprocert.com/  
-- CMS: https://wpcms.ccsprocert.com/  
-- Site config API: https://wpcms.ccsprocert.com/wp-json/ccspro/v1/site-config  
-- Default landing content API: https://wpcms.ccsprocert.com/wp-json/ccspro/v1/landing-page/default  
+- Live site: https://ccsprocert.com/
+- CMS: https://wpcms.ccsprocert.com/
+- Site config API: https://wpcms.ccsprocert.com/wp-json/ccspro/v1/site-config
+- Default landing content API: https://wpcms.ccsprocert.com/wp-json/ccspro/v1/landing-page/default
 
 ---
 
-## 10. Related docs
+## 11. What is NOT touched yet
+
+- `src/lib/wordpress.ts` — API client unchanged.
+- `src/content/landing.ts` — `defaultLandingPageContent` still exists for `/:slug` fallback.
+- `vercel.json` — SPA rewrite unchanged.
+- Core route structure in `App.tsx` remains unchanged (`/`, `/pricing`, `/about`, `/contact`, `/:slug`, `*`).
+
+---
+
+## 12. Related docs
 
 | File | Purpose |
 |------|---------|
-| **requirements.md** | Functional and non-functional requirements; section content; coming soon; fallbacks. |
-| **architecture.md** | System overview, frontend/backend architecture, REST API, data flow, deployment, mermaid diagrams. |
-| **docs/WORDPRESS_SETUP_GUIDE.md** | Step-by-step WordPress and CMS setup (DNS, Hostinger, plugins, MU-plugin, coming soon toggle). |
+| **claude.md** | AI assistant project rules, conventions, and constraints. |
+| **requirements.md** | Functional and non-functional requirements; section content; pages. |
+| **architecture.md** | Technical architecture, routing, data flow, deployment diagrams. |
+| **docs/WORDPRESS_SETUP_GUIDE.md** | Step-by-step WordPress and CMS setup. |
 
 ---
 
-*Last updated to include password gate for staging (VITE_DEV_PASSWORD); context.md sections 5 and 6 updated accordingly.*
+*Last updated after Phase 2 MU-plugin patching and provider cleanup.*
