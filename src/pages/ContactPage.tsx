@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Mail, Clock, Send } from "lucide-react";
+import { Mail, Clock, Send, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { mockSiteSettings, mockContactPage } from "@/content/mockData";
-import { useContactPage, useSiteConfig, useMenus } from "@/hooks/useWordPress";
+import { useContactPage, useSiteConfig, useMenus, useSubmitContact } from "@/hooks/useWordPress";
 import { Header } from "@/components/landing/Header";
 import { Footer } from "@/components/landing/Footer";
 
@@ -49,10 +49,21 @@ const ContactPage = () => {
     role: "",
     message: "",
   });
+  const [submitted, setSubmitted] = useState(false);
+
+  const { mutate: submitContact, isPending, error } = useSubmitContact();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Placeholder — no backend yet
+    submitContact(
+      { ...formData, _hp: "" },
+      {
+        onSuccess: () => {
+          setSubmitted(true);
+          setFormData({ name: "", email: "", role: "", message: "" });
+        },
+      }
+    );
   };
 
   return (
@@ -77,102 +88,148 @@ const ContactPage = () => {
             <div className="grid gap-10 lg:grid-cols-2">
               {/* Left: form */}
               <div className="card-elevated p-6 sm:p-8">
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  <div>
-                    <label
-                      htmlFor="name"
-                      className="block text-sm font-medium text-foreground mb-1.5"
+                {submitted ? (
+                  <div className="flex flex-col items-center justify-center gap-4 py-12 text-center">
+                    <CheckCircle className="h-12 w-12 text-emerald-500" />
+                    <h2 className="text-xl font-semibold text-foreground">
+                      Message sent!
+                    </h2>
+                    <p className="text-sm text-muted-foreground max-w-xs">
+                      Thanks for reaching out. We'll get back to you within one
+                      business day.
+                    </p>
+                    <button
+                      onClick={() => setSubmitted(false)}
+                      className="text-sm text-primary hover:underline mt-2"
                     >
-                      Name
-                    </label>
+                      Send another message
+                    </button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmit} className="space-y-5">
+                    {/* Honeypot — hidden from humans, bots fill this */}
                     <input
-                      id="name"
                       type="text"
-                      required
-                      className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      value={formData.name}
-                      onChange={(e) =>
-                        setFormData((prev) => ({ ...prev, name: e.target.value }))
-                      }
+                      name="_hp"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      aria-hidden="true"
+                      style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", overflow: "hidden" }}
                     />
-                  </div>
 
-                  <div>
-                    <label
-                      htmlFor="email"
-                      className="block text-sm font-medium text-foreground mb-1.5"
-                    >
-                      Email
-                    </label>
-                    <input
-                      id="email"
-                      type="email"
-                      required
-                      className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      value={formData.email}
-                      onChange={(e) =>
-                        setFormData((prev) => ({ ...prev, email: e.target.value }))
-                      }
-                    />
-                  </div>
+                    {error && (
+                      <div className="flex items-start gap-2 rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                        <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                        <span>{error.message}</span>
+                      </div>
+                    )}
 
-                  <div>
-                    <label
-                      htmlFor="role"
-                      className="block text-sm font-medium text-foreground mb-1.5"
-                    >
-                      I am a
-                    </label>
-                    <select
-                      id="role"
-                      required
-                      className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      value={formData.role}
-                      onChange={(e) =>
-                        setFormData((prev) => ({ ...prev, role: e.target.value }))
-                      }
-                    >
-                      <option value="" disabled>
-                        Select one...
-                      </option>
-                      {page.formFields.roleOptions.map((opt) => (
-                        <option key={opt} value={opt}>
-                          {opt}
+                    <div>
+                      <label
+                        htmlFor="name"
+                        className="block text-sm font-medium text-foreground mb-1.5"
+                      >
+                        Name
+                      </label>
+                      <input
+                        id="name"
+                        type="text"
+                        required
+                        className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        value={formData.name}
+                        onChange={(e) =>
+                          setFormData((prev) => ({ ...prev, name: e.target.value }))
+                        }
+                      />
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="email"
+                        className="block text-sm font-medium text-foreground mb-1.5"
+                      >
+                        Email
+                      </label>
+                      <input
+                        id="email"
+                        type="email"
+                        required
+                        className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        value={formData.email}
+                        onChange={(e) =>
+                          setFormData((prev) => ({ ...prev, email: e.target.value }))
+                        }
+                      />
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="role"
+                        className="block text-sm font-medium text-foreground mb-1.5"
+                      >
+                        I am a
+                      </label>
+                      <select
+                        id="role"
+                        required
+                        className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        value={formData.role}
+                        onChange={(e) =>
+                          setFormData((prev) => ({ ...prev, role: e.target.value }))
+                        }
+                      >
+                        <option value="" disabled>
+                          Select one...
                         </option>
-                      ))}
-                    </select>
-                  </div>
+                        {page.formFields.roleOptions.map((opt) => (
+                          <option key={opt} value={opt}>
+                            {opt}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
 
-                  <div>
-                    <label
-                      htmlFor="message"
-                      className="block text-sm font-medium text-foreground mb-1.5"
+                    <div>
+                      <label
+                        htmlFor="message"
+                        className="block text-sm font-medium text-foreground mb-1.5"
+                      >
+                        Message
+                      </label>
+                      <textarea
+                        id="message"
+                        rows={5}
+                        required
+                        className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+                        value={formData.message}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            message: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={isPending}
+                      className="btn-primary w-full inline-flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      Message
-                    </label>
-                    <textarea
-                      id="message"
-                      rows={5}
-                      required
-                      className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
-                      value={formData.message}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          message: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="btn-primary w-full inline-flex items-center justify-center gap-2"
-                  >
-                    Send Message
-                    <Send className="h-4 w-4" />
-                  </button>
-                </form>
+                      {isPending ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Sending…
+                        </>
+                      ) : (
+                        <>
+                          Send Message
+                          <Send className="h-4 w-4" />
+                        </>
+                      )}
+                    </button>
+                  </form>
+                )}
               </div>
 
               {/* Right: contact info */}

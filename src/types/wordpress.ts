@@ -470,3 +470,16 @@ export interface ContactPageContent {
     body: string;
   };
 }
+
+export interface ContactFormPayload {
+  name: string;
+  email: string;
+  role: string;
+  message: string;
+  _hp?: string;
+}
+
+export interface ContactSubmitResponse {
+  success: boolean;
+  message?: string;
+}

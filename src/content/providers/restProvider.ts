@@ -5,6 +5,8 @@ import type {
   PricingPageContent,
   AboutPageContent,
   ContactPageContent,
+  ContactFormPayload,
+  ContactSubmitResponse,
 } from "@/types/wordpress";
 import type { ContentProvider } from "./types";
 
@@ -125,6 +127,24 @@ async function getContactPage(): Promise<ContactPageContent> {
   return response.json();
 }
 
+async function submitContactForm(
+  data: ContactFormPayload
+): Promise<ContactSubmitResponse> {
+  const response = await fetch(`${WP_API_URL}/ccspro/v1/contact/submit`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    const msg =
+      (err as { message?: string }).message ??
+      "Something went wrong. Please try again.";
+    throw new WordPressAPIError(msg, response.status);
+  }
+  return response.json();
+}
+
 export const restProvider: ContentProvider = {
   getLandingPage,
   getSiteConfig,
@@ -132,4 +152,5 @@ export const restProvider: ContentProvider = {
   getPricingPage,
   getAboutPage,
   getContactPage,
+  submitContactForm,
 };

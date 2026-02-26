@@ -45,7 +45,7 @@ User → ccsprocert.com (Vercel)
 - **Homepage (`/`):** Uses live `useLandingPage("default")`, `useSiteConfig()`, and `useMenus()` data with `mockData.ts` fallback when API fields are missing.
 - **Other named pages (`/pricing`, `/about`, `/contact`):** Use WordPress API (`page/pricing`, `page/about`, `page/contact`) with `mockData.ts` fallback.
 - **Legacy route:** `/:slug` still works via `Index.tsx`, which fetches from WordPress or falls back to `src/content/landing.ts`.
-- **REST:** Custom namespace `ccspro/v1`. Key routes: `GET /site-config`, `GET /menus`, `GET /landing-page/{slug}`, `GET /page/pricing`, `GET /page/about`, `GET /page/contact`. CORS allows ccsprocert.com and localhost (5173, 3000, 127.0.0.1:5173).
+- **REST:** Custom namespace `ccspro/v1`. Key routes: `GET /site-config`, `GET /menus`, `GET /landing-page/{slug}`, `GET /page/pricing`, `GET /page/about`, `GET /page/contact`, `POST /contact/submit` (saves to `contact_submission` CPT + emails `harsh@focusdesignconsulting.com` via WP SMTP). CORS allows ccsprocert.com and localhost (5173, 3000, 127.0.0.1:5173) — methods: `GET, POST, OPTIONS`.
 
 ---
 
@@ -175,6 +175,8 @@ temp-repo/
 34. **Hero ACF gap fixes** — Added `hero_headline_suffix` ACF field and wired it through the REST response, `HeroContent` type, mock data, and `HeroSection.tsx` to replace the hardcoded "Ready Always." suffix. Also wired `heroDashboard` through the API-first + mock fallback pattern in `HomePage.tsx`; previously dashboard card edits in WordPress had no effect on the live page.
 
 35. **Pricing/About/Contact ACF integration** — Added 3 new ACF Options Sub-Pages (Pricing Page, About Page, Contact Page) under CCS Pro Settings with full field groups matching TypeScript interfaces. Added REST endpoints (`/page/pricing`, `/page/about`, `/page/contact`). Extended `ContentProvider`, `restProvider`, hooks with `usePricingPage()`, `useAboutPage()`, `useContactPage()`. All three pages now fetch from WordPress API with `mockData.ts` fallback. Header/Footer on all pages are now API-driven with fallback.
+
+36. **Contact form submission pipeline** — Wired the contact form end-to-end. WordPress side: `contact_submission` CPT (admin-only, no Add New, custom columns with read/unread indicator), `POST /ccspro/v1/contact/submit` endpoint (honeypot check, IP rate-limit 3/15 min via transients, validation, `wp_insert_post` + post-meta, `wp_mail` to `harsh@focusdesignconsulting.com`, `do_action('ccspro_contact_submitted')` CRM hook), CORS updated to allow `POST`. Frontend side: `ContactFormPayload`/`ContactSubmitResponse` types, `submitContactForm` in `ContentProvider` and `restProvider`, `useSubmitContact()` mutation hook, `ContactPage.tsx` wired with honeypot field, loading spinner, success screen, and error banner.
 
 ---
 

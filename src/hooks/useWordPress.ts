@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { getContentProvider } from "@/content/providers";
 import type { SiteConfigResponse } from "@/content/providers";
 import type {
@@ -7,6 +7,8 @@ import type {
   PricingPageContent,
   AboutPageContent,
   ContactPageContent,
+  ContactFormPayload,
+  ContactSubmitResponse,
 } from "@/types/wordpress";
 
 const STALE_TIME_MS = 5 * 60 * 1000; // 5 minutes
@@ -67,5 +69,11 @@ export function useContactPage() {
     queryFn: () => contentProvider.getContactPage(),
     staleTime: STALE_TIME_MS,
     retry: 1,
+  });
+}
+
+export function useSubmitContact() {
+  return useMutation<ContactSubmitResponse, Error, ContactFormPayload>({
+    mutationFn: (data) => contentProvider.submitContactForm(data),
   });
 }

@@ -49,6 +49,97 @@ function ccspro_register_rest_routes() {
         'callback' => 'ccspro_rest_get_contact_page',
         'permission_callback' => '__return_true',
     ));
+    register_rest_route('ccspro/v1', '/contact/submit', array(
+        'methods'             => 'POST',
+        'callback'            => 'ccspro_rest_submit_contact',
+        'permission_callback' => '__return_true',
+        'args'                => array(
+            'name'    => array('required' => true,  'type' => 'string', 'sanitize_callback' => 'sanitize_text_field'),
+            'email'   => array('required' => true,  'type' => 'string', 'sanitize_callback' => 'sanitize_email', 'validate_callback' => 'is_email'),
+            'role'    => array('required' => true,  'type' => 'string', 'sanitize_callback' => 'sanitize_text_field'),
+            'message' => array('required' => true,  'type' => 'string', 'sanitize_callback' => 'sanitize_textarea_field'),
+            '_hp'     => array('required' => false, 'type' => 'string', 'default' => ''),
+        ),
+    ));
+}
+
+function ccspro_rest_submit_contact($request) {
+    // Honeypot check — bots auto-fill this; humans leave it empty
+    if (!empty($request->get_param('_hp'))) {
+        return rest_ensure_response(array('success' => true));
+    }
+
+    // Rate limiting — max 3 submissions per IP per 15 minutes
+    $ip         = sanitize_text_field(
+        !empty($_SERVER['HTTP_X_FORWARDED_FOR'])
+            ? explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0]
+            : ($_SERVER['REMOTE_ADDR'] ?? 'unknown')
+    );
+    $rate_key   = 'ccspro_contact_rate_' . md5($ip);
+    $rate_count = (int) get_transient($rate_key);
+
+    if ($rate_count >= 3) {
+        return new WP_Error(
+            'rate_limit',
+            'Too many submissions. Please wait before trying again.',
+            array('status' => 429)
+        );
+    }
+
+    set_transient($rate_key, $rate_count + 1, 15 * MINUTE_IN_SECONDS);
+
+    $name    = $request->get_param('name');
+    $email   = $request->get_param('email');
+    $role    = $request->get_param('role');
+    $message = $request->get_param('message');
+
+    if (mb_strlen($message) > 5000) {
+        return new WP_Error('message_too_long', 'Message must be 5000 characters or fewer.', array('status' => 400));
+    }
+
+    // Store submission as CPT entry
+    $post_title = $name . ' — ' . date('Y-m-d H:i');
+    $post_id    = wp_insert_post(array(
+        'post_type'   => 'contact_submission',
+        'post_title'  => $post_title,
+        'post_status' => 'publish',
+    ), true);
+
+    if (is_wp_error($post_id)) {
+        return new WP_Error('db_error', 'Could not save submission.', array('status' => 500));
+    }
+
+    update_post_meta($post_id, '_ccspro_name',    $name);
+    update_post_meta($post_id, '_ccspro_email',   $email);
+    update_post_meta($post_id, '_ccspro_role',    $role);
+    update_post_meta($post_id, '_ccspro_message', $message);
+    update_post_meta($post_id, '_ccspro_ip',      $ip);
+    update_post_meta($post_id, '_ccspro_read',    '');
+
+    // Send notification email
+    $to      = 'harsh@focusdesignconsulting.com';
+    $subject = 'New Contact: ' . $name . ' (' . $role . ')';
+    $body    = '<html><body>' .
+               '<h2>New contact form submission</h2>' .
+               '<p><strong>Name:</strong> ' . esc_html($name)    . '</p>' .
+               '<p><strong>Email:</strong> ' . esc_html($email)  . '</p>' .
+               '<p><strong>Role:</strong> '  . esc_html($role)   . '</p>' .
+               '<p><strong>Message:</strong><br>' . nl2br(esc_html($message)) . '</p>' .
+               '<hr><p style="color:#888;font-size:12px;">Submitted from IP: ' . esc_html($ip) . '</p>' .
+               '</body></html>';
+    $headers = array('Content-Type: text/html; charset=UTF-8');
+    wp_mail($to, $subject, $body, $headers);
+
+    // CRM integration hook — attach handlers in a separate plugin/snippet
+    do_action('ccspro_contact_submitted', $post_id, array(
+        'name'    => $name,
+        'email'   => $email,
+        'role'    => $role,
+        'message' => $message,
+        'ip'      => $ip,
+    ));
+
+    return rest_ensure_response(array('success' => true));
 }
 
 function ccspro_rest_get_site_config($request) {

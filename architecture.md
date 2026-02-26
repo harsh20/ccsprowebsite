@@ -143,7 +143,7 @@ sequenceDiagram
 | `src/content/landing.ts` | Static fallback for `/:slug` route. |
 | `src/types/wordpress.ts` | TypeScript interfaces for all content structures (legacy + new). |
 | `src/lib/wordpress.ts` | getLandingPage(slug), getSiteConfig() — API client (page fetches go through providers). |
-| `src/hooks/useWordPress.ts` | useLandingPage(slug), useSiteConfig(), useMenus(), usePricingPage(), useAboutPage(), useContactPage() — React Query wrappers. |
+| `src/hooks/useWordPress.ts` | useLandingPage(slug), useSiteConfig(), useMenus(), usePricingPage(), useAboutPage(), useContactPage(), useSubmitContact() — React Query wrappers. |
 | `src/lib/landing-icons.ts` | Map icon name strings to Lucide components (33 icons). |
 | `src/components/landing/*` | All presentational section components. |
 | `src/components/landing/archived/*` | 7 components removed from homepage, preserved for future use. |
@@ -179,11 +179,19 @@ Each section component accepts both a legacy `content?: LandingPageContent` prop
 - **Content store:** All copy, CTAs, pricing, FAQ, etc. for each landing variant live in WordPress.
 - **API:** Exposes content via custom REST routes under `ccspro/v1`.
 
-### 4.2 Custom post type: Landing Page
+### 4.2 Custom post types
 
-- **Slug:** `landing_page`.
-- **Usage:** One published post per landing variant (e.g. `default`, `texas`).
-- **Fields:** ACF field groups attached to this CPT, organized by section.
+**`landing_page`**
+- One published post per landing variant (e.g. `default`, `texas`).
+- ACF field groups attached, organized by section.
+
+**`contact_submission`**
+- Created by `POST /ccspro/v1/contact/submit`; never created in admin ("Add New" disabled).
+- `show_ui: true`, `show_in_menu: true`, `public: false`.
+- Post title auto-generated: `{Name} — {date}`.
+- Custom admin columns: unread indicator, Name, Email, Role, Message (truncated), Date.
+- Post-meta stored: `_ccspro_name`, `_ccspro_email`, `_ccspro_role`, `_ccspro_message`, `_ccspro_ip`, `_ccspro_read`.
+- Entries marked read automatically when opened in admin.
 
 ### 4.3 REST API
 
@@ -195,9 +203,10 @@ Each section component accepts both a legacy `content?: LandingPageContent` prop
 | GET | /wp-json/ccspro/v1/page/pricing | Returns PricingPageContent from ACF Options (Pricing Page sub-page). |
 | GET | /wp-json/ccspro/v1/page/about | Returns AboutPageContent from ACF Options (About Page sub-page). |
 | GET | /wp-json/ccspro/v1/page/contact | Returns ContactPageContent from ACF Options (Contact Page sub-page). |
+| POST | /wp-json/ccspro/v1/contact/submit | Accepts `{name, email, role, message, _hp}`. Validates, rate-limits (3/IP/15 min via transients), stores as `contact_submission` CPT entry with post-meta, sends `wp_mail` notification, fires `ccspro_contact_submitted` action for CRM hooks. Returns `{success: true}`. |
 
 - **Namespace:** `ccspro/v1`. Registered in the MU-plugin.
-- **CORS:** Allows ccsprocert.com and localhost origins.
+- **CORS:** Allows ccsprocert.com and localhost origins. Permitted methods: `GET, POST, OPTIONS`.
 
 ### 4.4 Coming soon control
 

@@ -5,6 +5,8 @@ import type {
   PricingPageContent,
   AboutPageContent,
   ContactPageContent,
+  ContactFormPayload,
+  ContactSubmitResponse,
 } from "@/types/wordpress";
 
 export type { SiteConfigResponse } from "@/types/wordpress";
@@ -16,4 +18,5 @@ export interface ContentProvider {
   getPricingPage(): Promise<PricingPageContent>;
   getAboutPage(): Promise<AboutPageContent>;
   getContactPage(): Promise<ContactPageContent>;
+  submitContactForm(data: ContactFormPayload): Promise<ContactSubmitResponse>;
 }

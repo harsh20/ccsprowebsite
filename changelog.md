@@ -2,6 +2,19 @@
 
 All notable changes to this repository are documented in this file.
 
+## 2026-02-27 (contact form submission pipeline)
+
+### Added
+- `contact_submission` CPT: admin-only, custom columns (unread indicator, Name, Email, Role, Message, Date), auto-marks entries as read on open, "Add New" disabled.
+- `POST /ccspro/v1/contact/submit` REST endpoint: honeypot check, IP rate-limit (3/15 min via transients), `wp_insert_post` + post-meta storage, `wp_mail` notification to `harsh@focusdesignconsulting.com`, `do_action('ccspro_contact_submitted')` CRM hook.
+- `ContactFormPayload` and `ContactSubmitResponse` interfaces in `src/types/wordpress.ts`.
+- `submitContactForm` method on `ContentProvider` interface and `restProvider` implementation.
+- `useSubmitContact()` TanStack Query mutation hook in `src/hooks/useWordPress.ts`.
+
+### Changed
+- CORS updated from `GET, OPTIONS` to `GET, POST, OPTIONS` in both the filter and the preflight handler (`ccspro/cors.php`).
+- `ContactPage.tsx` wired: honeypot hidden field, `useSubmitContact` mutation, loading spinner on button, success confirmation screen, inline error banner, form reset on success.
+
 ## 2026-02-27 (mu-plugin modularization)
 
 ### Added
