@@ -18,7 +18,7 @@ const PasswordGate = ({ children }: { children: ReactNode }) => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (!stored) return false;
-      return stored === devPassword;
+      return stored === "authenticated";
     } catch {
       return false;
     }
@@ -35,7 +35,7 @@ const PasswordGate = ({ children }: { children: ReactNode }) => {
     setError("");
     if (password === devPassword) {
       try {
-        localStorage.setItem(STORAGE_KEY, password);
+        localStorage.setItem(STORAGE_KEY, "authenticated");
         setIsUnlocked(true);
       } catch {
         setError("Could not save access.");

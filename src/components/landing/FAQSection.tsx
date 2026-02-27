@@ -7,6 +7,7 @@ import {
 import { faqContent } from "@/content/landing";
 import { SectionHeader } from "./shared/Cards";
 import type { LandingPageContent, FaqContent } from "@/types/wordpress";
+import DOMPurify from "dompurify";
 
 interface FAQSectionProps {
   content?: LandingPageContent;
@@ -36,7 +37,7 @@ export function FAQSection({ content, faqData }: FAQSectionProps) {
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground pb-5 prose prose-sm max-w-none">
                   {faq.answer.includes("<") ? (
-                    <div dangerouslySetInnerHTML={{ __html: faq.answer }} />
+                    <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(faq.answer) }} />
                   ) : (
                     faq.answer
                   )}

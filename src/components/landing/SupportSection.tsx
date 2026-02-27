@@ -1,6 +1,7 @@
 import { ExternalLink } from "lucide-react";
 import { supportContent } from "@/content/landing";
 import { getLandingIcon } from "@/lib/landing-icons";
+import { safeHref } from "@/lib/utils";
 import { SupportFeatureBadge } from "./shared/Cards";
 import type { LandingPageContent, SupportSectionContent } from "@/types/wordpress";
 
@@ -40,7 +41,7 @@ export function SupportSection({ content, channelData }: SupportSectionProps) {
             {data.links.map((link, index) => (
               <span key={index}>
                 <a
-                  href={link.href}
+                  href={safeHref(link.href)}
                   className="inline-flex items-center gap-2 text-primary font-medium hover:underline"
                 >
                   {link.label}
@@ -82,7 +83,7 @@ function ChannelSupportSection({ data }: { data: SupportSectionContent }) {
                 </p>
                 {channel.link && (
                   <a
-                    href={channel.link}
+                    href={safeHref(channel.link)}
                     className="text-sm font-medium text-primary hover:underline"
                   >
                     {channel.link.startsWith("mailto:")

@@ -30,6 +30,11 @@ export class WordPressAPIError extends Error {
 }
 
 async function getLandingPage(slug: string = "default"): Promise<LandingPageContent> {
+  const SLUG_RE = /^[a-z0-9][a-z0-9-]*$/;
+  if (!SLUG_RE.test(slug)) {
+    throw new WordPressAPIError(`Invalid slug: "${slug}"`, 400, slug);
+  }
+
   const response = await fetch(freshUrl(`/ccspro/v1/landing-page/${slug}`), {
     method: "GET",
     headers: { Accept: "application/json" },

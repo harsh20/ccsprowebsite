@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { navLinks, navCtas, siteConfig } from "@/content/landing";
+import { safeHref } from "@/lib/utils";
 import type { LandingPageContent, HeaderData } from "@/types/wordpress";
 import ccsLogo from "@/assets/ccs-logo.png";
 
@@ -79,7 +80,7 @@ export function Header({ content, headerData }: HeaderProps) {
     return (
       <a
         key={link.label}
-        href={link.href}
+        href={safeHref(link.href)}
         className={`${className}${activeClass}`}
         target={target}
         rel={rel}
@@ -125,10 +126,10 @@ export function Header({ content, headerData }: HeaderProps) {
         </div>
 
         <div className="hidden lg:flex items-center gap-3">
-          <a href={signInHref} className="btn-ghost">
+          <a href={safeHref(signInHref)} className="btn-ghost">
             {signInLabel}
           </a>
-          <a href={ctaHref} className="btn-primary">
+          <a href={safeHref(ctaHref)} className="btn-primary">
             {ctaLabel}
           </a>
         </div>
@@ -157,12 +158,12 @@ export function Header({ content, headerData }: HeaderProps) {
               ),
             )}
             <div className="flex items-center justify-between pt-3 border-t border-border mt-3">
-              <a href={signInHref} className="btn-ghost">
+              <a href={safeHref(signInHref)} className="btn-ghost">
                 {signInLabel}
               </a>
             </div>
             <a
-              href={ctaHref}
+              href={safeHref(ctaHref)}
               className="btn-primary w-full text-center mt-2"
               onClick={() => setMobileMenuOpen(false)}
             >

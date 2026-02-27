@@ -2,6 +2,30 @@
 
 All notable changes to this repository are documented in this file.
 
+## 2026-02-27 (security hardening)
+
+### Added
+- `dompurify` dependency for HTML sanitization.
+- `safeHref(url)` utility in `src/lib/utils.ts` — allows relative paths (`/`, `#`) and `http`/`https` URLs only; blocks `javascript:`, `data:`, and `vbscript:` protocols.
+- Security headers in `vercel.json`: `Content-Security-Policy`, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy`, `Permissions-Policy`.
+- Slug regex validation in `restProvider.ts` (`/^[a-z0-9][a-z0-9-]*$/`) to block path traversal in API calls.
+
+### Changed
+- `FAQSection.tsx`: FAQ answers now sanitized with `DOMPurify.sanitize()` before `dangerouslySetInnerHTML` rendering.
+- `PasswordGate.tsx`: localStorage now stores `"authenticated"` flag instead of the raw password.
+- `HeroSection.tsx`, `Footer.tsx`, `SupportSection.tsx`, `FinalCTA.tsx`, `Header.tsx`: all WordPress-sourced `href` attributes now passed through `safeHref()`.
+- `NotFound.tsx`: console.error gated behind `import.meta.env.DEV` to prevent route information disclosure in production.
+- `rest-api.php`: contact email now read via `get_option('ccspro_contact_email')` with fallback, instead of being hardcoded.
+
+### Fixed
+- Stored XSS vector via unsanitized FAQ HTML from WordPress.
+- Protocol injection (`javascript:` URLs) via WordPress-sourced link attributes.
+- Password exposure in localStorage readable by XSS.
+- Path traversal in API slug parameter.
+- Missing security headers (clickjacking, MIME sniffing, referrer leakage).
+
+---
+
 ## 2026-02-27 (contact form submission pipeline)
 
 ### Added

@@ -1,6 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { finalCtaContent } from "@/content/landing";
+import { safeHref } from "@/lib/utils";
 import type { LandingPageContent, CtaBlockContent } from "@/types/wordpress";
 
 interface FinalCTAProps {
@@ -25,14 +26,14 @@ export function FinalCTA({ content, blockData }: FinalCTAProps) {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <a
-              href={data.primaryCta.href}
+              href={safeHref(data.primaryCta.href)}
               className="inline-flex items-center gap-2 rounded-xl bg-white text-primary px-7 py-3 font-semibold hover:bg-white/90 transition-colors"
             >
               {data.primaryCta.label}
               <ArrowRight className="h-4 w-4" />
             </a>
             <a
-              href={data.secondaryCta.href}
+              href={safeHref(data.secondaryCta.href)}
               className="inline-flex items-center rounded-xl border border-white/40 px-7 py-3 font-semibold text-white hover:bg-white/10 transition-colors"
             >
               {data.secondaryCta.label}
@@ -66,7 +67,7 @@ function CtaBlock({ data }: { data: CtaBlockContent }) {
     }
 
     return (
-      <a href={cta.href} className={baseClass}>
+      <a href={safeHref(cta.href)} className={baseClass}>
         {cta.label}
       </a>
     );

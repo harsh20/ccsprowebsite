@@ -126,7 +126,7 @@ function ccspro_rest_submit_contact($request) {
     update_post_meta($post_id, '_ccspro_read',    '');
 
     // Send notification email
-    $to      = 'harsh@focusdesignconsulting.com';
+    $to      = get_option('ccspro_contact_email', 'harsh@focusdesignconsulting.com');
     $subject = 'New Contact: ' . $name . ' (' . $role . ')';
     $body    = '<html><body>' .
                '<h2>New contact form submission</h2>' .
