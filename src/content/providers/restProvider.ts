@@ -13,6 +13,11 @@ import type { ContentProvider } from "./types";
 const WP_API_URL =
   import.meta.env.VITE_WP_API_URL ?? "https://wpcms.ccsprocert.com/wp-json";
 
+function freshUrl(path: string): string {
+  const sep = path.includes("?") ? "&" : "?";
+  return `${WP_API_URL}${path}${sep}_t=${Date.now()}`;
+}
+
 export class WordPressAPIError extends Error {
   constructor(
     message: string,
@@ -25,8 +30,7 @@ export class WordPressAPIError extends Error {
 }
 
 async function getLandingPage(slug: string = "default"): Promise<LandingPageContent> {
-  const url = `${WP_API_URL}/ccspro/v1/landing-page/${slug}`;
-  const response = await fetch(url, {
+  const response = await fetch(freshUrl(`/ccspro/v1/landing-page/${slug}`), {
     method: "GET",
     headers: { Accept: "application/json" },
     cache: "no-store",
@@ -50,7 +54,7 @@ async function getLandingPage(slug: string = "default"): Promise<LandingPageCont
 
 async function getSiteConfig(): Promise<SiteConfigResponse> {
   const response = await fetch(
-    `${WP_API_URL}/ccspro/v1/site-config`,
+    freshUrl("/ccspro/v1/site-config"),
     { cache: "no-store" }
   );
   if (!response.ok) {
@@ -75,7 +79,7 @@ async function getSiteConfig(): Promise<SiteConfigResponse> {
 
 async function getMenus(): Promise<MenusResponse> {
   try {
-    const response = await fetch(`${WP_API_URL}/ccspro/v1/menus`, { cache: "no-store" });
+    const response = await fetch(freshUrl("/ccspro/v1/menus"), { cache: "no-store" });
     if (!response.ok) {
       return {
         primaryNav: [],
@@ -96,7 +100,7 @@ async function getMenus(): Promise<MenusResponse> {
 }
 
 async function getPricingPage(): Promise<PricingPageContent> {
-  const response = await fetch(`${WP_API_URL}/ccspro/v1/page/pricing`, {
+  const response = await fetch(freshUrl("/ccspro/v1/page/pricing"), {
     method: "GET",
     headers: { Accept: "application/json" },
     cache: "no-store",
@@ -108,7 +112,7 @@ async function getPricingPage(): Promise<PricingPageContent> {
 }
 
 async function getAboutPage(): Promise<AboutPageContent> {
-  const response = await fetch(`${WP_API_URL}/ccspro/v1/page/about`, {
+  const response = await fetch(freshUrl("/ccspro/v1/page/about"), {
     method: "GET",
     headers: { Accept: "application/json" },
     cache: "no-store",
@@ -120,7 +124,7 @@ async function getAboutPage(): Promise<AboutPageContent> {
 }
 
 async function getContactPage(): Promise<ContactPageContent> {
-  const response = await fetch(`${WP_API_URL}/ccspro/v1/page/contact`, {
+  const response = await fetch(freshUrl("/ccspro/v1/page/contact"), {
     method: "GET",
     headers: { Accept: "application/json" },
     cache: "no-store",
@@ -134,7 +138,7 @@ async function getContactPage(): Promise<ContactPageContent> {
 async function submitContactForm(
   data: ContactFormPayload
 ): Promise<ContactSubmitResponse> {
-  const response = await fetch(`${WP_API_URL}/ccspro/v1/contact/submit`, {
+  const response = await fetch(freshUrl("/ccspro/v1/contact/submit"), {
     method: "POST",
     headers: { "Content-Type": "application/json", Accept: "application/json" },
     body: JSON.stringify(data),
