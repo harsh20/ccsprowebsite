@@ -241,8 +241,10 @@ function ccspro_get_field_group_config() {
                         array('key' => 'field_hero_doc_color', 'label' => 'Color', 'name' => 'status_color', 'type' => 'select', 'choices' => array('green' => 'Green', 'blue' => 'Blue', 'orange' => 'Orange', 'red' => 'Red', 'gray' => 'Gray'), 'default_value' => 'gray', 'wrapper' => array('width' => '30')),
                     ),
                 ),
-                array('key' => 'field_hero_dashboard_btn_primary', 'label' => 'Button Primary', 'name' => 'hero_dashboard_btn_primary', 'type' => 'text', 'wrapper' => array('width' => '50')),
-                array('key' => 'field_hero_dashboard_btn_secondary', 'label' => 'Button Secondary', 'name' => 'hero_dashboard_btn_secondary', 'type' => 'text', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_hero_dashboard_btn_primary', 'label' => 'Button Primary Label', 'name' => 'hero_dashboard_btn_primary', 'type' => 'text', 'wrapper' => array('width' => '25')),
+                array('key' => 'field_hero_dashboard_btn_primary_href', 'label' => 'Button Primary URL', 'name' => 'hero_dashboard_btn_primary_href', 'type' => 'text', 'placeholder' => '/dashboard', 'wrapper' => array('width' => '25')),
+                array('key' => 'field_hero_dashboard_btn_secondary', 'label' => 'Button Secondary Label', 'name' => 'hero_dashboard_btn_secondary', 'type' => 'text', 'wrapper' => array('width' => '25')),
+                array('key' => 'field_hero_dashboard_btn_secondary_href', 'label' => 'Button Secondary URL', 'name' => 'hero_dashboard_btn_secondary_href', 'type' => 'text', 'placeholder' => '/profile', 'wrapper' => array('width' => '25')),
                 array(
                     'key' => 'field_accordion_hero_end',
                     'label' => 'Hero End',
@@ -1274,6 +1276,8 @@ function ccspro_get_field_group_config() {
                 array('key' => 'field_contact_tab_group_callout', 'label' => 'Group Callout', 'type' => 'tab', 'placement' => 'top'),
                 array('key' => 'field_contact_group_callout_headline', 'label' => 'Headline', 'name' => 'contact_group_callout_headline', 'type' => 'text'),
                 array('key' => 'field_contact_group_callout_body', 'label' => 'Body', 'name' => 'contact_group_callout_body', 'type' => 'textarea', 'rows' => 4),
+                array('key' => 'field_contact_group_callout_cta_label', 'label' => 'CTA Label', 'name' => 'contact_group_callout_cta_label', 'type' => 'text', 'placeholder' => 'Talk to Us', 'wrapper' => array('width' => '50')),
+                array('key' => 'field_contact_group_callout_cta_href', 'label' => 'CTA URL', 'name' => 'contact_group_callout_cta_href', 'type' => 'text', 'placeholder' => '/contact', 'wrapper' => array('width' => '50')),
             ),
             'location' => array(
                 array(

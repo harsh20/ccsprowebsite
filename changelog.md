@@ -2,6 +2,22 @@
 
 All notable changes to this repository are documented in this file.
 
+## 2026-03-17 (button link field fixes)
+
+### Added
+- `hero_dashboard_btn_primary_href` and `hero_dashboard_btn_secondary_href` ACF text fields in `acf.php` so dashboard preview buttons can be linked from WordPress.
+- `contact_group_callout_cta_label` and `contact_group_callout_cta_href` ACF text fields in `acf.php` to add an optional CTA to the contact page group callout card.
+
+### Changed
+- `rest-api.php` (`heroDashboard.buttons`): changed from plain strings to `{label, href}` objects to match all other CTA fields in the project.
+- `rest-api.php` (`groupCallout`): added `cta: {label, href}` field to the contact page response.
+- `src/types/wordpress.ts` (`HeroDashboard.buttons`): type updated from `{primary: string; secondary: string}` to `{primary: CtaLink; secondary: CtaLink}`.
+- `src/types/wordpress.ts` (`ContactPageContent.groupCallout`): added optional `cta?: CtaLink` field.
+- `src/components/landing/HeroSection.tsx`: dashboard preview buttons replaced with `<SmartLink>` elements that navigate to the configured URL.
+- `src/pages/ContactPage.tsx`: group callout card now conditionally renders an arrow-link CTA when `groupCallout.cta` is present.
+- `src/content/mockData.ts`: dashboard button mock data updated to `{label, href}` shape; contact group callout mock data adds `cta` field.
+- `src/content/landing.ts`: static fallback dashboard buttons updated to `{label, href}` shape.
+
 ## 2026-02-27 (security hardening)
 
 ### Added

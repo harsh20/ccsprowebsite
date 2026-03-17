@@ -56,7 +56,7 @@ export interface HeroDashboard {
   npiValue: string;
   readinessStates: ReadinessState[];
   documents: HeroDashboardDocument[];
-  buttons: { primary: string; secondary: string };
+  buttons: { primary: CtaLink; secondary: CtaLink };
 }
 
 export interface VerificationContent {
@@ -473,6 +473,7 @@ export interface ContactPageContent {
   groupCallout: {
     headline: string;
     body: string;
+    cta?: CtaLink;
   };
 }
 

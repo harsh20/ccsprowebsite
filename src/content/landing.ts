@@ -70,8 +70,8 @@ export const heroDashboard = {
     { name: "DEA Certificate", status: "Missing", statusColor: "red" },
   ],
   buttons: {
-    primary: "Generate Signed PDF",
-    secondary: "Generate Packet PDF",
+    primary: { label: "Generate Signed PDF", href: "/dashboard" },
+    secondary: { label: "Generate Packet PDF", href: "/dashboard" },
   },
 };
 

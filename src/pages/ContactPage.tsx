@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Mail, Clock, Send, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { Mail, Clock, Send, CheckCircle, AlertCircle, Loader2, ArrowRight } from "lucide-react";
+import { SmartLink } from "@/components/SmartLink";
 import { mockContactPage } from "@/content/mockData";
 import { useContactPage, useSiteConfig, useMenus, useSubmitContact } from "@/hooks/useWordPress";
 import { Header } from "@/components/landing/Header";
@@ -244,13 +245,22 @@ const ContactPage = () => {
                 </div>
 
                 {/* Group callout */}
-                <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-6 space-y-2">
+                <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-6 space-y-3">
                   <h3 className="font-semibold text-emerald-900">
                     {page.groupCallout.headline}
                   </h3>
                   <p className="text-sm text-emerald-800">
                     {page.groupCallout.body}
                   </p>
+                  {page.groupCallout.cta?.label && (
+                    <SmartLink
+                      href={page.groupCallout.cta.href}
+                      className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-700 hover:text-emerald-900 transition-colors"
+                    >
+                      {page.groupCallout.cta.label}
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </SmartLink>
+                  )}
                 </div>
               </div>
             </div>

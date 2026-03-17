@@ -100,8 +100,8 @@ export const mockHomePage: HomePageContent = {
       { name: "State License", status: "Complete", statusColor: "green" },
     ],
     buttons: {
-      primary: "Generate Packet",
-      secondary: "View Profile",
+      primary: { label: "Generate Packet", href: "/dashboard" },
+      secondary: { label: "View Profile", href: "/profile" },
     },
   },
   painPoint: {
@@ -502,5 +502,6 @@ export const mockContactPage: ContactPageContent = {
   groupCallout: {
     headline: "Evaluating CCS Pro for your group or facility?",
     body: "Tell us your roster size and we'll put together a tailored walkthrough.",
+    cta: { label: "Talk to Us", href: "/contact" },
   },
 };

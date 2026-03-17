@@ -543,8 +543,14 @@ function ccspro_transform_landing_page_to_frontend($post_id) {
             'readinessStates' => $readiness_states,
             'documents' => $hero_docs,
             'buttons' => array(
-                'primary' => get_field('hero_dashboard_btn_primary', $post_id) ?: 'Generate Signed PDF',
-                'secondary' => get_field('hero_dashboard_btn_secondary', $post_id) ?: 'Generate Packet PDF',
+                'primary' => array(
+                    'label' => get_field('hero_dashboard_btn_primary', $post_id) ?: 'Generate Packet',
+                    'href'  => get_field('hero_dashboard_btn_primary_href', $post_id) ?: '/dashboard',
+                ),
+                'secondary' => array(
+                    'label' => get_field('hero_dashboard_btn_secondary', $post_id) ?: 'View Profile',
+                    'href'  => get_field('hero_dashboard_btn_secondary_href', $post_id) ?: '/profile',
+                ),
             ),
         ),
         'verificationContent' => array(
@@ -879,6 +885,10 @@ function ccspro_rest_get_contact_page($request) {
         'groupCallout' => array(
             'headline' => get_field('contact_group_callout_headline', 'option') ?: '',
             'body' => get_field('contact_group_callout_body', 'option') ?: '',
+            'cta' => array(
+                'label' => get_field('contact_group_callout_cta_label', 'option') ?: '',
+                'href'  => get_field('contact_group_callout_cta_href', 'option') ?: '#',
+            ),
         ),
     );
 

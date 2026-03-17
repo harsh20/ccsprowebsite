@@ -137,12 +137,18 @@ function DashboardCard({ dashboard }: { dashboard: HeroDashboard }) {
       </div>
 
       <div className="flex gap-3">
-        <button className="btn-primary text-sm flex-1">
-          {dashboard.buttons.primary}
-        </button>
-        <button className="btn-secondary text-sm flex-1">
-          {dashboard.buttons.secondary}
-        </button>
+        <SmartLink
+          href={dashboard.buttons.primary.href}
+          className="btn-primary text-sm flex-1 text-center"
+        >
+          {dashboard.buttons.primary.label}
+        </SmartLink>
+        <SmartLink
+          href={dashboard.buttons.secondary.href}
+          className="btn-secondary text-sm flex-1 text-center"
+        >
+          {dashboard.buttons.secondary.label}
+        </SmartLink>
       </div>
     </div>
   );
