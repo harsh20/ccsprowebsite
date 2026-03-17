@@ -1,7 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import { heroContent } from "@/content/landing";
 import { getLandingIcon } from "@/lib/landing-icons";
-import { safeHref } from "@/lib/utils";
+import { SmartLink } from "@/components/SmartLink";
 import type { LandingPageContent, HeroContent, HeroDashboard } from "@/types/wordpress";
 
 interface HeroSectionProps {
@@ -31,30 +31,30 @@ export function HeroSection({ content, heroData, dashboardData }: HeroSectionPro
             </p>
 
             <div className="flex flex-col sm:flex-row items-start gap-4">
-              <a
-                href={safeHref(hero.primaryCta.href)}
+              <SmartLink
+                href={hero.primaryCta.href}
                 className="btn-primary text-base px-7 py-3.5 inline-flex items-center gap-2"
               >
                 {hero.primaryCta.label}
                 <ArrowRight className="h-4 w-4" />
-              </a>
+              </SmartLink>
               {hero.secondaryCta.label && (
-                <a
-                  href={safeHref(hero.secondaryCta.href)}
+                <SmartLink
+                  href={hero.secondaryCta.href}
                   className="btn-secondary text-base px-7 py-3.5"
                 >
                   {hero.secondaryCta.label}
-                </a>
+                </SmartLink>
               )}
             </div>
 
             {hero.tertiaryCta?.label && (
-              <a
-                href={safeHref(hero.tertiaryCta.href)}
+              <SmartLink
+                href={hero.tertiaryCta.href}
                 className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
               >
                 {hero.tertiaryCta.label}
-              </a>
+              </SmartLink>
             )}
 
             <div className="flex flex-wrap gap-3 pt-2">

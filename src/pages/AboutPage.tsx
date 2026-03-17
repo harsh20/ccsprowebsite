@@ -1,10 +1,11 @@
 import { useEffect } from "react";
 import { ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
-import { mockSiteSettings, mockAboutPage } from "@/content/mockData";
+import { mockAboutPage } from "@/content/mockData";
 import { useAboutPage, useSiteConfig, useMenus } from "@/hooks/useWordPress";
 import { Header } from "@/components/landing/Header";
 import { Footer } from "@/components/landing/Footer";
+import { SmartLink } from "@/components/SmartLink";
+import { buildSiteLayoutData } from "@/lib/siteLayout";
 
 const AboutPage = () => {
   useEffect(() => {
@@ -16,33 +17,7 @@ const AboutPage = () => {
   const { data: menus } = useMenus();
 
   const page = apiData ?? mockAboutPage;
-
-  const headerData = siteConfig?.header
-    ? {
-        logo: siteConfig.header.logoText,
-        logoUrl: siteConfig.header.logoUrl,
-        ctaButton: siteConfig.header.ctaButton,
-        secondaryLink: siteConfig.header.signinLink,
-        primaryNav: menus?.primaryNav ?? mockSiteSettings.header.primaryNav,
-      }
-    : mockSiteSettings.header;
-
-  const [defaultCol1, defaultCol2, defaultCol3] = mockSiteSettings.footer.columns;
-  const footerData = siteConfig?.footer
-    ? {
-        brand: {
-          name: siteConfig.footer.brandName,
-          tagline: siteConfig.footer.tagline,
-        },
-        trustBadges: siteConfig.footer.trustBadges,
-        copyright: siteConfig.footer.copyright,
-        columns: [
-          { title: defaultCol1.title, links: menus?.footerCol1 ?? defaultCol1.links },
-          { title: defaultCol2.title, links: menus?.footerCol2 ?? defaultCol2.links },
-          { title: defaultCol3.title, links: menus?.footerCol3 ?? defaultCol3.links },
-        ],
-      }
-    : mockSiteSettings.footer;
+  const { headerData, footerData } = buildSiteLayoutData(siteConfig, menus);
 
   return (
     <div className="min-h-screen bg-background">
@@ -128,13 +103,13 @@ const AboutPage = () => {
         <section className="py-16 px-4">
           <div className="container mx-auto max-w-3xl text-center space-y-6">
             <p className="text-lg text-muted-foreground">{page.cta.text}</p>
-            <Link
-              to={page.cta.link.href}
+            <SmartLink
+              href={page.cta.link.href}
               className="btn-primary text-base px-7 py-3.5 inline-flex items-center gap-2"
             >
               {page.cta.link.label}
               <ArrowRight className="h-4 w-4" />
-            </Link>
+            </SmartLink>
           </div>
         </section>
       </main>

@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
+import { SmartLink } from "@/components/SmartLink";
 import { footerContent } from "@/content/landing";
 import { getLandingIcon } from "@/lib/landing-icons";
-import { safeHref } from "@/lib/utils";
+import { isInternalHref } from "@/lib/utils";
 import type { LandingPageContent, FooterData } from "@/types/wordpress";
 import ccsLogo from "@/assets/ccs-logo.png";
 
@@ -43,9 +44,9 @@ export function Footer({ content, footerData }: FooterProps) {
             <ul className="space-y-2">
               {data.links.legal.map((link) => (
                 <li key={link.label}>
-                  <a href={safeHref(link.href)} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <SmartLink href={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                     {link.label}
-                  </a>
+                  </SmartLink>
                 </li>
               ))}
             </ul>
@@ -56,9 +57,9 @@ export function Footer({ content, footerData }: FooterProps) {
             <ul className="space-y-2">
               {data.links.support.map((link) => (
                 <li key={link.label}>
-                  <a href={safeHref(link.href)} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <SmartLink href={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                     {link.label}
-                  </a>
+                  </SmartLink>
                 </li>
               ))}
             </ul>
@@ -75,7 +76,7 @@ export function Footer({ content, footerData }: FooterProps) {
 
 function NewFooter({ data }: { data: FooterData }) {
   const renderFooterLink = (link: { label: string; href: string; openInNewTab?: boolean }) => {
-    if (link.href.startsWith("/") && !link.openInNewTab) {
+    if (isInternalHref(link.href) && !link.openInNewTab) {
       return (
         <li key={link.label}>
           <Link
@@ -89,14 +90,13 @@ function NewFooter({ data }: { data: FooterData }) {
     }
     return (
       <li key={link.label}>
-        <a
-          href={safeHref(link.href)}
+        <SmartLink
+          href={link.href}
           className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-          target={link.openInNewTab ? "_blank" : undefined}
-          rel={link.openInNewTab ? "noopener noreferrer" : undefined}
+          openInNewTab={link.openInNewTab}
         >
           {link.label}
-        </a>
+        </SmartLink>
       </li>
     );
   };

@@ -1,5 +1,5 @@
 import { CheckCircle, ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { SmartLink } from "@/components/SmartLink";
 import type { HomePricingCardData } from "@/types/wordpress";
 
 interface HomePricingSectionProps {
@@ -57,27 +57,27 @@ function PricingCard({
         </div>
       )}
 
-      <Link
-        to={card.cta.href}
+      <SmartLink
+        href={card.cta.href}
         className={`w-full text-center mt-auto inline-flex items-center justify-center gap-2 ${
           card.highlighted ? "btn-primary" : "btn-secondary"
         }`}
       >
         {card.cta.label}
         <ArrowRight className="h-4 w-4" />
-      </Link>
+      </SmartLink>
 
       <p className="text-xs text-muted-foreground text-center mt-3">
         {card.finePrint}
       </p>
 
       {card.secondaryLink && (
-        <Link
-          to={card.secondaryLink.href}
+        <SmartLink
+          href={card.secondaryLink.href}
           className="text-sm text-primary font-medium hover:underline text-center mt-2"
         >
           {card.secondaryLink.label}
-        </Link>
+        </SmartLink>
       )}
     </div>
   );
@@ -90,11 +90,11 @@ export function HomePricingSection({ provider, group }: HomePricingSectionProps)
         <div className="grid gap-6 md:grid-cols-2 max-w-4xl mx-auto">
           <PricingCard
             card={provider}
-            note="Most providers pay under $600 total in year one."
+            note={provider.note ?? "Most providers pay under $600 total in year one."}
           />
           <PricingCard
             card={group}
-            note={[
+            note={group.note ?? [
               "One seat = one provider in your roster.",
               "All payer workflows included, no packet fees.",
               "Need more than 50 seats? Let's talk.",

@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-$modules = array('cpt', 'admin', 'cors', 'acf', 'rest-api');
+$modules = array('cpt', 'admin', 'cors', 'acf', 'rest-api', 'importer');
 foreach ($modules as $module) {
     require_once __DIR__ . '/ccspro/' . $module . '.php';
 }

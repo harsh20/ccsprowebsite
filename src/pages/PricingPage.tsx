@@ -1,11 +1,12 @@
 import { useEffect } from "react";
 import { CheckCircle, ArrowRight, Minus, Check } from "lucide-react";
-import { Link } from "react-router-dom";
-import { mockSiteSettings, mockPricingPage } from "@/content/mockData";
+import { mockPricingPage } from "@/content/mockData";
 import { usePricingPage, useSiteConfig, useMenus } from "@/hooks/useWordPress";
 import { Header } from "@/components/landing/Header";
 import { Footer } from "@/components/landing/Footer";
 import { FAQSection } from "@/components/landing/FAQSection";
+import { SmartLink } from "@/components/SmartLink";
+import { buildSiteLayoutData } from "@/lib/siteLayout";
 import type { PricingPlanExtended } from "@/types/wordpress";
 
 const PricingPage = () => {
@@ -18,33 +19,7 @@ const PricingPage = () => {
   const { data: menus } = useMenus();
 
   const page = apiData ?? mockPricingPage;
-
-  const headerData = siteConfig?.header
-    ? {
-        logo: siteConfig.header.logoText,
-        logoUrl: siteConfig.header.logoUrl,
-        ctaButton: siteConfig.header.ctaButton,
-        secondaryLink: siteConfig.header.signinLink,
-        primaryNav: menus?.primaryNav ?? mockSiteSettings.header.primaryNav,
-      }
-    : mockSiteSettings.header;
-
-  const [defaultCol1, defaultCol2, defaultCol3] = mockSiteSettings.footer.columns;
-  const footerData = siteConfig?.footer
-    ? {
-        brand: {
-          name: siteConfig.footer.brandName,
-          tagline: siteConfig.footer.tagline,
-        },
-        trustBadges: siteConfig.footer.trustBadges,
-        copyright: siteConfig.footer.copyright,
-        columns: [
-          { title: defaultCol1.title, links: menus?.footerCol1 ?? defaultCol1.links },
-          { title: defaultCol2.title, links: menus?.footerCol2 ?? defaultCol2.links },
-          { title: defaultCol3.title, links: menus?.footerCol3 ?? defaultCol3.links },
-        ],
-      }
-    : mockSiteSettings.footer;
+  const { headerData, footerData } = buildSiteLayoutData(siteConfig, menus);
 
   return (
     <div className="min-h-screen bg-background">
@@ -122,19 +97,19 @@ const PricingPage = () => {
               {page.finalCta.headline}
             </h2>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <a
+              <SmartLink
                 href={page.finalCta.providerCta.href}
                 className="btn-primary text-base px-7 py-3.5 inline-flex items-center gap-2"
               >
                 {page.finalCta.providerCta.label}
                 <ArrowRight className="h-4 w-4" />
-              </a>
-              <Link
-                to={page.finalCta.groupCta.href}
+              </SmartLink>
+              <SmartLink
+                href={page.finalCta.groupCta.href}
                 className="btn-secondary text-base px-7 py-3.5"
               >
                 {page.finalCta.groupCta.label}
-              </Link>
+              </SmartLink>
             </div>
           </div>
         </section>
@@ -187,25 +162,25 @@ function ExtendedPricingCard({ plan }: { plan: PricingPlanExtended }) {
       )}
 
       <div className="mt-auto space-y-3">
-        <Link
-          to={plan.cta.href}
+        <SmartLink
+          href={plan.cta.href}
           className={`w-full text-center inline-flex items-center justify-center gap-2 ${
             plan.highlighted ? "btn-primary" : "btn-secondary"
           }`}
         >
           {plan.cta.label}
           <ArrowRight className="h-4 w-4" />
-        </Link>
+        </SmartLink>
         <p className="text-xs text-muted-foreground text-center">
           {plan.finePrint}
         </p>
         {plan.secondaryLink && (
-          <Link
-            to={plan.secondaryLink.href}
+          <SmartLink
+            href={plan.secondaryLink.href}
             className="text-sm text-primary font-medium hover:underline text-center block"
           >
             {plan.secondaryLink.label}
-          </Link>
+          </SmartLink>
         )}
       </div>
     </div>

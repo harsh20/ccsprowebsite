@@ -318,6 +318,20 @@ function ccspro_transform_landing_page_to_frontend($post_id) {
         );
     }, $problems);
 
+    $homepage_pain_cards = get_field('homepage_pain_cards', $post_id) ?: array();
+    $homepage_pain_cards = array_values(array_filter(array_map(function ($row) {
+        $title = isset($row['title']) ? $row['title'] : '';
+        $body = isset($row['body']) ? $row['body'] : '';
+        if ($title === '' && $body === '') {
+            return null;
+        }
+        return array(
+            'icon' => isset($row['icon']) ? $row['icon'] : 'Circle',
+            'title' => $title,
+            'body' => $body,
+        );
+    }, $homepage_pain_cards)));
+
     $how_steps = get_field('how_it_works_steps', $post_id) ?: array();
     $how_steps = array_map(function ($row) {
         return array(
@@ -404,6 +418,22 @@ function ccspro_transform_landing_page_to_frontend($post_id) {
         return isset($row['note_text']) ? $row['note_text'] : '';
     }, $group_notes)));
 
+    $home_support_channels = get_field('home_support_channels', $post_id) ?: array();
+    $home_support_channels = array_values(array_filter(array_map(function ($row) {
+        $title = isset($row['title']) ? $row['title'] : '';
+        $description = isset($row['description']) ? $row['description'] : '';
+        $link = isset($row['link']) ? $row['link'] : '';
+        if ($title === '' && $description === '' && $link === '') {
+            return null;
+        }
+        return array(
+            'icon' => isset($row['icon']) ? $row['icon'] : 'Circle',
+            'title' => $title,
+            'description' => $description,
+            'link' => $link,
+        );
+    }, $home_support_channels)));
+
     $pricing_content = array(
         'sectionTitle' => get_field('pricing_section_title', $post_id) ?: 'Simple pricing. No surprises.',
         'sectionSubtitle' => get_field('pricing_section_subtitle', $post_id) ?: "Whether you're a solo provider or managing a 50-person group...",
@@ -413,7 +443,7 @@ function ccspro_transform_landing_page_to_frontend($post_id) {
             'priceSub' => get_field('provider_price_sub', $post_id) ?: '+ $60 per packet generated',
             'bullets' => $provider_bullets,
             'cta' => array(
-                'label' => get_field('provider_cta_label', $post_id) ?: 'Get Started — $99/year',
+                'label' => get_field('provider_cta_label', $post_id) ?: 'Get Started - $99/year',
                 'href' => get_field('provider_cta_href', $post_id) ?: '#',
             ),
             'finePrint' => get_field('provider_fine_print', $post_id) ?: 'No contracts. Cancel anytime.',
@@ -432,7 +462,7 @@ function ccspro_transform_landing_page_to_frontend($post_id) {
             'finePrint' => get_field('group_fine_print', $post_id) ?: "Up to 50 seats. More than 50? Let's talk.",
             'notes' => $group_notes,
             'secondaryLink' => array(
-                'label' => get_field('group_secondary_link_label', $post_id) ?: 'See full feature comparison →',
+                'label' => get_field('group_secondary_link_label', $post_id) ?: 'See full feature comparison ->',
                 'href' => get_field('group_secondary_link_href', $post_id) ?: '/pricing',
             ),
             'highlighted' => (bool) get_field('group_highlighted', $post_id),
@@ -528,6 +558,12 @@ function ccspro_transform_landing_page_to_frontend($post_id) {
             'quote' => get_field('founder_quote', $post_id) ?: '',
             'bullets' => $founder_bullets,
         ),
+        'painPointContent' => array(
+            'sectionLabel' => get_field('homepage_pain_section_label', $post_id) ?: 'The Problem',
+            'headline' => get_field('homepage_pain_headline', $post_id) ?: '',
+            'cards' => $homepage_pain_cards,
+            'summaryText' => get_field('homepage_pain_summary_text', $post_id) ?: '',
+        ),
         'problemOutcomeContent' => array(
             'problems' => $problems,
             'outcomeText' => array(
@@ -597,11 +633,41 @@ function ccspro_transform_landing_page_to_frontend($post_id) {
             ),
         ),
         'pricingContent' => $pricing_content,
+        'ctaBlockA' => array(
+            'headline' => get_field('homepage_cta_a_headline', $post_id) ?: '',
+            'subheadline' => get_field('homepage_cta_a_subheadline', $post_id) ?: '',
+            'primaryCta' => array(
+                'label' => get_field('homepage_cta_a_primary_label', $post_id) ?: '',
+                'href' => get_field('homepage_cta_a_primary_href', $post_id) ?: '#',
+            ),
+            'secondaryCta' => array(
+                'label' => get_field('homepage_cta_a_secondary_label', $post_id) ?: '',
+                'href' => get_field('homepage_cta_a_secondary_href', $post_id) ?: '#',
+            ),
+            'style' => get_field('homepage_cta_a_style', $post_id) ?: 'indigo',
+        ),
+        'ctaBlockB' => array(
+            'headline' => get_field('homepage_cta_b_headline', $post_id) ?: '',
+            'subheadline' => get_field('homepage_cta_b_subheadline', $post_id) ?: '',
+            'primaryCta' => array(
+                'label' => get_field('homepage_cta_b_primary_label', $post_id) ?: '',
+                'href' => get_field('homepage_cta_b_primary_href', $post_id) ?: '#',
+            ),
+            'secondaryCta' => array(
+                'label' => get_field('homepage_cta_b_secondary_label', $post_id) ?: '',
+                'href' => get_field('homepage_cta_b_secondary_href', $post_id) ?: '#',
+            ),
+            'style' => get_field('homepage_cta_b_style', $post_id) ?: 'emerald',
+        ),
         'supportContent' => array(
             'sectionTitle' => get_field('support_title', $post_id) ?: "We're here when you need us",
             'sectionSubtitle' => get_field('support_subtitle', $post_id) ?: '',
             'features' => $support_features,
             'links' => $support_links,
+        ),
+        'homeSupportContent' => array(
+            'headline' => get_field('home_support_headline', $post_id) ?: '',
+            'channels' => $home_support_channels,
         ),
         'teamContent' => array(
             'sectionTitle' => get_field('team_title', $post_id) ?: 'The team behind CCS Pro',

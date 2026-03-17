@@ -73,9 +73,9 @@ export const mockHomePage: HomePageContent = {
     headlineHighlight: "Done Once.",
     headlineSuffix: "Ready Always.",
     subheadline:
-      "CCS Pro lets Texas providers build their credentialing profile once and hand it off anywhere — in under 10 minutes.",
-    primaryCta: { label: "Start as a Provider — $99/year", href: "/pricing#provider" },
-    secondaryCta: { label: "I manage a group or facility →", href: "/pricing#groups" },
+      "CCS Pro lets Texas providers build their credentialing profile once and hand it off anywhere - in under 10 minutes.",
+    primaryCta: { label: "Start as a Provider - $99/year", href: "/pricing#provider" },
+    secondaryCta: { label: "I manage a group or facility ->", href: "/pricing#groups" },
     tertiaryCta: { label: "", href: "" },
     trustIndicators: [
       { icon: "Shield", text: "HIPAA Compliant" },
@@ -166,7 +166,7 @@ export const mockHomePage: HomePageContent = {
         step: "02",
         title: "Track Roster Compliance",
         description:
-          "Your dashboard shows real-time status across every provider — who's current, who has expiring documents, who hasn't completed their profile.",
+          "Your dashboard shows real-time status across every provider - who's current, who has expiring documents, who hasn't completed their profile.",
       },
       {
         icon: "ClipboardCheck",
@@ -207,7 +207,7 @@ export const mockHomePage: HomePageContent = {
     headline: "Providers: your profile is 10 minutes away.",
     subheadline: "Build it once. Use it for your entire career.",
     primaryCta: { label: "Start for $99/year", href: "/pricing#provider" },
-    secondaryCta: { label: "See how it works →", href: "#how-it-works" },
+    secondaryCta: { label: "See how it works ->", href: "#how-it-works" },
     style: "indigo",
   },
   pricing: {
@@ -334,7 +334,7 @@ export const mockPricingPage: PricingPageContent = {
       "E-signature via SignNow",
       "Packet generation on demand",
     ],
-    cta: { label: "Get Started — $99/year", href: "#" },
+    cta: { label: "Get Started - $99/year", href: "#" },
     finePrint: "No contracts. Cancel anytime.",
     highlighted: false,
     extras: ["Most providers pay under $600 total in year one."],
@@ -352,7 +352,7 @@ export const mockPricingPage: PricingPageContent = {
     cta: { label: "Talk to Us", href: "/contact" },
     finePrint: "Up to 50 seats. More than 50? Let's talk.",
     highlighted: true,
-    secondaryLink: { label: "See full feature comparison →", href: "#comparison" },
+    secondaryLink: { label: "See full feature comparison ->", href: "#comparison" },
     extras: [
       "One seat = one provider in your roster",
       "All payer workflows included, no packet fees.",
@@ -432,7 +432,7 @@ export const mockPricingPage: PricingPageContent = {
   },
   finalCta: {
     headline: "Ready to stop rebuilding from scratch?",
-    providerCta: { label: "Start as a Provider — $99/year", href: "#" },
+    providerCta: { label: "Start as a Provider - $99/year", href: "#" },
     groupCta: { label: "Talk to Us About Group Pricing", href: "/contact" },
   },
 };
@@ -448,7 +448,7 @@ export const mockAboutPage: AboutPageContent = {
       "CCS Pro started because the credentialing process in Texas is still largely manual, repetitive, and broken. We're fixing that.",
   },
   mission:
-    "Our mission is to give every Texas provider a portable, always-ready credentialing profile they own completely — and give every group and facility the compliance infrastructure to manage their roster without the chaos.",
+    "Our mission is to give every Texas provider a portable, always-ready credentialing profile they own completely - and give every group and facility the compliance infrastructure to manage their roster without the chaos.",
   whyTexas: {
     paragraph:
       "Texas has one of the largest and most complex provider markets in the country. The LHL234 (Texas Standardized Credentialing Application) is required by every payer and facility in the state, yet the process of filling it out, keeping it current, and submitting it to multiple organizations remains almost entirely manual. CCS Pro was built from day one around the Texas credentialing landscape.",
@@ -462,7 +462,7 @@ export const mockAboutPage: AboutPageContent = {
     {
       title: "Provider-first portability",
       description:
-        "Your profile belongs to you, not your group. Switch employers, add new facilities, or go independent — your credentials follow you.",
+        "Your profile belongs to you, not your group. Switch employers, add new facilities, or go independent - your credentials follow you.",
     },
     {
       title: "Texas-native",
@@ -497,7 +497,7 @@ export const mockContactPage: ContactPageContent = {
   contactInfo: {
     email: "support@ccsprocert.com",
     responseTime: "We respond within one business day.",
-    businessHours: "Monday – Friday, 9 AM – 5 PM CT",
+    businessHours: "Monday - Friday, 9 AM - 5 PM CT",
   },
   groupCallout: {
     headline: "Evaluating CCS Pro for your group or facility?",

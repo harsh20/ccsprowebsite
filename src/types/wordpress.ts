@@ -277,6 +277,7 @@ export interface LandingPageContent {
   navCtas: NavCtas;
   heroContent: HeroContent;
   heroDashboard: HeroDashboard;
+  painPointContent?: PainPointContent;
   verificationContent: VerificationContent;
   founderContent: FounderContent;
   problemOutcomeContent: ProblemOutcomeContent;
@@ -287,9 +288,12 @@ export interface LandingPageContent {
   caqhConciergeContent: CAQHConciergeContent;
   pricingContent: PricingContent | PricingContentV2;
   supportContent: SupportContent;
+  homeSupportContent?: SupportSectionContent;
   teamContent: TeamContent;
   faqContent: FaqContent;
   finalCtaContent: FinalCtaContent;
+  ctaBlockA?: CtaBlockContent;
+  ctaBlockB?: CtaBlockContent;
   ecosystemContent?: EcosystemContent;
   footerContent?: FooterContent;
 }
@@ -375,6 +379,7 @@ export interface HomePricingCardData {
   finePrint: string;
   highlighted: boolean;
   secondaryLink?: CtaLink;
+  note?: string | string[];
 }
 
 export interface CtaBlockContent {

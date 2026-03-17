@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Mail, Clock, Send, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
-import { mockSiteSettings, mockContactPage } from "@/content/mockData";
+import { mockContactPage } from "@/content/mockData";
 import { useContactPage, useSiteConfig, useMenus, useSubmitContact } from "@/hooks/useWordPress";
 import { Header } from "@/components/landing/Header";
 import { Footer } from "@/components/landing/Footer";
+import { buildSiteLayoutData } from "@/lib/siteLayout";
 
 const ContactPage = () => {
   useEffect(() => {
@@ -15,33 +16,7 @@ const ContactPage = () => {
   const { data: menus } = useMenus();
 
   const page = apiData ?? mockContactPage;
-
-  const headerData = siteConfig?.header
-    ? {
-        logo: siteConfig.header.logoText,
-        logoUrl: siteConfig.header.logoUrl,
-        ctaButton: siteConfig.header.ctaButton,
-        secondaryLink: siteConfig.header.signinLink,
-        primaryNav: menus?.primaryNav ?? mockSiteSettings.header.primaryNav,
-      }
-    : mockSiteSettings.header;
-
-  const [defaultCol1, defaultCol2, defaultCol3] = mockSiteSettings.footer.columns;
-  const footerData = siteConfig?.footer
-    ? {
-        brand: {
-          name: siteConfig.footer.brandName,
-          tagline: siteConfig.footer.tagline,
-        },
-        trustBadges: siteConfig.footer.trustBadges,
-        copyright: siteConfig.footer.copyright,
-        columns: [
-          { title: defaultCol1.title, links: menus?.footerCol1 ?? defaultCol1.links },
-          { title: defaultCol2.title, links: menus?.footerCol2 ?? defaultCol2.links },
-          { title: defaultCol3.title, links: menus?.footerCol3 ?? defaultCol3.links },
-        ],
-      }
-    : mockSiteSettings.footer;
+  const { headerData, footerData } = buildSiteLayoutData(siteConfig, menus);
 
   const [formData, setFormData] = useState({
     name: "",

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { SmartLink } from "@/components/SmartLink";
 import { navLinks, navCtas, siteConfig } from "@/content/landing";
-import { safeHref } from "@/lib/utils";
 import type { LandingPageContent, HeaderData } from "@/types/wordpress";
 import ccsLogo from "@/assets/ccs-logo.png";
 
@@ -13,13 +13,7 @@ interface HeaderProps {
 
 export function Header({ content, headerData }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  let location: { pathname: string } = { pathname: "/" };
-  try {
-    location = useLocation();
-  } catch {
-    // Outside router context (e.g. legacy usage) — default to "/"
-  }
+  const location = useLocation();
 
   const isHomepage = location.pathname === "/";
 
@@ -64,7 +58,7 @@ export function Header({ content, headerData }: HeaderProps) {
     const target = link.openInNewTab ? "_blank" : undefined;
     const rel = link.openInNewTab ? "noopener noreferrer" : undefined;
 
-    if (link.href.startsWith("/") && !link.openInNewTab) {
+    if (link.href.startsWith("/") && !link.openInNewTab && !link.href.includes("#")) {
       return (
         <Link
           key={link.label}
@@ -78,16 +72,15 @@ export function Header({ content, headerData }: HeaderProps) {
     }
 
     return (
-      <a
+      <SmartLink
         key={link.label}
-        href={safeHref(link.href)}
+        href={link.href}
         className={`${className}${activeClass}`}
-        target={target}
-        rel={rel}
+        openInNewTab={Boolean(target)}
         onClick={onClick}
       >
         {link.label}
-      </a>
+      </SmartLink>
     );
   };
 
@@ -126,12 +119,12 @@ export function Header({ content, headerData }: HeaderProps) {
         </div>
 
         <div className="hidden lg:flex items-center gap-3">
-          <a href={safeHref(signInHref)} className="btn-ghost">
+          <SmartLink href={signInHref} className="btn-ghost">
             {signInLabel}
-          </a>
-          <a href={safeHref(ctaHref)} className="btn-primary">
+          </SmartLink>
+          <SmartLink href={ctaHref} className="btn-primary">
             {ctaLabel}
-          </a>
+          </SmartLink>
         </div>
 
         <button
@@ -158,17 +151,17 @@ export function Header({ content, headerData }: HeaderProps) {
               ),
             )}
             <div className="flex items-center justify-between pt-3 border-t border-border mt-3">
-              <a href={safeHref(signInHref)} className="btn-ghost">
+              <SmartLink href={signInHref} className="btn-ghost">
                 {signInLabel}
-              </a>
+              </SmartLink>
             </div>
-            <a
-              href={safeHref(ctaHref)}
+            <SmartLink
+              href={ctaHref}
               className="btn-primary w-full text-center mt-2"
               onClick={() => setMobileMenuOpen(false)}
             >
               {ctaLabel}
-            </a>
+            </SmartLink>
           </div>
         </div>
       )}

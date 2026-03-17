@@ -1,5 +1,5 @@
 import { ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { SmartLink } from "@/components/SmartLink";
 import { finalCtaContent } from "@/content/landing";
 import { safeHref } from "@/lib/utils";
 import type { LandingPageContent, CtaBlockContent } from "@/types/wordpress";
@@ -58,11 +58,11 @@ function CtaBlock({ data }: { data: CtaBlockContent }) {
         : "inline-flex items-center justify-center rounded-full bg-white px-6 py-3 font-semibold text-emerald-700 hover:bg-emerald-50 transition-colors"
       : "inline-flex items-center text-white underline underline-offset-4 text-sm font-medium";
 
-    if (cta.href.startsWith("/")) {
+    if (cta.href.startsWith("/") && !cta.href.includes("#")) {
       return (
-        <Link to={cta.href} className={baseClass}>
+        <SmartLink href={cta.href} className={baseClass}>
           {cta.label}
-        </Link>
+        </SmartLink>
       );
     }
 
