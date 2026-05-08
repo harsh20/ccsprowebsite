@@ -5,7 +5,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { getContentProvider } from "@/content/providers";
-import PasswordGate from "@/components/PasswordGate";
 import HomePage from "./pages/HomePage";
 import Index from "./pages/Index";
 import PricingPage from "./pages/PricingPage";
@@ -48,31 +47,28 @@ const App = () => {
   }, []);
 
   return (
-    <PasswordGate>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          {comingSoon === null ? (
-            // Loading splash — avoids flashing <ComingSoon /> while API is in flight
-            <div className="min-h-screen bg-background" />
-          ) : comingSoon ? (
-            <ComingSoon />
-          ) : (
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/pricing" element={<PricingPage />} />
-                <Route path="/about" element={<AboutPage />} />
-                <Route path="/contact" element={<ContactPage />} />
-                <Route path="/:slug" element={<Index />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          )}
-        </TooltipProvider>
-      </QueryClientProvider>
-    </PasswordGate>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        {comingSoon === null ? (
+          <div className="min-h-screen bg-background" />
+        ) : comingSoon ? (
+          <ComingSoon />
+        ) : (
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/pricing" element={<PricingPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/:slug" element={<Index />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        )}
+      </TooltipProvider>
+    </QueryClientProvider>
   );
 };
 
