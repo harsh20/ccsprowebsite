@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Mail, Clock, Send, CheckCircle, AlertCircle, Loader2, ArrowRight } from "lucide-react";
+import { Mail, Phone, Clock, Send, CheckCircle, AlertCircle, Loader2, ArrowRight } from "lucide-react";
 import { SmartLink } from "@/components/SmartLink";
 import { mockContactPage } from "@/content/mockData";
 import { useContactPage, useSiteConfig, useMenus, useSubmitContact } from "@/hooks/useWordPress";
@@ -225,6 +225,23 @@ const ContactPage = () => {
                       </a>
                     </div>
                   </div>
+
+                  {page.contactInfo.phone && (
+                    <div className="flex items-start gap-4">
+                      <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <Phone className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-foreground">Phone</h3>
+                        <a
+                          href={`tel:${page.contactInfo.phone.replace(/[^+\d]/g, "")}`}
+                          className="text-sm text-primary hover:underline"
+                        >
+                          {page.contactInfo.phone}
+                        </a>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="flex items-start gap-4">
                     <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">

@@ -79,7 +79,7 @@ Named routes (`/pricing`, `/about`, `/contact`) must be defined before `/:slug` 
 ### 2.6 Contact page sections
 
 1. **Hero** — "Get in touch."
-2. **Two-column layout** — Left: contact form (Name, Email, "I am a" dropdown, Message, Submit). Right: direct contact info (email, response time, business hours).
+2. **Two-column layout** — Left: contact form (Name, Email, "I am a" dropdown, Message, Submit). Right: direct contact info (email, phone, response time, business hours).
 3. **Group callout** — Highlighted box for group/facility evaluations.
 
 ### 2.7 Legacy landing page (`/:slug`)

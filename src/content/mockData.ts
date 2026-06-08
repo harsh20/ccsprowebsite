@@ -496,6 +496,7 @@ export const mockContactPage: ContactPageContent = {
   },
   contactInfo: {
     email: "support@ccsprocert.com",
+    phone: "+1 210-315-6322",
     responseTime: "We respond within one business day.",
     businessHours: "Monday - Friday, 9 AM - 5 PM CT",
   },

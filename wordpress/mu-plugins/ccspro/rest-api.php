@@ -879,6 +879,7 @@ function ccspro_rest_get_contact_page($request) {
         ),
         'contactInfo' => array(
             'email' => get_field('contact_email', 'option') ?: '',
+            'phone' => get_field('contact_phone', 'option') ?: '',
             'responseTime' => get_field('contact_response_time', 'option') ?: '',
             'businessHours' => get_field('contact_business_hours', 'option') ?: '',
         ),

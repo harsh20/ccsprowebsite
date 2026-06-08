@@ -128,6 +128,7 @@ function ccspro_import_named_page_options($data) {
     update_field('contact_hero_subheadline', $contact['hero']['subheadline'], 'option');
     update_field('contact_role_options', ccspro_import_rows_from_strings($contact['formFields']['roleOptions'], 'option_text'), 'option');
     update_field('contact_email', $contact['contactInfo']['email'], 'option');
+    update_field('contact_phone', $contact['contactInfo']['phone'] ?? '', 'option');
     update_field('contact_response_time', $contact['contactInfo']['responseTime'], 'option');
     update_field('contact_business_hours', $contact['contactInfo']['businessHours'], 'option');
     update_field('contact_group_callout_headline', $contact['groupCallout']['headline'], 'option');
@@ -374,6 +375,7 @@ function ccspro_get_mock_contact_page_data() {
         ),
         'contactInfo' => array(
             'email' => 'support@ccsprocert.com',
+            'phone' => '+1 210-315-6322',
             'responseTime' => 'We respond within one business day.',
             'businessHours' => 'Monday - Friday, 9 AM - 5 PM CT',
         ),

@@ -1270,6 +1270,7 @@ function ccspro_get_field_group_config() {
 
                 array('key' => 'field_contact_tab_info', 'label' => 'Contact Info', 'type' => 'tab', 'placement' => 'top'),
                 array('key' => 'field_contact_email', 'label' => 'Email', 'name' => 'contact_email', 'type' => 'email'),
+                array('key' => 'field_contact_phone', 'label' => 'Phone Number', 'name' => 'contact_phone', 'type' => 'text', 'placeholder' => '+1 210-315-6322'),
                 array('key' => 'field_contact_response_time', 'label' => 'Response Time', 'name' => 'contact_response_time', 'type' => 'text'),
                 array('key' => 'field_contact_business_hours', 'label' => 'Business Hours', 'name' => 'contact_business_hours', 'type' => 'text'),
 

@@ -2,6 +2,12 @@
 
 All notable changes to this repository are documented in this file.
 
+## 2026-06-08 (contact phone number)
+
+### Added
+- `contact_phone` ACF text field on the Contact Page options screen (Contact Info tab), exposed via `GET /ccspro/v1/page/contact` in `contactInfo.phone`.
+- Phone number block on the contact page UI with clickable `tel:` link — conditionally hidden when the field is empty in WordPress.
+
 ## 2026-03-17 (button link field fixes)
 
 ### Added

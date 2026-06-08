@@ -467,6 +467,7 @@ export interface ContactPageContent {
   };
   contactInfo: {
     email: string;
+    phone: string;
     responseTime: string;
     businessHours: string;
   };
